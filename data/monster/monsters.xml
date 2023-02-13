@@ -1085,4 +1085,8 @@
 	<monster name="Zugurosh" file="monsters/zugurosh.xml" />
 	<monster name="Zulazza The Corruptor" file="monsters/zulazza_the_corruptor.xml" />
 	<monster name="Zushuka" file="monsters/zushuka.xml" />
+	<monster name="Mage Minion" file="monsters/minions/mage_minion.xml" />
+	<monster name="Warrior Minion" file="monsters/minions/warrior_minion.xml" />
+	<monster name="Siege Minion" file="monsters/minions/siege_minion.xml" />
+	<monster name="Super Minion" file="monsters/minions/super_minion.xml" />
 </monsters>

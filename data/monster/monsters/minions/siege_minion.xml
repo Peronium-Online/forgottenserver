@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Siege Minion" nameDescription="a siege minion" race="undead" experience="350" speed="200">
+	<health now="250" max="250" />
+	<look type="50" corpse="5996" />
+	<targetchange interval="4000" chance="20" />
+	<flags>
+		<flag summonable="0" />
+		<flag attackable="1" />
+		<flag hostile="1" />
+		<flag illusionable="0" />
+		<flag convinceable="0" />
+		<flag pushable="0" />
+		<flag canpushitems="1" />
+		<flag canpushcreatures="1" />
+		<flag targetdistance="2" />
+		<flag staticattack="70" />
+		<flag runonhealth="0" />
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="0" max="-125" />
+		<attack name="energy" interval="2000" chance="50" range="5" min="-80" max="-150">
+			<attribute key="shootEffect" value="energy" />
+		</attack>
+        <attack name="physical" interval="2000" chance="50" range="5" min="-80" max="-150">
+			<attribute key="shootEffect" value="spear" />
+		</attack>
+	</attacks>
+	<defenses armor="35" defense="40">
+		<defense name="healing" interval="2000" chance="15" min="10" max="50">
+			<attribute key="areaEffect" value="blueshimmer" />
+		</defense>
+	</defenses>
+	<immunities>
+		<immunity drown="1" />
+		<immunity paralyze="1" />
+		<immunity invisible="1" />
+	</immunities>
+	<voices interval="5000" chance="10">
+		<voice sentence="Your resistance is futile!" />
+	</voices>
+	<loot>
+		<item id="2148" name="gold coin" countmax="3" />
+	</loot>
+</monster>
