@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Super Minion" nameDescription="a super minion" race="undead" experience="700" speed="200">
+	<health now="600" max="600" />
+	<look type="935" head="94" body="1" legs="80" feet="94" corpse="27730" />
+	<targetchange interval="4000" chance="20" />
+	<flags>
+		<flag summonable="0" />
+		<flag attackable="1" />
+		<flag hostile="1" />
+		<flag illusionable="0" />
+		<flag convinceable="0" />
+		<flag pushable="0" />
+		<flag canpushitems="1" />
+		<flag canpushcreatures="1" />
+		<flag targetdistance="1" />
+		<flag staticattack="70" />
+		<flag runonhealth="0" />
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="0" max="-250" />
+		<attack name="energy" interval="2000" chance="50" range="5" min="-100" max="-300">
+			<attribute key="shootEffect" value="energy" />
+		</attack>
+	</attacks>
+	<defenses armor="35" defense="40">
+		<defense name="healing" interval="2000" chance="15" min="10" max="150">
+			<attribute key="areaEffect" value="blueshimmer" />
+		</defense>
+	</defenses>
+	<immunities>
+		<immunity drown="1" />
+		<immunity paralyze="1" />
+		<immunity invisible="1" />
+	</immunities>
+	<voices interval="5000" chance="10">
+		<voice sentence="Your resistance is futile!" />
+	</voices>
+	<loot>
+		<item id="2148" name="gold coin" countmax="10" />
+	</loot>
+</monster>
