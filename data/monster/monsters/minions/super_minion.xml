@@ -4,7 +4,8 @@
 	<look type="935" head="94" body="1" legs="80" feet="94" corpse="27730" />
 	<targetchange interval="4000" chance="20" />
 	<targetseeks>
-		<targetseek cid="bazir" priority="5" />
+		<targetseek cid="wolf" priority="5" />
+		<targetseek cid="rabbit" priority="5" />
 	</targetseeks>
 	<flags>
 		<flag summonable="0" />

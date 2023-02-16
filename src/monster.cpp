@@ -387,7 +387,7 @@ void Monster::updateTargetList()
 
 		for (auto target : mType->info.targetSeeks) {
 			auto creature = g_game.getCreatureByName(target.cid);
-			if (creature) {
+			if (creature && !creature->isDead()) {
 				onCreatureFound(creature, true);
 			}
 		}
@@ -471,6 +471,10 @@ bool Monster::isFriend(const Creature* creature) const
 
 bool Monster::isSeekTarget(const Creature* creature) const
 {
+	if (creature == nullptr || creature->isDead()) {
+		return false;
+	}
+
 	auto lowerCasedName = boost::algorithm::to_lower_copy(creature->getName());
 	if (mType->info.targetSeeks.size() > 0) {
 		for (auto target : mType->info.targetSeeks) {
@@ -506,8 +510,6 @@ bool Monster::isOpponent(const Creature* creature) const
 
 void Monster::onCreatureLeave(Creature* creature)
 {
-	// std::cout << "onCreatureLeave - " << creature->getName() << std::endl;
-
 	if (getMaster() == creature) {
 		// Take random steps and only use defense abilities (e.g. heal) until its master comes back
 		isMasterInRange = false;
@@ -663,7 +665,7 @@ BlockType_t Monster::blockHit(Creature* attacker, CombatType_t combatType, int32
 bool Monster::isTarget(const Creature* creature) const
 {
 	if ((creature->isRemoved() || !creature->isAttackable() || creature->getZone() == ZONE_PROTECTION ||
-	    !canSeeCreature(creature) && !isSeekTarget(creature))) {
+	    !canSeeCreature(creature)) && !isSeekTarget(creature)) {
 		return false;
 	}
 
