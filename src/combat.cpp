@@ -10,6 +10,7 @@
 #include "game.h"
 #include "spectators.h"
 #include "weapons.h"
+#include "monster.h"
 
 extern Game g_game;
 extern Weapons* g_weapons;
@@ -379,9 +380,10 @@ ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
 				return RETURNVALUE_ACTIONNOTPERMITTEDINANOPVPZONE;
 			}
 		} else if (attacker->getMonster()) {
+			const Monster* attackerMonster = attacker->getMonster();
 			const Creature* targetMaster = target->getMaster();
 
-			if (!targetMaster || !targetMaster->getPlayer()) {
+			if ((!targetMaster || !targetMaster->getPlayer()) && !attackerMonster->isSeekTarget(target)) {
 				const Creature* attackerMaster = attacker->getMaster();
 
 				if (!attackerMaster || !attackerMaster->getPlayer()) {

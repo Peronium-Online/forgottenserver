@@ -1361,6 +1361,28 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 		}
 	}
 
+	if ((node = monsterNode.child("targetseeks"))) {
+		for (auto targetSeekNode : node.children()) {
+			uint32_t priority = 1;
+
+			if ((attr = targetSeekNode.attribute("priority"))) {
+				priority = pugi::cast<uint32_t>(attr.value());
+			}
+
+			if ((attr = targetSeekNode.attribute("cid"))) {
+				std::string cid = attr.as_string();
+
+				targetSeekBlock_t targetSeek;
+				targetSeek.cid = cid;
+				targetSeek.priority = priority;
+
+				mType->info.targetSeeks.emplace_back(targetSeek);
+			} else {
+				std::cout << "[Warning - Monsters::loadMonster] Missing target to seek cid(name). " << file << std::endl;
+			}
+		}
+	}
+
 	if ((node = monsterNode.child("script"))) {
 		for (auto eventNode : node.children()) {
 			if ((attr = eventNode.attribute("name"))) {
@@ -1377,6 +1399,7 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 	mType->info.defenseSpells.shrink_to_fit();
 	mType->info.voiceVector.shrink_to_fit();
 	mType->info.scripts.shrink_to_fit();
+	mType->info.targetSeeks.shrink_to_fit();
 	return mType;
 }
 

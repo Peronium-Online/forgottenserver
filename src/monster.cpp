@@ -332,7 +332,7 @@ void Monster::removeFriend(Creature* creature)
 void Monster::addTarget(Creature* creature, bool pushFront /* = false*/)
 {
 	assert(creature != this);
-	if (std::find(targetList.begin(), targetList.end(), creature) == targetList.end()) {
+	if (std::find(targetList.begin(), targetList.end(), creature) == targetList.end() || isSeekTarget(creature)) {
 		creature->incrementReferenceCounter();
 		if (pushFront) {
 			targetList.push_front(creature);
@@ -381,6 +381,17 @@ void Monster::updateTargetList()
 	for (Creature* spectator : spectators) {
 		onCreatureFound(spectator);
 	}
+
+	if (mType->info.targetSeeks.size() > 0) {
+		std::list<Creature*> seeks;
+
+		for (auto target : mType->info.targetSeeks) {
+			auto creature = g_game.getCreatureByName(target.cid);
+			if (creature) {
+				onCreatureFound(creature, true);
+			}
+		}
+	}
 }
 
 void Monster::clearTargetList()
@@ -405,7 +416,7 @@ void Monster::onCreatureFound(Creature* creature, bool pushFront /* = false*/)
 		return;
 	}
 
-	if (!canSee(creature->getPosition())) {
+	if (!canSee(creature->getPosition()) && !isSeekTarget(creature)) {
 		return;
 	}
 
@@ -451,8 +462,23 @@ bool Monster::isFriend(const Creature* creature) const
 		if (tmpPlayer && (tmpPlayer == getMaster() || masterPlayer->isPartner(tmpPlayer))) {
 			return true;
 		}
-	} else if (creature->getMonster() && !creature->isSummon()) {
+	} else if (creature->getMonster() && !creature->isSummon() && !isSeekTarget(creature)) {
 		return true;
+	}
+
+	return false;
+}
+
+bool Monster::isSeekTarget(const Creature* creature) const
+{
+	auto lowerCasedName = boost::algorithm::to_lower_copy(creature->getName());
+	if (mType->info.targetSeeks.size() > 0) {
+		for (auto target : mType->info.targetSeeks) {
+			auto lowerCasedTarget = boost::algorithm::to_lower_copy(target.cid);
+			if (lowerCasedName.compare(lowerCasedTarget) == 0) {
+				return true;
+			}
+		}
 	}
 
 	return false;
@@ -460,6 +486,10 @@ bool Monster::isFriend(const Creature* creature) const
 
 bool Monster::isOpponent(const Creature* creature) const
 {
+	if (isSeekTarget(creature)) {
+		return true;
+	}
+
 	if (isSummon() && getMaster()->getPlayer()) {
 		if (creature != getMaster()) {
 			return true;
@@ -632,8 +662,8 @@ BlockType_t Monster::blockHit(Creature* attacker, CombatType_t combatType, int32
 
 bool Monster::isTarget(const Creature* creature) const
 {
-	if (creature->isRemoved() || !creature->isAttackable() || creature->getZone() == ZONE_PROTECTION ||
-	    !canSeeCreature(creature)) {
+	if ((creature->isRemoved() || !creature->isAttackable() || creature->getZone() == ZONE_PROTECTION ||
+	    !canSeeCreature(creature) && !isSeekTarget(creature))) {
 		return false;
 	}
 

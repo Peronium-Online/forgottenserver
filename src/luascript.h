@@ -1324,6 +1324,8 @@ private:
 	static int luaMonsterTypeGetAttackList(lua_State* L);
 	static int luaMonsterTypeAddAttack(lua_State* L);
 
+	static int luaMonsterTypeAddTargetSeek(lua_State* L);
+
 	static int luaMonsterTypeGetDefenseList(lua_State* L);
 	static int luaMonsterTypeAddDefense(lua_State* L);
 

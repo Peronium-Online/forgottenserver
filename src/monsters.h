@@ -56,6 +56,12 @@ struct summonBlock_t
 	bool force = false;
 };
 
+struct targetSeekBlock_t
+{
+	std::string cid;
+	uint32_t priority = 1;
+};
+
 class BaseSpell;
 struct spellBlock_t
 {
@@ -107,6 +113,7 @@ class MonsterType
 		std::vector<spellBlock_t> attackSpells;
 		std::vector<spellBlock_t> defenseSpells;
 		std::vector<summonBlock_t> summons;
+		std::vector<targetSeekBlock_t> targetSeeks;
 
 		Skulls_t skull = SKULL_NONE;
 		Outfit_t outfit = {};

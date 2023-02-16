@@ -14358,6 +14358,36 @@ int LuaScriptInterface::luaMonsterTypeAddAttack(lua_State* L)
 	return 1;
 }
 
+int LuaScriptInterface::luaMonsterTypeAddTargetSeek(lua_State* L)
+{
+	std::cout << "Adding a new target to SEEK!!!" << std::endl;
+	//monsterType::addTargetSeek(creature, priority)
+	MonsterType* monsterType = getUserdata<MonsterType>(L, 1);
+	if (monsterType) {
+		std::cout << "Monster Type found!!! " << monsterType->name << std::endl;
+		Creature* creature = getUserdata<Creature>(L, 2);
+		uint32_t priority = getNumber<uint32_t>(L, 3);
+
+		if (creature) {
+			std::cout << "Creature found!!! " << creature->getName() << std::endl;
+
+
+			targetSeekBlock_t targetSeek;
+			targetSeek.cid = creature->getID();
+			targetSeek.priority = priority;
+			monsterType->info.targetSeeks.push_back(targetSeek);
+			pushBoolean(L, true);
+		} else {
+			lua_pushnil(L);
+		}
+
+	} else {
+		lua_pushnil(L);
+	}
+
+	return 1;
+}
+
 int LuaScriptInterface::luaMonsterTypeGetDefenseList(lua_State* L)
 {
 	// monsterType:getDefenseList()
