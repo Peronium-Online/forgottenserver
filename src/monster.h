@@ -113,6 +113,7 @@ public:
 	const CreatureHashSet& getFriendList() const { return friendList; }
 
 	bool isTarget(const Creature* creature) const;
+	bool isSeekTarget(const Creature* creature) const;
 	bool isFleeing() const
 	{
 		return !isSummon() && getHealth() <= mType->info.runAwayHealth && challengeFocusDuration <= 0;

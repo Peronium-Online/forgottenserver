@@ -3,6 +3,10 @@
 	<health now="100" max="100" />
 	<look type="214" corpse="6055" />
 	<targetchange interval="4000" chance="20" />
+	<targetseeks>
+		<targetseek cid="wolf" priority="5" />
+		<targetseek cid="rabbit" priority="5" />
+	</targetseeks>
 	<flags>
 		<flag summonable="0" />
 		<flag attackable="1" />

@@ -406,3 +406,13 @@ registerMonsterType.defenses = function(mtype, mask)
 		end
 	end
 end
+registerMonsterType.targetseeks = function (mtype, mask)
+	if type(mask.targetseeks) == "table" then
+		for _, target_seek in pairs(mask) do
+			local creature = Creature(target_seek.cid)
+			if creature then
+				mtype:addTargetSeek(creature, target_seek.priority or 1)
+			end
+		end
+	end
+end

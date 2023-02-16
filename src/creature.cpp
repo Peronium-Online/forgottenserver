@@ -69,6 +69,10 @@ bool Creature::canSee(const Position& pos) const
 
 bool Creature::canSeeCreature(const Creature* creature) const
 {
+	if (creature == nullptr) {
+		return false;
+	}
+
 	if (!canSeeGhostMode(creature) && creature->isInGhostMode()) {
 		return false;
 	}
@@ -450,8 +454,10 @@ void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 	}
 
 	if (followCreature == creature) {
-		setFollowCreature(nullptr);
-		onFollowCreatureDisappear(isLogout);
+		if ((!this->getMonster() || !this->getMonster()->isSeekTarget(creature) || creature->isDead())) {
+			setFollowCreature(nullptr);
+			onFollowCreatureDisappear(isLogout);
+		}
 	}
 }
 
@@ -915,8 +921,10 @@ bool Creature::setAttackedCreature(Creature* creature)
 	if (creature) {
 		const Position& creaturePos = creature->getPosition();
 		if (creaturePos.z != getPosition().z || !canSee(creaturePos)) {
-			attackedCreature = nullptr;
-			return false;
+			if ((!this->getMonster() || !this->getMonster()->isSeekTarget(creature)) || creature->isDead()) {
+				attackedCreature = nullptr;
+				return false;
+			}
 		}
 
 		attackedCreature = creature;
@@ -932,13 +940,18 @@ bool Creature::setAttackedCreature(Creature* creature)
 	return true;
 }
 
-void Creature::getPathSearchParams(const Creature*, FindPathParams& fpp) const
+void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const
 {
 	fpp.fullPathSearch = !hasFollowPath;
 	fpp.clearSight = true;
-	fpp.maxSearchDist = 12;
+	fpp.maxSearchDist = 100;
 	fpp.minTargetDist = 1;
 	fpp.maxTargetDist = 1;
+
+	auto monster = this->getMonster();
+	if (monster) {
+		fpp.keepDistance = !monster->isSeekTarget(creature);
+	}
 }
 
 void Creature::goToFollowCreature()
@@ -997,8 +1010,10 @@ bool Creature::setFollowCreature(Creature* creature)
 
 		const Position& creaturePos = creature->getPosition();
 		if (creaturePos.z != getPosition().z || !canSee(creaturePos)) {
-			followCreature = nullptr;
-			return false;
+			if ((!this->getMonster() || !this->getMonster()->isSeekTarget(creature)) || creature->isDead()) {
+				followCreature = nullptr;
+				return false;
+			}
 		}
 
 		if (!listWalkDir.empty()) {
