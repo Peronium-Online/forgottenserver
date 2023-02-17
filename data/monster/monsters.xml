@@ -1089,4 +1089,5 @@
 	<monster name="Warrior Minion" file="monsters/minions/warrior_minion.xml" />
 	<monster name="Siege Minion" file="monsters/minions/siege_minion.xml" />
 	<monster name="Super Minion" file="monsters/minions/super_minion.xml" />
+	<monster name="Defense Tower" file="monsters/towers/defense_tower.xml" />
 </monsters>

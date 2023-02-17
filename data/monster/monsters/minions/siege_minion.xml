@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Siege Minion" nameDescription="a siege minion" race="undead" experience="350" speed="200">
-	<health now="250" max="250" />
+	<health now="450" max="450" />
 	<look type="50" corpse="5996" />
 	<targetchange interval="4000" chance="20" />
 	<targetseeks>
-		<targetseek cid="wolf" priority="5" />
-		<targetseek cid="rabbit" priority="5" />
+		<targetseek cid="defense tower" priority="5" />
 	</targetseeks>
 	<flags>
 		<flag summonable="0" />

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Super Minion" nameDescription="a super minion" race="undead" experience="700" speed="200">
-	<health now="600" max="600" />
+	<health now="800" max="800" />
 	<look type="935" head="94" body="1" legs="80" feet="94" corpse="27730" />
 	<targetchange interval="4000" chance="20" />
 	<targetseeks>
-		<targetseek cid="wolf" priority="5" />
-		<targetseek cid="rabbit" priority="5" />
+		<targetseek cid="defense tower" priority="5" />
 	</targetseeks>
 	<flags>
 		<flag summonable="0" />

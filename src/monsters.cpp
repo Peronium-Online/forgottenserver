@@ -1378,7 +1378,8 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 
 				mType->info.targetSeeks.emplace_back(targetSeek);
 			} else {
-				std::cout << "[Warning - Monsters::loadMonster] Missing target to seek cid(name). " << file << std::endl;
+				std::cout << "[Warning - Monsters::loadMonster] Missing target to seek cid(name). " << file
+				          << std::endl;
 			}
 		}
 	}

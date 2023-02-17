@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Defense Tower" nameDescription="a defense tower" race="undead" experience="10000" speed="0" >
+	<health now="30000" max="30000" />
+	<look typeex="7059" corpse="5972" />
+	<targetchange interval="2000" chance="5" />
+    <targetseeks>
+		<targetseek cid="mage minion" priority="5" />
+		<targetseek cid="warrior minion" priority="5" />
+		<targetseek cid="super minion" priority="5" />
+		<targetseek cid="siege minion" priority="5" />
+	</targetseeks>
+	<flags>
+		<flag attackable="1" />
+		<flag hostile="1" />
+		<flag summonable="0" />
+		<flag convinceable="0" />
+		<flag illusionable="0" />
+		<flag isboss="1" />
+		<flag ignorespawnblock="0" />
+		<flag pushable="0" />
+		<flag canpushitems="0" />
+		<flag canpushcreatures="0" />
+		<flag staticattack="90" />
+		<flag targetdistance="8" />
+		<flag canwalkonenergy="0" />
+		<flag canwalkonfire="0" />
+		<flag canwalkonpoison="0" />
+	</flags>
+	<attacks>
+		<attack name="fire" interval="1000" chance="100" range="8" min="-80" max="-100">
+			<attribute key="shootEffect" value="fire" />
+		</attack>
+	</attacks>
+	<defenses armor="10" defense="5" />
+	<immunities>
+		<immunity paralyze="1" />
+		<immunity invisible="0" />
+		<immunity drunk="1" />
+	</immunities>
+	<loot>
+		<item id="2148" name="gold coin" countmax="100" />
+	</loot>
+</monster>

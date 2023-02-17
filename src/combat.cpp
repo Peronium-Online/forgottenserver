@@ -8,9 +8,9 @@
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
+#include "monster.h"
 #include "spectators.h"
 #include "weapons.h"
-#include "monster.h"
 
 extern Game g_game;
 extern Weapons* g_weapons;
