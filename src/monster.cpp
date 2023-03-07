@@ -113,7 +113,11 @@ bool Monster::canWalkOnFieldType(CombatType_t combatType) const
 	}
 }
 
-void Monster::onAttackedCreatureDisappear(bool) { attackTicks = 0; }
+void Monster::onAttackedCreatureDisappear(bool)
+{
+	attackTicks = 0;
+	updateTargetList();
+}
 
 void Monster::onCreatureAppear(Creature* creature, bool isLogin)
 {
@@ -332,7 +336,7 @@ void Monster::removeFriend(Creature* creature)
 void Monster::addTarget(Creature* creature, bool pushFront /* = false*/)
 {
 	assert(creature != this);
-	if (std::find(targetList.begin(), targetList.end(), creature) == targetList.end() || isSeekTarget(creature)) {
+	if (std::find(targetList.begin(), targetList.end(), creature) == targetList.end()) {
 		creature->incrementReferenceCounter();
 		if (pushFront) {
 			targetList.push_front(creature);

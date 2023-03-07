@@ -448,16 +448,18 @@ void Creature::onRemoveCreature(Creature* creature, bool)
 
 void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 {
+	if (this->getMonster() && this->getMonster()->isSeekTarget(creature) && !creature->isDead()) {
+		return;
+	}
+
 	if (attackedCreature == creature) {
 		setAttackedCreature(nullptr);
 		onAttackedCreatureDisappear(isLogout);
 	}
 
 	if (followCreature == creature) {
-		if ((!this->getMonster() || !this->getMonster()->isSeekTarget(creature) || creature->isDead())) {
-			setFollowCreature(nullptr);
-			onFollowCreatureDisappear(isLogout);
-		}
+		setFollowCreature(nullptr);
+		onFollowCreatureDisappear(isLogout);
 	}
 }
 
@@ -921,7 +923,7 @@ bool Creature::setAttackedCreature(Creature* creature)
 	if (creature) {
 		const Position& creaturePos = creature->getPosition();
 		if (creaturePos.z != getPosition().z || !canSee(creaturePos)) {
-			if ((!this->getMonster() || !this->getMonster()->isSeekTarget(creature)) || creature->isDead()) {
+			if (!this->getMonster() || !this->getMonster()->isSeekTarget(creature) || creature->isDead()) {
 				attackedCreature = nullptr;
 				return false;
 			}
@@ -944,14 +946,9 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 {
 	fpp.fullPathSearch = !hasFollowPath;
 	fpp.clearSight = true;
-	fpp.maxSearchDist = 100;
+	fpp.maxSearchDist = 200;
 	fpp.minTargetDist = 1;
 	fpp.maxTargetDist = 1;
-
-	auto monster = this->getMonster();
-	if (monster) {
-		fpp.keepDistance = !monster->isSeekTarget(creature);
-	}
 }
 
 void Creature::goToFollowCreature()
