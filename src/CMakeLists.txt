@@ -1,4 +1,4 @@
-set(tfs_SRC
+set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/otpch.cpp
 	${CMAKE_CURRENT_LIST_DIR}/actions.cpp
 	${CMAKE_CURRENT_LIST_DIR}/ban.cpp
@@ -78,7 +78,7 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/xtea.cpp
 	PARENT_SCOPE)
 
-set(tfs_HDR
+set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/otpch.h
 	${CMAKE_CURRENT_LIST_DIR}/account.h
 	${CMAKE_CURRENT_LIST_DIR}/actions.h
@@ -168,4 +168,4 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/xtea.h
 	)
 
-add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC})
+add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${peronium_HDR} ${peronium_SRC})

@@ -3,15 +3,15 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
-project(tfs CXX)
+project(peronium_server CXX)
 
 add_subdirectory(src)
-add_executable(tfs ${tfs_SRC})
+add_executable(peronium_server ${peronium_SRC})
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set_target_properties(tfs PROPERTIES CXX_STANDARD 17)
-set_target_properties(tfs PROPERTIES CXX_STANDARD_REQUIRED ON)
+set_target_properties(peronium_server PROPERTIES CXX_STANDARD 17)
+set_target_properties(peronium_server PROPERTIES CXX_STANDARD_REQUIRED ON)
 
 if (NOT WIN32)
     add_compile_options(-Wall -Werror -pipe -fvisibility=hidden)
@@ -64,7 +64,7 @@ endif ()
 find_package(Boost 1.66.0 REQUIRED COMPONENTS date_time system iostreams)
 
 include_directories(${Boost_INCLUDE_DIRS} ${Crypto++_INCLUDE_DIR} ${LUA_INCLUDE_DIR} ${MYSQL_INCLUDE_DIR} ${PUGIXML_INCLUDE_DIR})
-target_link_libraries(tfs PRIVATE
+target_link_libraries(peronium_server PRIVATE
         Boost::date_time
         Boost::system
         Boost::iostreams
@@ -76,13 +76,17 @@ target_link_libraries(tfs PRIVATE
         ${PUGIXML_LIBRARIES}
         )
 
+if (CMAKE_BUILD_TYPE STREQUAL Test)
+    add_subdirectory(test)
+endif()
+
 ### INTERPROCEDURAL_OPTIMIZATION ###
 cmake_policy(SET CMP0069 NEW)
 include(CheckIPOSupported)
 check_ipo_supported(RESULT result OUTPUT error)
 if (result)
     message(STATUS "IPO / LTO enabled")
-    set_target_properties(tfs PROPERTIES INTERPROCEDURAL_OPTIMIZATION True)
+    set_target_properties(peronium_server PROPERTIES INTERPROCEDURAL_OPTIMIZATION True)
 else ()
     message(STATUS "IPO / LTO not supported: <${error}>")
 endif ()
@@ -97,8 +101,8 @@ if(NOT SKIP_GIT)
 	set(POST_CONFIGURE_FILE "${CMAKE_CURRENT_BINARY_DIR}/gitmetadata.h")
 	include(git_watcher)
 	if(Git_FOUND)
-		add_dependencies(tfs check_git)
-		target_include_directories(tfs PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+		add_dependencies(peronium_server check_git)
+		target_include_directories(peronium_server PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 	endif()
 endif()
 ### END  Git Version ###
@@ -106,10 +110,10 @@ endif()
 # Precompiled header
 # note: cotire() must be called last on a target
 if (${CMAKE_VERSION} VERSION_GREATER "3.16.0")
-    target_precompile_headers(tfs PUBLIC src/otpch.h)
+    target_precompile_headers(peronium_server PUBLIC src/otpch.h)
 else ()
     include(cotire)
-    set_target_properties(tfs PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/otpch.h")
-    set_target_properties(tfs PROPERTIES COTIRE_ADD_UNITY_BUILD FALSE)
-    cotire(tfs)
+    set_target_properties(peronium_server PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/otpch.h")
+    set_target_properties(peronium_server PROPERTIES COTIRE_ADD_UNITY_BUILD FALSE)
+    cotire(peronium_server)
 endif ()

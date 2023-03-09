@@ -162,6 +162,9 @@ public:
 	void setDrunkenness(uint8_t newDrunkenness) { drunkenness = newDrunkenness; }
 	uint8_t getDrunkenness() const { return drunkenness; }
 
+	void setTeam(uint8_t newTeam) { team = newTeam; }
+	uint8_t getTeam() { return team; }
+
 	const Outfit_t getCurrentOutfit() const { return currentOutfit; }
 	void setCurrentOutfit(Outfit_t outfit) { currentOutfit = outfit; }
 	const Outfit_t getDefaultOutfit() const { return defaultOutfit; }
@@ -389,6 +392,7 @@ protected:
 	int32_t health = 1000;
 	int32_t healthMax = 1000;
 	uint8_t drunkenness = 0;
+	uint8_t team = 0;
 
 	Outfit_t currentOutfit;
 	Outfit_t defaultOutfit;

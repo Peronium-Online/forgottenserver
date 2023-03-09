@@ -25,7 +25,7 @@ round_keys expand_key(const key& k)
 
 void encrypt(uint8_t* data, size_t length, const round_keys& k)
 {
-	for (int32_t i = 0; i < k.size(); i += 2) {
+	for (uint32_t i = 0; i < k.size(); i += 2) {
 		for (auto it = data, last = data + length; it < last; it += 8) {
 			uint32_t left, right;
 			std::memcpy(&left, it, 4);

@@ -19,6 +19,7 @@
 [Rr]elease/
 x64/
 build/
+build_test/
 [Bb]in/
 [Oo]bj/
 cmake-build-*/
