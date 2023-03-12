@@ -4,6 +4,7 @@
 #ifndef FS_TOWN_H
 #define FS_TOWN_H
 
+#include "libs/util/tools/strings.h"
 #include "position.h"
 
 class Town

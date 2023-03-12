@@ -8,6 +8,8 @@
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
+#include "libs/util/tools/random.h"
+#include "libs/util/tools/xml.h"
 #include "monster.h"
 #include "npc.h"
 #include "pugicast.h"

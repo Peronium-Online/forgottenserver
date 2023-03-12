@@ -8,6 +8,7 @@
 #include "condition.h"
 #include "game.h"
 #include "iologindata.h"
+#include "libs/util/tools/direction.h"
 #include "scheduler.h"
 
 extern Game g_game;

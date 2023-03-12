@@ -5,7 +5,7 @@
 #define FS_TALKACTION_H
 
 #include "baseevents.h"
-#include "const.h"
+#include "constants/const.h"
 #include "luascript.h"
 
 class TalkAction;

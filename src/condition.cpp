@@ -7,6 +7,7 @@
 
 #include "combat.h"
 #include "game.h"
+#include "libs/util/tools/random.h"
 #include "spectators.h"
 
 extern Game g_game;

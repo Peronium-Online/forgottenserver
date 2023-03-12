@@ -70,11 +70,17 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/teleport.cpp
 	${CMAKE_CURRENT_LIST_DIR}/thing.cpp
 	${CMAKE_CURRENT_LIST_DIR}/tile.cpp
-	${CMAKE_CURRENT_LIST_DIR}/tools.cpp
 	${CMAKE_CURRENT_LIST_DIR}/trashholder.cpp
 	${CMAKE_CURRENT_LIST_DIR}/weapons.cpp
 	${CMAKE_CURRENT_LIST_DIR}/wildcardtree.cpp
 	${CMAKE_CURRENT_LIST_DIR}/xtea.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/date.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/direction.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/gamehelpers.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/hash.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/random.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/strings.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocation.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocations.cpp
 	PARENT_SCOPE)
@@ -159,7 +165,6 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/thing.h
 	${CMAKE_CURRENT_LIST_DIR}/thread_holder_base.h
 	${CMAKE_CURRENT_LIST_DIR}/tile.h
-	${CMAKE_CURRENT_LIST_DIR}/tools.h
 	${CMAKE_CURRENT_LIST_DIR}/town.h
 	${CMAKE_CURRENT_LIST_DIR}/trashholder.h
 	${CMAKE_CURRENT_LIST_DIR}/weapons.h

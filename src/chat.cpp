@@ -6,6 +6,7 @@
 #include "chat.h"
 
 #include "game.h"
+#include "libs/util/tools/xml.h"
 #include "pugicast.h"
 #include "scheduler.h"
 

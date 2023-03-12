@@ -5,6 +5,7 @@
 
 #include "quests.h"
 
+#include "libs/util/tools/xml.h"
 #include "player.h"
 #include "pugicast.h"
 

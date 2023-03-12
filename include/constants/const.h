@@ -4,6 +4,8 @@
 #ifndef FS_CONST_H
 #define FS_CONST_H
 
+#include <cinttypes>
+
 static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 24590;
 static constexpr int32_t MIN_MARKET_FEE = 20;
 static constexpr int32_t MAX_MARKET_FEE = 100000;

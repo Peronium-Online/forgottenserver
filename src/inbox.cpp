@@ -5,8 +5,6 @@
 
 #include "inbox.h"
 
-#include "tools.h"
-
 Inbox::Inbox(uint16_t type) : Container(type, 30, false, true) {}
 
 ReturnValue Inbox::queryAdd(int32_t, const Thing& thing, uint32_t, uint32_t flags, Creature*) const

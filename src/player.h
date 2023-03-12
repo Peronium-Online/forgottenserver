@@ -4,12 +4,14 @@
 #ifndef FS_PLAYER_H
 #define FS_PLAYER_H
 
+#include "constants/enums.h"
 #include "creature.h"
 #include "cylinder.h"
 #include "depotlocker.h"
-#include "constants/enums.h"
 #include "groups.h"
 #include "guild.h"
+#include "libs/util/tools/date.h"
+#include "libs/util/tools/gamehelpers.h"
 #include "libs/vocation/Vocation.h"
 #include "protocolgame.h"
 #include "town.h"

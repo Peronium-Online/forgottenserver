@@ -1,7 +1,17 @@
 set(peronium_HDR
     ${peronium_HDR}
+	${CMAKE_CURRENT_LIST_DIR}/constants/const.h
+	${CMAKE_CURRENT_LIST_DIR}/constants/definitions.h
 	${CMAKE_CURRENT_LIST_DIR}/constants/enums.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/loader/XMLLoadable.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/bitwise.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/date.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/direction.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/gamehelpers.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/hash.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/random.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/strings.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocation.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocations.h
 )

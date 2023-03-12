@@ -1,7 +1,7 @@
 #include "libs/vocation/Vocations.h"
 
 #include "../src/pugicast.h"
-#include "../src/tools.h"
+#include "libs/util/tools/strings.h"
 
 #include <algorithm>
 #include <iostream>

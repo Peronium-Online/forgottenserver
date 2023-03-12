@@ -5,9 +5,8 @@
 #define FS_OUTPUTMESSAGE_H
 
 #include "connection.h"
+#include "libs/util/tools/hash.h"
 #include "networkmessage.h"
-#include "tools.h"
-
 class OutputMessage : public NetworkMessage
 {
 public:

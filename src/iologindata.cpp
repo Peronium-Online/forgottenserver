@@ -10,6 +10,7 @@
 #include "depotchest.h"
 #include "game.h"
 #include "inbox.h"
+#include "libs/util/tools/hash.h"
 #include "storeinbox.h"
 
 extern ConfigManager g_config;

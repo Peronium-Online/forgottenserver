@@ -15,6 +15,7 @@
 #include "game.h"
 #include "inbox.h"
 #include "iologindata.h"
+#include "libs/util/tools/random.h"
 #include "monster.h"
 #include "movement.h"
 #include "npc.h"
@@ -23,7 +24,6 @@
 #include "scheduler.h"
 #include "spectators.h"
 #include "storeinbox.h"
-#include "tools.h"
 #include "weapons.h"
 
 extern ConfigManager g_config;

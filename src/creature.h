@@ -4,7 +4,7 @@
 #ifndef FS_CREATURE_H
 #define FS_CREATURE_H
 
-#include "const.h"
+#include "constants/const.h"
 #include "constants/enums.h"
 #include "creatureevent.h"
 #include "map.h"

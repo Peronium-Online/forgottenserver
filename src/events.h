@@ -4,7 +4,7 @@
 #ifndef FS_EVENTS_H
 #define FS_EVENTS_H
 
-#include "const.h"
+#include "constants/const.h"
 #include "creature.h"
 #include "luascript.h"
 

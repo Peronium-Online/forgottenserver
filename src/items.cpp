@@ -5,6 +5,8 @@
 
 #include "items.h"
 
+#include "libs/util/tools/direction.h"
+#include "libs/util/tools/gamehelpers.h"
 #include "movement.h"
 #include "pugicast.h"
 #include "weapons.h"

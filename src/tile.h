@@ -6,7 +6,7 @@
 
 #include "cylinder.h"
 #include "item.h"
-#include "tools.h"
+#include "libs/util/tools/bitwise.h"
 
 class BedItem;
 class Creature;

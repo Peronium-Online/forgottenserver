@@ -19,6 +19,8 @@
 #include "iologindata.h"
 #include "iomarket.h"
 #include "items.h"
+#include "libs/util/tools/direction.h"
+#include "libs/util/tools/random.h"
 #include "monster.h"
 #include "movement.h"
 #include "npc.h"

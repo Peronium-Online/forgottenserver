@@ -6,6 +6,7 @@
 #include "events.h"
 
 #include "item.h"
+#include "libs/util/tools/xml.h"
 #include "player.h"
 
 Events::Events() : scriptInterface("Event Interface") { scriptInterface.initState(); }

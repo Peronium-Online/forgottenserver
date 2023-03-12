@@ -4,7 +4,7 @@
 #ifndef FS_PARTY_H
 #define FS_PARTY_H
 
-#include "const.h"
+#include "constants/const.h"
 
 class Creature;
 class Player;

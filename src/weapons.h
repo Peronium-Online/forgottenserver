@@ -6,7 +6,7 @@
 
 #include "baseevents.h"
 #include "combat.h"
-#include "const.h"
+#include "constants/const.h"
 #include "libs/vocation/Vocations.h"
 #include "luascript.h"
 

@@ -5,7 +5,7 @@
 #define FS_OTPCH_H
 
 // Definitions should be global.
-#include "definitions.h"
+#include "constants/definitions.h"
 
 // System headers required in headers should be included here.
 #include <algorithm>

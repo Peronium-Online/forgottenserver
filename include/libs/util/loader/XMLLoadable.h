@@ -1,5 +1,5 @@
-// TODO: fix this when tools is migrated
-// #include "src/tools.h"
+#include "libs/util/tools/xml.h"
+
 #include <iostream>
 #include <pugixml.hpp>
 #include <string>
@@ -15,7 +15,7 @@ public:
 		pugi::xml_document doc;
 		pugi::xml_parse_result result = doc.load_file(this->filepath.c_str());
 		if (!result) {
-			// printXMLError("Error - XMLLoadable::loadFromXml", this->filepath, result);
+			printXMLError("Error - XMLLoadable::loadFromXml", this->filepath, result);
 			std::cout << "Error - XMLLoadable::loadFromXml " << this->filepath << result << std::endl;
 			return false;
 		}

@@ -9,6 +9,8 @@
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
+#include "libs/util/tools/direction.h"
+#include "libs/util/tools/random.h"
 #include "spectators.h"
 #include "spells.h"
 

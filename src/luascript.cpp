@@ -35,6 +35,7 @@
 #include "storeinbox.h"
 #include "teleport.h"
 #include "weapons.h"
+#include "libs/util/tools/random.h"
 
 #include <boost/range/adaptor/reversed.hpp>
 

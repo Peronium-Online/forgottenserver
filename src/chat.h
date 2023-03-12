@@ -4,7 +4,7 @@
 #ifndef FS_CHAT_H
 #define FS_CHAT_H
 
-#include "const.h"
+#include "constants/const.h"
 #include "luascript.h"
 
 class Party;

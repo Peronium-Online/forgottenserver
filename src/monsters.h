@@ -4,7 +4,7 @@
 #ifndef FS_MONSTERS_H
 #define FS_MONSTERS_H
 
-#include "const.h"
+#include "constants/const.h"
 #include "constants/enums.h"
 
 class ConditionDamage;
