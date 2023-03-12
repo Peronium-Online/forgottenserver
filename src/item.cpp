@@ -10,6 +10,7 @@
 #include "container.h"
 #include "game.h"
 #include "house.h"
+#include "libs/vocation/Vocations.h"
 #include "mailbox.h"
 #include "podium.h"
 #include "teleport.h"

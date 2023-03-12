@@ -5,7 +5,10 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 project(peronium_server CXX)
 
+include_directories(include)
+
 add_subdirectory(src)
+add_subdirectory(include)
 add_executable(peronium_server ${peronium_SRC})
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")

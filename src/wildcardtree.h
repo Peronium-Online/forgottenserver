@@ -4,7 +4,7 @@
 #ifndef FS_WILDCARDTREE_H
 #define FS_WILDCARDTREE_H
 
-#include "enums.h"
+#include "constants/enums.h"
 
 class WildcardTreeNode
 {

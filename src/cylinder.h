@@ -4,7 +4,7 @@
 #ifndef FS_CYLINDER_H
 #define FS_CYLINDER_H
 
-#include "enums.h"
+#include "constants/enums.h"
 #include "thing.h"
 
 class Creature;

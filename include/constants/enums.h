@@ -4,6 +4,10 @@
 #ifndef FS_ENUMS_H
 #define FS_ENUMS_H
 
+#include <cstdint>
+#include <list>
+#include <string>
+
 enum RuleViolationType_t : uint8_t
 {
 	REPORT_TYPE_NAME = 0,

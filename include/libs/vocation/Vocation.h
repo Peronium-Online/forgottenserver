@@ -1,10 +1,9 @@
-// Copyright 2022 The Forgotten Server Authors. All rights reserved.
-// Use of this source code is governed by the GPL-2.0 License that can be found in the LICENSE file.
+#include "constants/enums.h"
+
+#include <string>
 
 #ifndef FS_VOCATION_H
 #define FS_VOCATION_H
-
-#include "enums.h"
 
 class Vocation
 {
@@ -74,19 +73,6 @@ private:
 	uint8_t clientId = 0;
 
 	bool allowPvp = true;
-};
-
-class Vocations
-{
-public:
-	bool loadFromXml();
-
-	Vocation* getVocation(uint16_t id);
-	int32_t getVocationId(const std::string& name) const;
-	uint16_t getPromotedVocation(uint16_t vocationId) const;
-
-private:
-	std::map<uint16_t, Vocation> vocationsMap;
 };
 
 #endif // FS_VOCATION_H

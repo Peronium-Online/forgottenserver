@@ -4,7 +4,7 @@
 #ifndef FS_OUTFIT_H
 #define FS_OUTFIT_H
 
-#include "enums.h"
+#include "constants/enums.h"
 
 struct Outfit
 {

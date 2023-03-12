@@ -7,9 +7,9 @@
 #include "actions.h"
 #include "baseevents.h"
 #include "creature.h"
+#include "libs/vocation/Vocations.h"
 #include "luascript.h"
 #include "talkaction.h"
-#include "vocation.h"
 
 class InstantSpell;
 class RuneSpell;

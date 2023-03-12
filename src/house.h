@@ -5,8 +5,8 @@
 #define FS_HOUSE_H
 
 #include "const.h"
+#include "constants/enums.h"
 #include "container.h"
-#include "enums.h"
 #include "position.h"
 
 class BedItem;

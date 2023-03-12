@@ -72,10 +72,11 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/tile.cpp
 	${CMAKE_CURRENT_LIST_DIR}/tools.cpp
 	${CMAKE_CURRENT_LIST_DIR}/trashholder.cpp
-	${CMAKE_CURRENT_LIST_DIR}/vocation.cpp
 	${CMAKE_CURRENT_LIST_DIR}/weapons.cpp
 	${CMAKE_CURRENT_LIST_DIR}/wildcardtree.cpp
 	${CMAKE_CURRENT_LIST_DIR}/xtea.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocation.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocations.cpp
 	PARENT_SCOPE)
 
 set(peronium_HDR
@@ -101,7 +102,6 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/definitions.h
 	${CMAKE_CURRENT_LIST_DIR}/depotchest.h
 	${CMAKE_CURRENT_LIST_DIR}/depotlocker.h
-	${CMAKE_CURRENT_LIST_DIR}/enums.h
 	${CMAKE_CURRENT_LIST_DIR}/events.h
 	${CMAKE_CURRENT_LIST_DIR}/fileloader.h
 	${CMAKE_CURRENT_LIST_DIR}/game.h
@@ -162,7 +162,6 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/tools.h
 	${CMAKE_CURRENT_LIST_DIR}/town.h
 	${CMAKE_CURRENT_LIST_DIR}/trashholder.h
-	${CMAKE_CURRENT_LIST_DIR}/vocation.h
 	${CMAKE_CURRENT_LIST_DIR}/weapons.h
 	${CMAKE_CURRENT_LIST_DIR}/wildcardtree.h
 	${CMAKE_CURRENT_LIST_DIR}/xtea.h

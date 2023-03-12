@@ -5,7 +5,7 @@
 #define FS_ITEMS_H
 
 #include "const.h"
-#include "enums.h"
+#include "constants/enums.h"
 #include "itemloader.h"
 #include "position.h"
 

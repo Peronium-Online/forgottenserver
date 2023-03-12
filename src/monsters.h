@@ -5,7 +5,7 @@
 #define FS_MONSTERS_H
 
 #include "const.h"
-#include "enums.h"
+#include "constants/enums.h"
 
 class ConditionDamage;
 class LuaScriptInterface;

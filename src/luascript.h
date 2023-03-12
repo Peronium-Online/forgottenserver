@@ -4,8 +4,8 @@
 #ifndef FS_LUASCRIPT_H
 #define FS_LUASCRIPT_H
 
+#include "constants/enums.h"
 #include "database.h"
-#include "enums.h"
 #include "position.h"
 
 #if LUA_VERSION_NUM >= 502

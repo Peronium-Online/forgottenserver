@@ -4,7 +4,7 @@
 #ifndef FS_ACCOUNT_H
 #define FS_ACCOUNT_H
 
-#include "enums.h"
+#include "constants/enums.h"
 
 struct Account
 {

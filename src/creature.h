@@ -5,8 +5,8 @@
 #define FS_CREATURE_H
 
 #include "const.h"
+#include "constants/enums.h"
 #include "creatureevent.h"
-#include "enums.h"
 #include "map.h"
 #include "position.h"
 #include "tile.h"

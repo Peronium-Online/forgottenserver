@@ -4,7 +4,7 @@
 #ifndef FS_CONDITION_H
 #define FS_CONDITION_H
 
-#include "enums.h"
+#include "constants/enums.h"
 
 class Creature;
 class Player;

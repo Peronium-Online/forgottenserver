@@ -5,7 +5,7 @@
 
 #include "tasks.h"
 
-#include "enums.h"
+#include "constants/enums.h"
 #include "game.h"
 
 extern Game g_game;

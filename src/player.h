@@ -7,12 +7,12 @@
 #include "creature.h"
 #include "cylinder.h"
 #include "depotlocker.h"
-#include "enums.h"
+#include "constants/enums.h"
 #include "groups.h"
 #include "guild.h"
+#include "libs/vocation/Vocation.h"
 #include "protocolgame.h"
 #include "town.h"
-#include "vocation.h"
 
 class DepotChest;
 class House;
