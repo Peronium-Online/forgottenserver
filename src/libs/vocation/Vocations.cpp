@@ -1,6 +1,6 @@
 #include "libs/vocation/Vocations.h"
 
-#include "../src/pugicast.h"
+#include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/strings.h"
 
 #include <algorithm>
@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-bool Vocations::load(pugi::xml_node node)
+bool Vocations::load(pugi::xml_node node, bool)
 {
 	pugi::xml_attribute attr = node.attribute("id");
 	if (!attr) {

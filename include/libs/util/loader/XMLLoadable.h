@@ -10,8 +10,12 @@
 class XMLLoadable
 {
 public:
-	bool loadFromXML()
+	bool isLoaded() const { return loaded; }
+
+	bool loadFromXML(bool reloading = false)
 	{
+		loaded = false;
+
 		pugi::xml_document doc;
 		pugi::xml_parse_result result = doc.load_file(this->filepath.c_str());
 		if (!result) {
@@ -21,17 +25,19 @@ public:
 		}
 
 		for (auto node : doc.child(this->childNode.c_str()).children()) {
-			this->load(node);
+			this->load(node, reloading);
 		}
 
+		loaded = true;
 		return true;
 	};
 
 protected:
 	std::string filepath;
 	std::string childNode;
+	bool loaded = false;
 
-	virtual bool load(pugi::xml_node node) = 0;
+	virtual bool load(pugi::xml_node node, bool reloading) = 0;
 };
 
 #endif // XMLLOADABLE_H

@@ -12,6 +12,8 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/random.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/strings.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monster.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monsters.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocation.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocations.h
 )

@@ -1,9 +1,9 @@
+#ifndef FS_VOCATION_H
+#define FS_VOCATION_H
+
 #include "constants/enums.h"
 
 #include <string>
-
-#ifndef FS_VOCATION_H
-#define FS_VOCATION_H
 
 class Vocation
 {

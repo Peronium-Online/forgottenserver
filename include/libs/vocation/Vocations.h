@@ -1,8 +1,8 @@
-#include "libs/util/loader/XMLLoadable.h"
-#include "libs/vocation/Vocation.h"
-
 #ifndef FS_VOCATIONS_H
 #define FS_VOCATIONS_H
+
+#include "libs/util/loader/XMLLoadable.h"
+#include "libs/vocation/Vocation.h"
 
 #include <map>
 
@@ -23,7 +23,7 @@ public:
 private:
 	std::map<uint16_t, Vocation> vocationsMap;
 
-	virtual bool load(pugi::xml_node node) override;
+	virtual bool load(pugi::xml_node node, bool) override;
 };
 
 #endif // FS_VOCATIONS_H
