@@ -7,8 +7,8 @@
 
 #include "libs/util/tools/direction.h"
 #include "libs/util/tools/gamehelpers.h"
+#include "libs/util/tools/pugicast.h"
 #include "movement.h"
-#include "pugicast.h"
 #include "weapons.h"
 
 extern MoveEvents* g_moveEvents;

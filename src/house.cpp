@@ -11,8 +11,8 @@
 #include "housetile.h"
 #include "inbox.h"
 #include "iologindata.h"
+#include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/xml.h"
-#include "pugicast.h"
 
 extern ConfigManager g_config;
 extern Game g_game;

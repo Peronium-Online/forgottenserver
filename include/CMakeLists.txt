@@ -3,7 +3,8 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/constants/const.h
 	${CMAKE_CURRENT_LIST_DIR}/constants/definitions.h
 	${CMAKE_CURRENT_LIST_DIR}/constants/enums.h
-	${CMAKE_CURRENT_LIST_DIR}/libs/util/loader/XMLLoadable.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/xml/XMLElement.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/xml/XMLLoadable.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/bitwise.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/date.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/direction.h
@@ -14,6 +15,8 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monster.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monsters.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterSpell.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterType.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocation.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocations.h
 )

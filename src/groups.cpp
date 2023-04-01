@@ -6,8 +6,8 @@
 #include "groups.h"
 
 #include "constants/const.h"
+#include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/xml.h"
-#include "pugicast.h"
 
 const std::unordered_map<std::string, PlayerFlags> ParsePlayerFlagMap = {
     {"cannotusecombat", PlayerFlag_CannotUseCombat},

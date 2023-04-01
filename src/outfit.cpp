@@ -5,8 +5,8 @@
 
 #include "outfit.h"
 
+#include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/xml.h"
-#include "pugicast.h"
 
 bool Outfits::loadFromXml()
 {

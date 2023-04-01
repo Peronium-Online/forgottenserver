@@ -8,7 +8,7 @@
 #include "combat.h"
 #include "configmanager.h"
 #include "game.h"
-#include "pugicast.h"
+#include "libs/util/tools/pugicast.h"
 #include "spells.h"
 #include "weapons.h"
 

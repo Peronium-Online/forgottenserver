@@ -7,7 +7,7 @@
 
 #include "combat.h"
 #include "game.h"
-#include "pugicast.h"
+#include "libs/util/tools/pugicast.h"
 
 extern Game g_game;
 extern Vocations g_vocations;

@@ -19,6 +19,7 @@
 #include "iologindata.h"
 #include "iomapserialize.h"
 #include "iomarket.h"
+#include "libs/util/tools/random.h"
 #include "luavariant.h"
 #include "monster.h"
 #include "movement.h"
@@ -35,7 +36,6 @@
 #include "storeinbox.h"
 #include "teleport.h"
 #include "weapons.h"
-#include "libs/util/tools/random.h"
 
 #include <boost/range/adaptor/reversed.hpp>
 
@@ -14343,7 +14343,7 @@ int LuaScriptInterface::luaMonsterTypeAddAttack(lua_State* L)
 	if (monsterType) {
 		MonsterSpell* spell = getUserdata<MonsterSpell>(L, 2);
 		if (spell) {
-			spellBlock_t sb;
+			MonsterSpell sb;
 			if (g_monsters.deserializeSpell(spell, sb, monsterType->name)) {
 				monsterType->info.attackSpells.push_back(std::move(sb));
 			} else {
@@ -14421,7 +14421,7 @@ int LuaScriptInterface::luaMonsterTypeAddDefense(lua_State* L)
 	if (monsterType) {
 		MonsterSpell* spell = getUserdata<MonsterSpell>(L, 2);
 		if (spell) {
-			spellBlock_t sb;
+			MonsterSpell sb;
 			if (g_monsters.deserializeSpell(spell, sb, monsterType->name)) {
 				monsterType->info.defenseSpells.push_back(std::move(sb));
 			} else {

@@ -7,10 +7,10 @@
 #include "configmanager.h"
 
 #include "game.h"
+#include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/strings.h"
 #include "libs/util/tools/xml.h"
 #include "monster.h"
-#include "pugicast.h"
 
 #if __has_include("luajit/lua.hpp")
 #include <luajit/lua.hpp>

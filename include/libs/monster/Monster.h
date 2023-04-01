@@ -2,11 +2,11 @@
 #define PR_MONSTER_H
 
 #include "libs/monster/MonsterType.h"
-#include "libs/util/loader/XMLLoadable.h"
+#include "libs/util/xml/XMLLoadable.h"
 
 #include <string>
 
-class Monster final : public XMLLoadable
+class Monster final : virtual public XMLLoadable
 {
 public:
 	Monster();

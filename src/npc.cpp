@@ -7,9 +7,9 @@
 
 #include "game.h"
 #include "libs/util/tools/direction.h"
+#include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/random.h"
 #include "libs/util/tools/xml.h"
-#include "pugicast.h"
 #include "spectators.h"
 
 extern Game g_game;

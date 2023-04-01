@@ -1,12 +1,12 @@
 #ifndef FS_VOCATIONS_H
 #define FS_VOCATIONS_H
 
-#include "libs/util/loader/XMLLoadable.h"
+#include "libs/util/xml/XMLLoadable.h"
 #include "libs/vocation/Vocation.h"
 
 #include <map>
 
-class Vocations final : public XMLLoadable
+class Vocations final : virtual public XMLLoadable
 {
 public:
 	Vocations()

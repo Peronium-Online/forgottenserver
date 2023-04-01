@@ -7,10 +7,10 @@
 
 #include "configmanager.h"
 #include "game.h"
+#include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/random.h"
 #include "libs/util/tools/xml.h"
 #include "monster.h"
-#include "pugicast.h"
 #include "scheduler.h"
 
 extern Game g_game;

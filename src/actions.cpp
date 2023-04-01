@@ -12,8 +12,8 @@
 #include "housetile.h"
 #include "libs/util/tools/date.h"
 #include "libs/util/tools/gamehelpers.h"
+#include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/strings.h"
-#include "pugicast.h"
 #include "spells.h"
 
 extern Game g_game;

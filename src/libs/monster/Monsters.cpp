@@ -1,6 +1,6 @@
 #include "libs/monster/Monsters.h"
 
-#include "configmanager.h"
+#include "../../configmanager.h"
 #include "libs/monster/Monster.h"
 
 #include <boost/algorithm/string.hpp>

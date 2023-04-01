@@ -7,8 +7,8 @@
 
 #include "configmanager.h"
 #include "libs/util/tools/date.h"
+#include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/strings.h"
-#include "pugicast.h"
 #include "scheduler.h"
 
 extern ConfigManager g_config;
