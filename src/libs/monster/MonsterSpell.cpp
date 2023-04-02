@@ -1,10 +1,12 @@
 #include "libs/monster/MonsterSpell.h"
 
 #include "../../weapons.h"
+#include "libs/monster/Monsters.h"
 
 #include <boost/algorithm/string.hpp>
 
 extern Spells* g_spells;
+extern Monsters g_monsters;
 
 std::string MonsterSpell::getName()
 {
@@ -245,6 +247,78 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 
 		combatBuilder.withMelee();
 		this->setRange(1);
+	} else if (tmpName == "physical") {
+		combatBuilder.withPhysicalDamage();
+	} else if (tmpName == "bleed") {
+		combatBuilder.withBleedDamage();
+	} else if (tmpName == "poison" || tmpName == "earth") {
+		combatBuilder.withEarthDamage();
+	} else if (tmpName == "fire") {
+		combatBuilder.withFireDamage();
+	} else if (tmpName == "energy") {
+		combatBuilder.withEnergyDamage();
+	} else if (tmpName == "drown") {
+		combatBuilder.withDrownDamage();
+	} else if (tmpName == "ice") {
+		combatBuilder.withIceDamage();
+	} else if (tmpName == "holy") {
+		combatBuilder.withHolyDamage();
+	} else if (tmpName == "death") {
+		combatBuilder.withDeathDamage();
+	} else if (tmpName == "lifedrain") {
+		combatBuilder.withLifeDrainDamage();
+	} else if (tmpName == "manadrain") {
+		combatBuilder.withManaDrainDamage();
+	} else if (tmpName == "healing") {
+		combatBuilder.withHealing();
+	} else if (tmpName == "speed") {
+		int32_t minSpeedChange = 0;
+		int32_t maxSpeedChange = 0;
+		int32_t duration = 10000;
+
+		if ((attr = node.attribute("duration"))) {
+			duration = pugi::cast<int32_t>(attr.value());
+		}
+
+		if ((attr = node.attribute("speedchange"))) {
+			minSpeedChange = pugi::cast<int32_t>(attr.value());
+		} else if ((attr = node.attribute("minspeedchange"))) {
+			minSpeedChange = pugi::cast<int32_t>(attr.value());
+
+			if ((attr = node.attribute("maxspeedchange"))) {
+				maxSpeedChange = pugi::cast<int32_t>(attr.value());
+			}
+		} else {
+			std::cout << "[Error - MonsterSpell::loadFromXMLNode] - " << getName()
+			          << " - missing speedchange/minspeedchange value" << std::endl;
+			return nullptr;
+		}
+
+		combatBuilder.withSpeedChange(minSpeedChange, maxSpeedChange, duration);
+	} else if (tmpName == "outfit") {
+		int32_t duration = 10000;
+
+		if ((attr = node.attribute("duration"))) {
+			duration = pugi::cast<int32_t>(attr.value());
+		}
+
+		if ((attr = node.attribute("monster"))) {
+			MonsterType* mType = g_monsters.findMonsterTypeByName(attr.as_string());
+			if (mType) {
+				combatBuilder.withOutfitChange(mType->info.outfit, duration);
+			}
+		} else if ((attr = node.attribute("item"))) {
+			auto lookTypeEx = pugi::cast<uint16_t>(attr.value());
+			combatBuilder.withOutfitChange(lookTypeEx, duration);
+		}
+	} else if (tmpName == "invisible") {
+		int32_t duration = 10000;
+
+		if ((attr = node.attribute("duration"))) {
+			duration = pugi::cast<int32_t>(attr.value());
+		}
+
+		combatBuilder.withInvisibility(duration);
 	}
 
 	auto combatSpell = combatBuilder.getInstance();
