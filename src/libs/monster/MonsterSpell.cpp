@@ -8,6 +8,14 @@
 extern Spells* g_spells;
 extern Monsters g_monsters;
 
+struct damage_condition_params
+{
+	int32_t tick;
+	int32_t startDamage;
+	int32_t minDamage;
+	int32_t maxDamage;
+};
+
 std::string MonsterSpell::getName()
 {
 	if (!this->name.empty()) {
@@ -319,6 +327,57 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 		}
 
 		combatBuilder.withInvisibility(duration);
+	} else if (tmpName == "drunk") {
+		int32_t duration = 10000;
+		uint8_t drunkenness = 25;
+
+		if ((attr = node.attribute("duration"))) {
+			duration = pugi::cast<int32_t>(attr.value());
+		}
+
+		if ((attr = node.attribute("drunkenness"))) {
+			drunkenness = pugi::cast<uint8_t>(attr.value());
+		}
+
+		combatBuilder.withDrunk(duration, drunkenness);
+	} else if (tmpName == "firefield") {
+		combatBuilder.withFireField();
+	} else if (tmpName == "poisonfield") {
+		combatBuilder.withPoisonField();
+	} else if (tmpName == "energyfield") {
+		combatBuilder.withEnergyField();
+	} else if (tmpName == "firecondition") {
+		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		combatBuilder.withConditionFire(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
+		                                conditionParams.startDamage);
+	} else if (tmpName == "poisoncondition" || tmpName == "earthcondition") {
+		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		combatBuilder.withConditionPoison(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
+		                                  conditionParams.startDamage);
+	} else if (tmpName == "energycondition") {
+		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		combatBuilder.withConditionEnergy(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
+		                                  conditionParams.startDamage);
+	} else if (tmpName == "drowncondition") {
+		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		combatBuilder.withConditionDrown(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
+		                                 conditionParams.startDamage);
+	} else if (tmpName == "freezecondition" || tmpName == "icecondition") {
+		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		combatBuilder.withConditionFreeze(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
+		                                  conditionParams.startDamage);
+	} else if (tmpName == "cursecondition" || tmpName == "deathcondition") {
+		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		combatBuilder.withConditionCurse(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
+		                                 conditionParams.startDamage);
+	} else if (tmpName == "dazzlecondition" || tmpName == "holycondition") {
+		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		combatBuilder.withConditionDazzle(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
+		                                  conditionParams.startDamage);
+	} else if (tmpName == "physicalcondition" || tmpName == "bleedcondition") {
+		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		combatBuilder.withConditionBleed(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
+		                                 conditionParams.startDamage);
 	}
 
 	auto combatSpell = combatBuilder.getInstance();
@@ -326,4 +385,30 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 	this->combatSpell = true;
 
 	return this;
+}
+
+damage_condition_params getDamageConditionParamsFromXML(const pugi::xml_node node, const MonsterSpell* spell)
+{
+	int32_t tickInterval = -1;
+	if (pugi::xml_attribute attr = node.attribute("tick")) {
+		int32_t value = pugi::cast<int32_t>(attr.value());
+		if (value > 0) {
+			tickInterval = value;
+		}
+	}
+
+	int32_t startDamage = 0;
+	if (pugi::xml_attribute attr = node.attribute("start")) {
+		int32_t value = std::abs(pugi::cast<int32_t>(attr.value()));
+		if (value <= spell->minCombatValue) {
+			startDamage = value;
+		}
+	}
+
+	return damage_condition_params{
+		startDamage = startDamage,
+		tickInterval = tickInterval,
+		minDamage : std::abs(spell->minCombatValue),
+		maxDamage : std::abs(spell->maxCombatValue),
+	};
 }

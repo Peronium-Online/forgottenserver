@@ -124,11 +124,17 @@ public:
 
 		CombatBuilder* withConditionFire(int32_t damage, uint32_t tickInterval = 9000)
 		{
+			return this->withConditionFire(damage, damage, tickInterval);
+		}
+
+		CombatBuilder* withConditionFire(int32_t minDamage, int32_t maxDamage, uint32_t tickInterval = 10000,
+		                                 int32_t startDamage = 0)
+		{
 			if (tickInterval <= 0) {
-				tickInterval = 9000;
+				tickInterval = 10000;
 			}
 
-			Condition* condition = getDamageCondition(CONDITION_FIRE, damage, damage, 0, tickInterval);
+			Condition* condition = getDamageCondition(CONDITION_FIRE, maxDamage, minDamage, startDamage, tickInterval);
 			combat->addCondition(condition);
 
 			return this;
@@ -136,11 +142,18 @@ public:
 
 		CombatBuilder* withConditionPoison(int32_t damage, uint32_t tickInterval = 4000)
 		{
+			return this->withConditionPoison(damage, damage, tickInterval);
+		}
+
+		CombatBuilder* withConditionPoison(int32_t minDamage, int32_t maxDamage, uint32_t tickInterval = 4000,
+		                                   int32_t startDamage = 0)
+		{
 			if (tickInterval <= 0) {
 				tickInterval = 4000;
 			}
 
-			Condition* condition = getDamageCondition(CONDITION_POISON, damage, damage, 0, tickInterval);
+			Condition* condition =
+			    getDamageCondition(CONDITION_POISON, maxDamage, minDamage, startDamage, tickInterval);
 			combat->addCondition(condition);
 
 			return this;
@@ -148,11 +161,18 @@ public:
 
 		CombatBuilder* withConditionEnergy(int32_t damage, uint32_t tickInterval = 10000)
 		{
+			return this->withConditionEnergy(damage, damage, tickInterval);
+		}
+
+		CombatBuilder* withConditionEnergy(int32_t minDamage, int32_t maxDamage, uint32_t tickInterval = 10000,
+		                                   int32_t startDamage = 0)
+		{
 			if (tickInterval <= 0) {
 				tickInterval = 10000;
 			}
 
-			Condition* condition = getDamageCondition(CONDITION_ENERGY, damage, damage, 0, tickInterval);
+			Condition* condition =
+			    getDamageCondition(CONDITION_ENERGY, maxDamage, minDamage, startDamage, tickInterval);
 			combat->addCondition(condition);
 
 			return this;
@@ -160,11 +180,17 @@ public:
 
 		CombatBuilder* withConditionDrown(int32_t damage, uint32_t tickInterval = 5000)
 		{
+			return this->withConditionDrown(damage, damage, tickInterval);
+		}
+
+		CombatBuilder* withConditionDrown(int32_t minDamage, int32_t maxDamage, uint32_t tickInterval = 5000,
+		                                  int32_t startDamage = 0)
+		{
 			if (tickInterval <= 0) {
 				tickInterval = 5000;
 			}
 
-			Condition* condition = getDamageCondition(CONDITION_DROWN, damage, damage, 0, tickInterval);
+			Condition* condition = getDamageCondition(CONDITION_DROWN, maxDamage, minDamage, startDamage, tickInterval);
 			combat->addCondition(condition);
 
 			return this;
@@ -172,11 +198,18 @@ public:
 
 		CombatBuilder* withConditionFreeze(int32_t damage, uint32_t tickInterval = 8000)
 		{
+			return this->withConditionFreeze(damage, damage, tickInterval);
+		}
+
+		CombatBuilder* withConditionFreeze(int32_t minDamage, int32_t maxDamage, uint32_t tickInterval = 8000,
+		                                   int32_t startDamage = 0)
+		{
 			if (tickInterval <= 0) {
 				tickInterval = 8000;
 			}
 
-			Condition* condition = getDamageCondition(CONDITION_FREEZING, damage, damage, 0, tickInterval);
+			Condition* condition =
+			    getDamageCondition(CONDITION_FREEZING, maxDamage, minDamage, startDamage, tickInterval);
 			combat->addCondition(condition);
 
 			return this;
@@ -184,11 +217,18 @@ public:
 
 		CombatBuilder* withConditionDazzle(int32_t damage, uint32_t tickInterval = 10000)
 		{
+			return this->withConditionDazzle(damage, damage, tickInterval);
+		}
+
+		CombatBuilder* withConditionDazzle(int32_t minDamage, int32_t maxDamage, uint32_t tickInterval = 10000,
+		                                   int32_t startDamage = 0)
+		{
 			if (tickInterval <= 0) {
 				tickInterval = 10000;
 			}
 
-			Condition* condition = getDamageCondition(CONDITION_DAZZLED, damage, damage, 0, tickInterval);
+			Condition* condition =
+			    getDamageCondition(CONDITION_DAZZLED, maxDamage, minDamage, startDamage, tickInterval);
 			combat->addCondition(condition);
 
 			return this;
@@ -196,11 +236,18 @@ public:
 
 		CombatBuilder* withConditionCurse(int32_t damage, uint32_t tickInterval = 4000)
 		{
+			return this->withConditionCurse(damage, damage, tickInterval);
+		}
+
+		CombatBuilder* withConditionCurse(int32_t minDamage, int32_t maxDamage, uint32_t tickInterval = 4000,
+		                                  int32_t startDamage = 0)
+		{
 			if (tickInterval <= 0) {
 				tickInterval = 4000;
 			}
 
-			Condition* condition = getDamageCondition(CONDITION_CURSED, damage, damage, 0, tickInterval);
+			Condition* condition =
+			    getDamageCondition(CONDITION_CURSED, maxDamage, minDamage, startDamage, tickInterval);
 			combat->addCondition(condition);
 
 			return this;
@@ -208,11 +255,18 @@ public:
 
 		CombatBuilder* withConditionBleed(int32_t damage, uint32_t tickInterval = 4000)
 		{
+			return this->withConditionBleed(damage, damage, tickInterval);
+		}
+
+		CombatBuilder* withConditionBleed(int32_t minDamage, int32_t maxDamage, uint32_t tickInterval = 4000,
+		                                  int32_t startDamage = 0)
+		{
 			if (tickInterval <= 0) {
 				tickInterval = 4000;
 			}
 
-			Condition* condition = getDamageCondition(CONDITION_POISON, damage, damage, 0, tickInterval);
+			Condition* condition =
+			    getDamageCondition(CONDITION_BLEEDING, maxDamage, minDamage, startDamage, tickInterval);
 			combat->addCondition(condition);
 
 			return this;
@@ -357,6 +411,33 @@ public:
 			Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_INVISIBLE, duration, 0);
 			combat->setParam(COMBAT_PARAM_AGGRESSIVE, 0);
 			combat->addCondition(condition);
+
+			return this;
+		}
+
+		CombatBuilder* withDrunk(int32_t duration = 10000, uint8_t level = 25)
+		{
+			Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, level);
+			combat->addCondition(condition);
+
+			return this;
+		}
+
+		CombatBuilder* withFireField()
+		{
+			combat->setParam(COMBAT_PARAM_CREATEITEM, ITEM_FIREFIELD_PVP_FULL);
+			return this;
+		}
+
+		CombatBuilder* withPoisonField()
+		{
+			combat->setParam(COMBAT_PARAM_CREATEITEM, ITEM_POISONFIELD_PVP);
+			return this;
+		}
+
+		CombatBuilder* withEnergyField()
+		{
+			combat->setParam(COMBAT_PARAM_CREATEITEM, ITEM_ENERGYFIELD_PVP);
 			return this;
 		}
 	};
