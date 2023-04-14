@@ -471,5 +471,22 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 		this->setLook(outfit, corpse);
 	}
 
+	if (pugi::xml_node attacksNode = node.child("attacks")) {
+		for (auto attackNode : attacksNode.children()) {
+			MonsterSpell spell;
+			if (spell.loadFromXMLNode(attackNode, reloading)) {
+				this->mType->info.attackSpells.emplace_back(std::move(spell));
+			} else {
+				std::cout << "[Warning - MonsterType::loadFromXMLNode] Cant load spell. " << this->mType->name
+				          << std::endl;
+			}
+		}
+	}
+
+	if (pugi::xml_node defensesNode = node.child("defenses")) {
+		if (attr = node.attribute("defense")) {
+		}
+	}
+
 	return this->build();
 }

@@ -75,6 +75,10 @@ public:
 	public:
 		Combat_ptr getInstance() { return combat; }
 
+		bool isTargetNeeded() { return needTarget; }
+
+		bool isDirectionNeeded() { return needDirection; }
+
 		CombatBuilder* withLength(int32_t length, int32_t spread = 3)
 		{
 			if (length <= 0) {
@@ -438,6 +442,18 @@ public:
 		CombatBuilder* withEnergyField()
 		{
 			combat->setParam(COMBAT_PARAM_CREATEITEM, ITEM_ENERGYFIELD_PVP);
+			return this;
+		}
+
+		CombatBuilder* withShootType(ShootType_t shoot)
+		{
+			combat->setParam(COMBAT_PARAM_DISTANCEEFFECT, shoot);
+			return this;
+		}
+
+		CombatBuilder* withMagicEffect(MagicEffectClasses effect)
+		{
+			combat->setParam(COMBAT_PARAM_EFFECT, effect);
 			return this;
 		}
 	};

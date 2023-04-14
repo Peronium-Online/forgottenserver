@@ -2,6 +2,7 @@
 
 #include "../../weapons.h"
 #include "libs/monster/Monsters.h"
+#include "libs/util/tools/gamehelpers.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -378,11 +379,55 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 		auto conditionParams = getDamageConditionParamsFromXML(node, this);
 		combatBuilder.withConditionBleed(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
 		                                 conditionParams.startDamage);
+	} else if (tmpName == "strength") {
+		//
+	} else if (tmpName == "effect") {
+		//
+	} else {
+		std::cout << "[Error - MonsterSpell::loadFromXMLNode] - " << getName() << " - Unknown spell name: " << name
+		          << std::endl;
+		return nullptr;
 	}
 
-	auto combatSpell = combatBuilder.getInstance();
+	for (auto attrNode : node.children()) {
+		if (auto attr = attrNode.attribute("key")) {
+			const auto value = attr.value();
+			if (caseInsensitiveEqual(value, "shooteffect")) {
+				if (attr = attrNode.attribute("value")) {
+					ShootType_t shoot = getShootType(boost::algorithm::to_lower_copy<std::string>(attr.as_string()));
+					if (shoot != CONST_ANI_NONE) {
+						combatBuilder.withShootType(shoot);
+					} else {
+						std::cout << "[Warning - MonsterSpell::loadFromXMLNode] - " << getName()
+						          << " - Unknown shootEffect: " << attr.as_string() << std::endl;
+					}
+				}
+			} else if (caseInsensitiveEqual(value, "areaeffect")) {
+				if (attr = attrNode.attribute("value")) {
+					MagicEffectClasses effect =
+					    getMagicEffect(boost::algorithm::to_lower_copy<std::string>(attr.as_string()));
+					if (effect != CONST_ME_NONE) {
+						combatBuilder.withMagicEffect(effect);
+					} else {
+						std::cout << "[Warning - MonsterSpell::loadFromXMLNode] - " << getName()
+						          << " - Unknown areaEffect: " << attr.as_string() << std::endl;
+					}
+				}
+			} else {
+				std::cout << "[Warning - MonsterSpell::loadFromXMLNode] - " << getName() << " - Effect type: \""
+				          << attr.as_string() << "\" does not exist." << std::endl;
+			}
+		}
+	}
+
+	auto combatPtr = combatBuilder.getInstance();
+	combatPtr->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, this->minCombatValue, 0, this->maxCombatValue, 0);
+
+	auto combatSpell = new CombatSpell(combatPtr, combatBuilder.isTargetNeeded(), combatBuilder.isDirectionNeeded());
 	this->setBaseSpell(combatSpell);
-	this->combatSpell = true;
+	if (combatSpell) {
+		this->combatSpell = true;
+	}
 
 	return this;
 }
