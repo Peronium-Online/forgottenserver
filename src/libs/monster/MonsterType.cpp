@@ -327,4 +327,38 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 
 		return this->build();
 	}
+
+	if (pugi::xml_node voicesNode = node.child("voices")) {
+		MonsterVoice voice;
+		if ((attr = node.attribute("speed")) || (attr = node.attribute("interval"))) {
+			voice.setYellSpeedTicks(pugi::cast<uint32_t>(attr.value()));
+		} else {
+			std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing voices speed. " << this->mType->name
+			          << std::endl;
+		}
+
+		if (attr = node.attribute("chance")) {
+			voice.setYellChance(pugi::cast<uint32_t>(attr.value()));
+		} else {
+			std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing voices chance. " << this->mType->name
+			          << std::endl;
+		}
+
+		for (auto voiceNode : voicesNode.children()) {
+			std::string sentence;
+			if (attr = voiceNode.attribute("sentence")) {
+				sentence = attr.as_string();
+			} else {
+				std::cout << "[Warning - MonsterType::loadFromXMLNode]  Missing voice sentence. " << this->mType->name
+				          << std::endl;
+			}
+
+			bool yell = false;
+			if (attr = voiceNode.attribute("yell")) {
+				yell = attr.as_bool();
+			}
+
+			voice.addVoiceBlock(sentence, yell);
+		}
+	}
 }

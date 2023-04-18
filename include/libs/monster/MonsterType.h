@@ -4,17 +4,12 @@
 #include "constants/const.h"
 #include "constants/enums.h"
 #include "libs/monster/MonsterSpell.h"
+#include "libs/monster/MonsterVoice.h"
 #include "libs/util/xml/XMLElementBuilder.h"
 
 #include <map>
 #include <string>
 #include <vector>
-
-struct voiceBlock_t
-{
-	std::string text;
-	bool yellText;
-};
 
 struct summonBlock_t
 {
@@ -64,7 +59,7 @@ class MonsterType
 
 		std::map<CombatType_t, int32_t> elementMap;
 
-		std::vector<voiceBlock_t> voiceVector;
+		MonsterVoice voice;
 
 		std::vector<LootBlock> lootItems;
 		std::vector<std::string> scripts;
@@ -552,6 +547,12 @@ public:
 		Builder* withImmunityToBleed()
 		{
 			this->mType->info.conditionImmunities |= CONDITION_BLEEDING;
+			return this;
+		}
+
+		Builder* setVoice(MonsterVoice voice)
+		{
+			this->mType->info.voice = voice;
 			return this;
 		}
 	};
