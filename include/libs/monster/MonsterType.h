@@ -54,8 +54,6 @@ struct LootBlock
 	}
 };
 
-class BaseSpell;
-
 class LuaScriptInterface;
 
 class MonsterType
@@ -152,39 +150,312 @@ public:
 
 		virtual MonsterType* build();
 
-		virtual Builder* setName(std::string name);
-		virtual Builder* setNameDescription(std::string nameDescription);
-		virtual Builder* setRace(std::string raceName);
-		virtual Builder* setRace(uint16_t raceNumber);
-		virtual Builder* setExperience(uint64_t exp);
-		virtual Builder* setSpeed(int32_t speed);
-		virtual Builder* setManaCost(uint32_t cost);
-		virtual Builder* setSkull(std::string skull);
-		virtual Builder* setScript(std::string filename);
-		virtual Builder* setHealthNow(int32_t healthNow);
-		virtual Builder* setHealthMax(int32_t healthMax);
-		virtual Builder* setSummonable(bool summonable);
-		virtual Builder* setAttackable(bool attackable);
-		virtual Builder* setHostile(bool hostile);
-		virtual Builder* setIgnoreSpawnBlock(bool ignore);
-		virtual Builder* setIllusionable(bool illusionble);
-		virtual Builder* setChallengeable(bool challengeable);
-		virtual Builder* setConvinceable(bool convinceable);
-		virtual Builder* setPushable(bool pushable);
-		virtual Builder* setBoss(bool boss);
-		virtual Builder* setCanPushItems(bool canPushItems);
-		virtual Builder* setCanPushCreatures(bool canPushCreatures);
-		virtual Builder* setStaticAttack(uint32_t staticAttack);
-		virtual Builder* setLightLevel(uint16_t lightLevel);
-		virtual Builder* setLightColor(uint16_t lightColor);
-		virtual Builder* setTargetDistance(int32_t targetDistance);
-		virtual Builder* setRunOnHealth(int32_t runOnHealth);
-		virtual Builder* setHideHealth(bool hideHealth);
-		virtual Builder* setCanWalkOnEnergy(bool canWalk);
-		virtual Builder* setCanWalkOnFire(bool canWalk);
-		virtual Builder* setCanWalkOnPoison(bool canWalk);
-		virtual Builder* setTargetChange(uint32_t interval, int32_t chance);
-		virtual Builder* setLook(Outfit_t outfit, uint16_t corpse);
+		Builder* setName(std::string name)
+		{
+			std::string lowerCasedMonsterName = boost::algorithm::to_lower_copy(name);
+
+			this->mType->name = name;
+			this->mType->nameDescription = "a " + lowerCasedMonsterName;
+			return this;
+		}
+
+		Builder* setNameDescription(std::string nameDescription)
+		{
+			this->mType->nameDescription = nameDescription;
+			return this;
+		}
+
+		Builder* setRace(std::string raceName)
+		{
+			if (raceName == "venom") {
+				this->mType->info.race = RACE_VENOM;
+			} else if (raceName == "blood") {
+				this->mType->info.race = RACE_BLOOD;
+			} else if (raceName == "undead") {
+				this->mType->info.race = RACE_UNDEAD;
+			} else if (raceName == "fire") {
+				this->mType->info.race = RACE_FIRE;
+			} else if (raceName == "energy") {
+				this->mType->info.race = RACE_ENERGY;
+			} else if (raceName == "ink") {
+				this->mType->info.race = RACE_INK;
+			}
+
+			return this;
+		}
+
+		Builder* setRace(uint16_t raceNumber)
+		{
+			switch (raceNumber) {
+				case 1:
+					this->mType->info.race = RACE_VENOM;
+					break;
+				case 2:
+					this->mType->info.race = RACE_BLOOD;
+					break;
+				case 3:
+					this->mType->info.race = RACE_UNDEAD;
+					break;
+				case 4:
+					this->mType->info.race = RACE_FIRE;
+					break;
+				case 5:
+					this->mType->info.race = RACE_ENERGY;
+					break;
+				case 6:
+					this->mType->info.race = RACE_INK;
+					break;
+				default:
+					break;
+			}
+
+			return this;
+		}
+
+		Builder* setExperience(uint64_t exp)
+		{
+			this->mType->info.experience = exp;
+			return this;
+		}
+
+		Builder* setSpeed(int32_t speed)
+		{
+			this->mType->info.baseSpeed = speed;
+			return this;
+		}
+
+		Builder* setSkull(std::string skull)
+		{
+			this->mType->info.skull = getSkullType(boost::algorithm::to_lower_copy<std::string>(skull));
+			return this;
+		}
+
+		Builder* setScript(std::string filename)
+		{
+			if (!g_monsters.scriptInterface) {
+				g_monsters.scriptInterface.reset(new LuaScriptInterface("Monster Interface"));
+				g_monsters.scriptInterface->initState();
+			}
+
+			if (g_monsters.scriptInterface->loadFile("data/monster/scripts/" + filename) == 0) {
+				mType->info.scriptInterface = g_monsters.scriptInterface.get();
+				mType->info.creatureAppearEvent = g_monsters.scriptInterface->getEvent("onCreatureAppear");
+				mType->info.creatureDisappearEvent = g_monsters.scriptInterface->getEvent("onCreatureDisappear");
+				mType->info.creatureMoveEvent = g_monsters.scriptInterface->getEvent("onCreatureMove");
+				mType->info.creatureSayEvent = g_monsters.scriptInterface->getEvent("onCreatureSay");
+				mType->info.thinkEvent = g_monsters.scriptInterface->getEvent("onThink");
+			} else {
+				std::cout << "[Warning - MonsterType::setScript] Can not load script: " << filename << std::endl;
+				std::cout << g_monsters.scriptInterface->getLastLuaError() << std::endl;
+			}
+
+			return this;
+		}
+
+		Builder* setHealthNow(int32_t healthNow)
+		{
+			this->mType->info.health = healthNow;
+			return this;
+		}
+
+		Builder* setHealthMax(int32_t healthMax)
+		{
+			this->mType->info.healthMax = healthMax;
+			return this;
+		}
+
+		Builder* setManaCost(uint32_t cost)
+		{
+			this->mType->info.manaCost = cost;
+			return this;
+		}
+
+		Builder* setSummonable(bool summonable)
+		{
+			this->mType->info.isSummonable = summonable;
+			return this;
+		}
+
+		Builder* setAttackable(bool attackable)
+		{
+			this->mType->info.isAttackable = attackable;
+			return this;
+		}
+
+		Builder* setHostile(bool hostile)
+		{
+			this->mType->info.isHostile = hostile;
+			return this;
+		}
+
+		Builder* setIgnoreSpawnBlock(bool ignore)
+		{
+			this->mType->info.isIgnoringSpawnBlock = ignore;
+			return this;
+		}
+
+		Builder* setIllusionable(bool illusionable)
+		{
+			this->mType->info.isIllusionable = illusionable;
+			return this;
+		}
+
+		Builder* setChallengeable(bool challengeable)
+		{
+			this->mType->info.isChallengeable = challengeable;
+			return this;
+		}
+
+		Builder* setConvinceable(bool convinceable)
+		{
+			this->mType->info.isConvinceable = convinceable;
+			return this;
+		}
+
+		Builder* setPushable(bool pushable)
+		{
+			if (pushable) {
+				this->mType->info.canPushCreatures = false;
+			}
+			this->mType->info.pushable = pushable;
+
+			return this;
+		}
+
+		Builder* setBoss(bool boss)
+		{
+			this->mType->info.isBoss = boss;
+			return this;
+		}
+
+		Builder* setCanPushItems(bool canPushItems)
+		{
+			this->mType->info.canPushItems = canPushItems;
+			return this;
+		}
+
+		Builder* setCanPushCreatures(bool canPush)
+		{
+			if (canPush) {
+				this->mType->info.pushable = false;
+			}
+			this->mType->info.canPushCreatures = canPush;
+
+			return this;
+		}
+
+		Builder* setStaticAttack(uint32_t staticAttack)
+		{
+			if (staticAttack > 100) {
+				std::cout << "[Warning - MonsterType::loadFromXMLNode] staticattack greater than 100. "
+				          << this->mType->name << std::endl;
+				staticAttack = 100;
+			}
+
+			this->mType->info.staticAttackChance = staticAttack;
+
+			return this;
+		}
+
+		Builder* setLightLevel(uint16_t lightLevel)
+		{
+			this->mType->info.light.level = lightLevel;
+			return this;
+		}
+
+		Builder* setLightColor(uint16_t lightColor)
+		{
+			this->mType->info.light.color = lightColor;
+			return this;
+		}
+
+		Builder* setTargetDistance(int32_t targetDistance)
+		{
+			if (targetDistance < 1) {
+				targetDistance = 1;
+				std::cout << "[Warning - MonsterType::loadFromXMLNode] targetdistance less than 1. "
+				          << this->mType->name << std::endl;
+			}
+
+			this->mType->info.targetDistance = targetDistance;
+			return this;
+		}
+
+		Builder* setRunOnHealth(int32_t runAwayHealth)
+		{
+			this->mType->info.runAwayHealth = runAwayHealth;
+			return this;
+		}
+
+		Builder* setHideHealth(bool hideHealth)
+		{
+			this->mType->info.hiddenHealth = hideHealth;
+			return this;
+		}
+
+		Builder* setCanWalkOnEnergy(bool canWalk)
+		{
+			this->mType->info.canWalkOnEnergy = canWalk;
+			return this;
+		}
+
+		Builder* setCanWalkOnFire(bool canWalk)
+		{
+			this->mType->info.canWalkOnFire = canWalk;
+			return this;
+		}
+
+		Builder* setCanWalkOnPoison(bool canWalk)
+		{
+			this->mType->info.canWalkOnPoison = canWalk;
+			return this;
+		}
+
+		Builder* setTargetChange(uint32_t interval, int32_t chance)
+		{
+			if (chance > 100) {
+				chance = 100;
+				std::cout << "[Warning - MonsterType::loadFromXMLNode] targetchange chance value out of bounds. "
+				          << this->mType->name << std::endl;
+			}
+
+			this->mType->info.changeTargetSpeed = interval;
+			this->mType->info.changeTargetChance = chance;
+
+			return this;
+		}
+
+		Builder* setLook(Outfit_t outfit, uint16_t corpse)
+		{
+			this->mType->info.outfit = outfit;
+			this->mType->info.lookcorpse = corpse;
+
+			return this;
+		}
+
+		Builder* addAttackSpell(MonsterSpell spell)
+		{
+			this->mType->info.attackSpells.emplace_back(std::move(spell));
+			return this;
+		}
+
+		Builder* setDefense(int32_t defense)
+		{
+			this->mType->info.defense = defense;
+			return this;
+		}
+
+		Builder* setArmor(int32_t armor)
+		{
+			this->mType->info.armor = armor;
+			return this;
+		}
+
+		Builder* addDefenseSpell(MonsterSpell spell)
+		{
+			this->mType->info.defenseSpells.emplace_back(std::move(spell));
+			return this;
+		}
 	};
 };
 
