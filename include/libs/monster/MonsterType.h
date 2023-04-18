@@ -456,6 +456,104 @@ public:
 			this->mType->info.defenseSpells.emplace_back(std::move(spell));
 			return this;
 		}
+
+		Builder* withImmunityToPhysical()
+		{
+			this->mType->info.damageImmunities |= COMBAT_PHYSICALDAMAGE;
+			this->mType->info.conditionImmunities |= CONDITION_BLEEDING;
+			return this;
+		}
+
+		Builder* withImmunityToFire()
+		{
+			this->mType->info.damageImmunities |= COMBAT_FIREDAMAGE;
+			this->mType->info.conditionImmunities |= CONDITION_FIRE;
+			return this;
+		}
+
+		Builder* withImmunityToPoison()
+		{
+			this->mType->info.damageImmunities |= COMBAT_EARTHDAMAGE;
+			this->mType->info.conditionImmunities |= CONDITION_POISON;
+			return this;
+		}
+
+		Builder* withImmunityToEnergy()
+		{
+			this->mType->info.damageImmunities |= COMBAT_ENERGYDAMAGE;
+			this->mType->info.conditionImmunities |= CONDITION_ENERGY;
+			return this;
+		}
+
+		Builder* withImmunityToDrown()
+		{
+			this->mType->info.damageImmunities |= COMBAT_DROWNDAMAGE;
+			this->mType->info.conditionImmunities |= CONDITION_DROWN;
+			return this;
+		}
+
+		Builder* withImmunityToIce()
+		{
+			this->mType->info.damageImmunities |= COMBAT_ICEDAMAGE;
+			this->mType->info.conditionImmunities |= CONDITION_FREEZING;
+			return this;
+		}
+
+		Builder* withImmunityToHoly()
+		{
+			this->mType->info.damageImmunities |= COMBAT_HOLYDAMAGE;
+			this->mType->info.conditionImmunities |= CONDITION_DAZZLED;
+			return this;
+		}
+
+		Builder* withImmunityToDeath()
+		{
+			this->mType->info.damageImmunities |= COMBAT_DEATHDAMAGE;
+			this->mType->info.conditionImmunities |= CONDITION_CURSED;
+			return this;
+		}
+
+		Builder* withImmunityToLifeDrain()
+		{
+			this->mType->info.damageImmunities |= COMBAT_LIFEDRAIN;
+			return this;
+		}
+
+		Builder* withImmunityToManaDrain()
+		{
+			this->mType->info.damageImmunities |= COMBAT_MANADRAIN;
+			return this;
+		}
+
+		Builder* withImmunityToParalyze()
+		{
+			this->mType->info.conditionImmunities |= CONDITION_PARALYZE;
+			return this;
+		}
+
+		Builder* withImmunityToOutfitChange()
+		{
+			this->mType->info.conditionImmunities |= CONDITION_OUTFIT;
+			return this;
+		}
+
+		Builder* withImmunityToDrunk()
+		{
+			this->mType->info.conditionImmunities |= CONDITION_DRUNK;
+			return this;
+		}
+
+		Builder* withImmunityToInvisibility()
+		{
+			this->mType->info.conditionImmunities |= CONDITION_INVISIBLE;
+			return this;
+		}
+
+		Builder* withImmunityToBleed()
+		{
+			this->mType->info.conditionImmunities |= CONDITION_BLEEDING;
+			return this;
+		}
 	};
 };
 

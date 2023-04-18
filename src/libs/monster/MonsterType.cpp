@@ -40,7 +40,7 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 	}
 
 	this->setName(attr.as_string());
-	if ((attr = node.attribute("nameDescription"))) {
+	if (attr = node.attribute("nameDescription")) {
 		this->setNameDescription(attr.as_string());
 	}
 
@@ -52,23 +52,23 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 		this->setRace(tmpInt);
 	}
 
-	if ((attr = node.attribute("experience"))) {
+	if (attr = node.attribute("experience")) {
 		this->setExperience(pugi::cast<uint64_t>(attr.value()));
 	}
 
-	if ((attr = node.attribute("speed"))) {
+	if (attr = node.attribute("speed")) {
 		this->setSpeed(pugi::cast<int32_t>(attr.value()));
 	}
 
-	if ((attr = node.attribute("manacost"))) {
+	if (attr = node.attribute("manacost")) {
 		this->setManaCost(pugi::cast<uint32_t>(attr.value()));
 	}
 
-	if ((attr = node.attribute("skull"))) {
+	if (attr = node.attribute("skull")) {
 		this->setSkull(attr.as_string());
 	}
 
-	if ((attr = node.attribute("script"))) {
+	if (attr = node.attribute("script")) {
 		this->setScript(attr.as_string());
 	}
 
@@ -220,5 +220,111 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 		}
 	}
 
-	return this->build();
+	if (pugi::xml_node immunitiesNode = node.child("immunities")) {
+		for (auto immunityNode : immunitiesNode.children()) {
+			if (attr = immunityNode.attribute("name")) {
+				std::string tmpStrValue = boost::algorithm::to_lower_copy<std::string>(attr.as_string());
+				if (tmpStrValue == "physical") {
+					this->withImmunityToPhysical();
+				} else if (tmpStrValue == "energy") {
+					this->withImmunityToEnergy();
+				} else if (tmpStrValue == "fire") {
+					this->withImmunityToFire();
+				} else if (tmpStrValue == "poison" || tmpStrValue == "earth") {
+					this->withImmunityToPoison();
+				} else if (tmpStrValue == "drown") {
+					this->withImmunityToDrown();
+				} else if (tmpStrValue == "ice") {
+					this->withImmunityToIce();
+				} else if (tmpStrValue == "holy") {
+					this->withImmunityToHoly();
+				} else if (tmpStrValue == "death") {
+					this->withImmunityToDeath();
+				} else if (tmpStrValue == "lifedrain") {
+					this->withImmunityToLifeDrain();
+				} else if (tmpStrValue == "manadrain") {
+					this->withImmunityToManaDrain();
+				} else if (tmpStrValue == "paralyze") {
+					this->withImmunityToParalyze();
+				} else if (tmpStrValue == "outfit") {
+					this->withImmunityToOutfitChange();
+				} else if (tmpStrValue == "drunk") {
+					this->withImmunityToDrunk();
+				} else if (tmpStrValue == "invisible" || tmpStrValue == "invisibility") {
+					this->withImmunityToInvisibility();
+				} else if (tmpStrValue == "bleed") {
+					this->withImmunityToBleed();
+				} else {
+					std::cout << "[Warning - MonsterType::loadFromXMLNode] Unknown immunity name " << attr.as_string()
+					          << ". " << this->mType->name << std::endl;
+				}
+			} else if ((attr = immunityNode.attribute("physical"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToPhysical();
+				}
+			} else if ((attr = immunityNode.attribute("energy"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToEnergy();
+				}
+			} else if ((attr = immunityNode.attribute("fire"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToFire();
+				}
+			} else if ((attr = immunityNode.attribute("poison")) || (attr = immunityNode.attribute("earth"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToPoison();
+				}
+			} else if ((attr = immunityNode.attribute("drown"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToDrown();
+				}
+			} else if ((attr = immunityNode.attribute("ice"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToIce();
+				}
+			} else if ((attr = immunityNode.attribute("holy"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToHoly();
+				}
+			} else if ((attr = immunityNode.attribute("death"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToDeath();
+				}
+			} else if ((attr = immunityNode.attribute("lifedrain"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToLifeDrain();
+				}
+			} else if ((attr = immunityNode.attribute("manadrain"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToManaDrain();
+				}
+			} else if ((attr = immunityNode.attribute("paralyze"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToParalyze();
+				}
+			} else if ((attr = immunityNode.attribute("outfit"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToOutfitChange();
+				}
+			} else if ((attr = immunityNode.attribute("bleed"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToBleed();
+				}
+			} else if ((attr = immunityNode.attribute("drunk"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToDrunk();
+				}
+			} else if ((attr = immunityNode.attribute("invisible")) ||
+			           (attr = immunityNode.attribute("invisibility"))) {
+				if (attr.as_bool()) {
+					this->withImmunityToInvisibility();
+				}
+			} else {
+				std::cout << "[Warning - MonsterType::loadFromXMLNode] Unknown immunity name " << attr.as_string()
+				          << ". " << this->mType->name << std::endl;
+			}
+		}
+
+		return this->build();
+	}
 }
