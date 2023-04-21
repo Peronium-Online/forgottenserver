@@ -3,6 +3,7 @@
 
 #include "constants/const.h"
 #include "constants/enums.h"
+#include "libs/monster/MonsterLoot.h"
 #include "libs/monster/MonsterSpell.h"
 #include "libs/monster/MonsterVoice.h"
 #include "libs/util/xml/XMLElementBuilder.h"
@@ -26,32 +27,9 @@ struct targetSeekBlock_t
 	uint32_t priority = 1;
 };
 
-struct LootBlock
-{
-	uint16_t id;
-	uint32_t countmax;
-	uint32_t chance;
-
-	// optional
-	int32_t subType;
-	int32_t actionId;
-	std::string text;
-
-	std::vector<LootBlock> childLoot;
-	LootBlock()
-	{
-		id = 0;
-		countmax = 1;
-		chance = 0;
-
-		subType = -1;
-		actionId = -1;
-	}
-};
-
 class LuaScriptInterface;
 
-class MonsterType
+class MonsterType : public virtual XMLElementBuilder<MonsterType*>
 {
 	struct MonsterInfo
 	{
@@ -61,7 +39,7 @@ class MonsterType
 
 		MonsterVoice voice;
 
-		std::vector<LootBlock> lootItems;
+		std::vector<MonsterLoot> lootItems;
 		std::vector<std::string> scripts;
 		std::vector<MonsterSpell> attackSpells;
 		std::vector<MonsterSpell> defenseSpells;
@@ -132,8 +110,6 @@ public:
 	std::string nameDescription;
 
 	MonsterInfo info;
-
-	void loadLoot(MonsterType* monsterType, LootBlock lootBlock);
 
 	class Builder : public virtual XMLElementBuilder<MonsterType*>
 	{
@@ -553,6 +529,12 @@ public:
 		Builder* setVoice(MonsterVoice voice)
 		{
 			this->mType->info.voice = voice;
+			return this;
+		}
+
+		Builder* addLoot(MonsterLoot loot)
+		{
+			this->mType->info.lootItems.emplace_back(std::move(loot));
 			return this;
 		}
 	};

@@ -361,4 +361,15 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 			voice.addVoiceBlock(sentence, yell);
 		}
 	}
+
+	if (pugi::xml_node lootsNode = node.child("loot")) {
+		for (auto lootNode : lootsNode.children()) {
+			MonsterLoot monsterLoot;
+			if (monsterLoot.loadFromXMLNode(lootNode, reloading)) {
+			} else {
+				std::cout << "[Warning - MonsterType::loadFromXMLNode] Cant load loot. " << this->mType->name
+				          << std::endl;
+			}
+		}
+	}
 }
