@@ -6,11 +6,16 @@
 #include "libs/monster/MonsterLoot.h"
 #include "libs/monster/MonsterSpell.h"
 #include "libs/monster/MonsterVoice.h"
+#include "libs/monster/Monsters.h"
+#include "libs/util/tools/gamehelpers.h"
 #include "libs/util/xml/XMLElementBuilder.h"
 
+#include <boost/algorithm/string.hpp>
 #include <map>
 #include <string>
 #include <vector>
+
+extern Monsters g_monsters;
 
 struct summonBlock_t
 {
@@ -435,10 +440,34 @@ public:
 			return this;
 		}
 
+		Builder* withImmunityToPhysical(int32_t percentage)
+		{
+			this->mType->info.elementMap[COMBAT_PHYSICALDAMAGE] = percentage;
+			if (this->mType->info.damageImmunities & COMBAT_PHYSICALDAMAGE) {
+				std::cout
+				    << "[Warning - MonsterType::withImmunityToPhysical] Same element \"physical\" on immunity and element tags. "
+				    << this->mType->name << std::endl;
+			}
+
+			return this;
+		}
+
 		Builder* withImmunityToFire()
 		{
 			this->mType->info.damageImmunities |= COMBAT_FIREDAMAGE;
 			this->mType->info.conditionImmunities |= CONDITION_FIRE;
+			return this;
+		}
+
+		Builder* withImmunityToFire(int32_t percentage)
+		{
+			this->mType->info.elementMap[COMBAT_FIREDAMAGE] = percentage;
+			if (this->mType->info.damageImmunities & COMBAT_FIREDAMAGE) {
+				std::cout
+				    << "[Warning - MonsterType::withImmunityToFire] Same element \"fire\" on immunity and element tags. "
+				    << this->mType->name << std::endl;
+			}
+
 			return this;
 		}
 
@@ -449,10 +478,34 @@ public:
 			return this;
 		}
 
+		Builder* withImmunityToPoison(int32_t percentage)
+		{
+			this->mType->info.elementMap[COMBAT_EARTHDAMAGE] = percentage;
+			if (this->mType->info.damageImmunities & COMBAT_EARTHDAMAGE) {
+				std::cout
+				    << "[Warning - MonsterType::withImmunityToPoison] Same element \"earth\" on immunity and element tags. "
+				    << this->mType->name << std::endl;
+			}
+
+			return this;
+		}
+
 		Builder* withImmunityToEnergy()
 		{
 			this->mType->info.damageImmunities |= COMBAT_ENERGYDAMAGE;
 			this->mType->info.conditionImmunities |= CONDITION_ENERGY;
+			return this;
+		}
+
+		Builder* withImmunityToEnergy(int32_t percentage)
+		{
+			this->mType->info.elementMap[COMBAT_ENERGYDAMAGE] = percentage;
+			if (this->mType->info.damageImmunities & COMBAT_ENERGYDAMAGE) {
+				std::cout
+				    << "[Warning - MonsterType::withImmunityToEnergy] Same element \"energy\" on immunity and element tags. "
+				    << this->mType->name << std::endl;
+			}
+
 			return this;
 		}
 
@@ -463,10 +516,34 @@ public:
 			return this;
 		}
 
+		Builder* withImmunityToDrown(int32_t percentage)
+		{
+			this->mType->info.elementMap[COMBAT_DROWNDAMAGE] = percentage;
+			if (this->mType->info.damageImmunities & COMBAT_DROWNDAMAGE) {
+				std::cout
+				    << "[Warning - MonsterType::withImmunityToDrown] Same element \"drown\" on immunity and element tags. "
+				    << this->mType->name << std::endl;
+			}
+
+			return this;
+		}
+
 		Builder* withImmunityToIce()
 		{
 			this->mType->info.damageImmunities |= COMBAT_ICEDAMAGE;
 			this->mType->info.conditionImmunities |= CONDITION_FREEZING;
+			return this;
+		}
+
+		Builder* withImmunityToIce(int32_t percentage)
+		{
+			this->mType->info.elementMap[COMBAT_ICEDAMAGE] = percentage;
+			if (this->mType->info.damageImmunities & COMBAT_ICEDAMAGE) {
+				std::cout
+				    << "[Warning - MonsterType::withImmunityToIce] Same element \"ice\" on immunity and element tags. "
+				    << this->mType->name << std::endl;
+			}
+
 			return this;
 		}
 
@@ -477,10 +554,34 @@ public:
 			return this;
 		}
 
+		Builder* withImmunityToHoly(int32_t percentage)
+		{
+			this->mType->info.elementMap[COMBAT_HOLYDAMAGE] = percentage;
+			if (this->mType->info.damageImmunities & COMBAT_HOLYDAMAGE) {
+				std::cout
+				    << "[Warning - MonsterType::withImmunityToHoly] Same element \"holy\" on immunity and element tags. "
+				    << this->mType->name << std::endl;
+			}
+
+			return this;
+		}
+
 		Builder* withImmunityToDeath()
 		{
 			this->mType->info.damageImmunities |= COMBAT_DEATHDAMAGE;
 			this->mType->info.conditionImmunities |= CONDITION_CURSED;
+			return this;
+		}
+
+		Builder* withImmunityToDeath(int32_t percentage)
+		{
+			this->mType->info.elementMap[COMBAT_DEATHDAMAGE] = percentage;
+			if (this->mType->info.damageImmunities & COMBAT_DEATHDAMAGE) {
+				std::cout
+				    << "[Warning - MonsterType::withImmunityToDeath] Same element \"death\" on immunity and element tags. "
+				    << this->mType->name << std::endl;
+			}
+
 			return this;
 		}
 
@@ -490,9 +591,33 @@ public:
 			return this;
 		}
 
+		Builder* withImmunityToLifeDrain(int32_t percentage)
+		{
+			this->mType->info.elementMap[COMBAT_LIFEDRAIN] = percentage;
+			if (this->mType->info.damageImmunities & COMBAT_LIFEDRAIN) {
+				std::cout
+				    << "[Warning - MonsterType::withImmunityToLifeDrain] Same element \"lifedrain\" on immunity and element tags. "
+				    << this->mType->name << std::endl;
+			}
+
+			return this;
+		}
+
 		Builder* withImmunityToManaDrain()
 		{
 			this->mType->info.damageImmunities |= COMBAT_MANADRAIN;
+			return this;
+		}
+
+		Builder* withImmunityToManaDrain(int32_t percentage)
+		{
+			this->mType->info.elementMap[COMBAT_MANADRAIN] = percentage;
+			if (this->mType->info.damageImmunities & COMBAT_MANADRAIN) {
+				std::cout
+				    << "[Warning - MonsterType::withImmunityToManaDrain] Same element \"manadrain\" on immunity and element tags. "
+				    << this->mType->name << std::endl;
+			}
+
 			return this;
 		}
 

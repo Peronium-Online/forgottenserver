@@ -1,12 +1,5 @@
 #include "libs/monster/MonsterType.h"
 
-#include "libs/monster/Monsters.h"
-#include "libs/util/tools/gamehelpers.h"
-
-#include <boost/algorithm/string.hpp>
-
-extern Monsters g_monsters;
-
 MonsterType* MonsterType::Builder::build()
 {
 	if (this->mType->info.manaCost == 0 && (this->mType->info.isSummonable || this->mType->info.isConvinceable)) {
@@ -324,8 +317,6 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 				          << ". " << this->mType->name << std::endl;
 			}
 		}
-
-		return this->build();
 	}
 
 	if (pugi::xml_node voicesNode = node.child("voices")) {
@@ -360,14 +351,47 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 
 			voice.addVoiceBlock(sentence, yell);
 		}
+
+		this->setVoice(voice);
 	}
 
 	if (pugi::xml_node lootsNode = node.child("loot")) {
 		for (auto lootNode : lootsNode.children()) {
 			MonsterLoot monsterLoot;
 			if (monsterLoot.loadFromXMLNode(lootNode, reloading)) {
+				this->addLoot(std::move(monsterLoot));
 			} else {
 				std::cout << "[Warning - MonsterType::loadFromXMLNode] Cant load loot. " << this->mType->name
+				          << std::endl;
+			}
+		}
+	}
+
+	if (pugi::xml_node elementsNode = node.child("elements")) {
+		for (auto elementNode : elementsNode.children()) {
+			if (attr = elementNode.attribute("physicalPercent")) {
+				this->withImmunityToPhysical(pugi::cast<uint32_t>(attr.value()));
+			} else if (attr = elementNode.attribute("energyPercent")) {
+				this->withImmunityToEnergy(pugi::cast<uint32_t>(attr.value()));
+			} else if (attr = elementNode.attribute("firePercent")) {
+				this->withImmunityToFire(pugi::cast<uint32_t>(attr.value()));
+			} else if ((attr = elementNode.attribute("poisonPercent")) ||
+			           (attr = elementNode.attribute("earthPercent"))) {
+				this->withImmunityToPoison(pugi::cast<uint32_t>(attr.value()));
+			} else if (attr = elementNode.attribute("drownPercent")) {
+				this->withImmunityToDrown(pugi::cast<uint32_t>(attr.value()));
+			} else if (attr = elementNode.attribute("icePercent")) {
+				this->withImmunityToIce(pugi::cast<uint32_t>(attr.value()));
+			} else if (attr = elementNode.attribute("holyPercent")) {
+				this->withImmunityToHoly(pugi::cast<uint32_t>(attr.value()));
+			} else if (attr = elementNode.attribute("deathPercent")) {
+				this->withImmunityToDeath(pugi::cast<uint32_t>(attr.value()));
+			} else if (attr = elementNode.attribute("lifedrainPercent")) {
+				this->withImmunityToLifeDrain(pugi::cast<uint32_t>(attr.value()));
+			} else if (attr = elementNode.attribute("manadrainPercent")) {
+				this->withImmunityToManaDrain(pugi::cast<uint32_t>(attr.value()));
+			} else {
+				std::cout << "[Warning - MonsterType::loadFromXMLNode] Unknown element percent. " << this->mType->name
 				          << std::endl;
 			}
 		}
