@@ -4,6 +4,7 @@
 #include "constants/const.h"
 #include "constants/enums.h"
 #include "libs/monster/MonsterLoot.h"
+#include "libs/monster/MonsterSeek.h"
 #include "libs/monster/MonsterSpell.h"
 #include "libs/monster/MonsterSummon.h"
 #include "libs/monster/MonsterVoice.h"
@@ -17,12 +18,6 @@
 #include <vector>
 
 extern Monsters g_monsters;
-
-struct targetSeekBlock_t
-{
-	std::string cid;
-	uint32_t priority = 1;
-};
 
 class MonsterType : public virtual XMLElementBuilder<MonsterType*>
 {
@@ -39,7 +34,7 @@ class MonsterType : public virtual XMLElementBuilder<MonsterType*>
 		std::vector<MonsterSpell> attackSpells;
 		std::vector<MonsterSpell> defenseSpells;
 		std::vector<MonsterSummon> summons;
-		std::vector<targetSeekBlock_t> targetSeeks;
+		std::vector<MonsterSeek> seeks;
 
 		Skulls_t skull = SKULL_NONE;
 		Outfit_t outfit = {};
@@ -662,6 +657,18 @@ public:
 		Builder* addSummon(MonsterSummon summon)
 		{
 			this->mType->info.summons.emplace_back(std::move(summon));
+			return this;
+		}
+
+		Builder* addSeek(MonsterSeek seek)
+		{
+			this->mType->info.seeks.emplace_back(std::move(seek));
+			return this;
+		}
+
+		Builder* addEvent(std::string script)
+		{
+			this->mType->info.scripts.emplace_back(std::move(script));
 			return this;
 		}
 	};

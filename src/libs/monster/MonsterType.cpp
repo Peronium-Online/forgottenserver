@@ -8,6 +8,14 @@ MonsterType* MonsterType::Builder::build()
 		    << this->mType->name << std::endl;
 	}
 
+	this->mType->info.summons.shrink_to_fit();
+	this->mType->info.lootItems.shrink_to_fit();
+	this->mType->info.attackSpells.shrink_to_fit();
+	this->mType->info.defenseSpells.shrink_to_fit();
+	this->mType->info.voice.shrinkToFit();
+	this->mType->info.scripts.shrink_to_fit();
+	this->mType->info.seeks.shrink_to_fit();
+
 	return this->mType;
 }
 
@@ -432,4 +440,34 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 			}
 		}
 	}
+
+	if (pugi::xml_node seeksNode = node.child("seeks")) {
+		for (auto seekNode : seeksNode.children()) {
+			if (attr = seekNode.attribute("name")) {
+				MonsterSeek* seek = new MonsterSeek(attr.as_string());
+
+				if (attr = seekNode.attribute("priority")) {
+					seek->setPriority(pugi::cast<uint32_t>(attr.value()));
+				}
+
+				this->addSeek(*seek);
+			} else {
+				std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing target to seek name. "
+				          << this->mType->name << std::endl;
+			}
+		}
+	}
+
+	if (pugi::xml_node scriptNode = node.child("script")) {
+		for (auto scriptNode : scriptNode.children()) {
+			if (attr = scriptNode.attribute("name")) {
+				this->addEvent(attr.as_string());
+			} else {
+				std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing name for script event. "
+				          << this->mType->name << std::endl;
+			}
+		}
+	}
+
+	return this->build();
 }

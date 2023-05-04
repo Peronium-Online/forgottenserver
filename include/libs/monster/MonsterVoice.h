@@ -38,6 +38,8 @@ public:
 	{
 		this->voiceBlocks.emplace_back(std::move(voiceBlock_t{text, yellText}));
 	}
+
+	void shrinkToFit() { this->voiceBlocks.shrink_to_fit(); }
 };
 
 #endif
