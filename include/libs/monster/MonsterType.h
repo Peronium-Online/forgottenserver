@@ -5,6 +5,7 @@
 #include "constants/enums.h"
 #include "libs/monster/MonsterLoot.h"
 #include "libs/monster/MonsterSpell.h"
+#include "libs/monster/MonsterSummon.h"
 #include "libs/monster/MonsterVoice.h"
 #include "libs/monster/Monsters.h"
 #include "libs/util/tools/gamehelpers.h"
@@ -17,22 +18,11 @@
 
 extern Monsters g_monsters;
 
-struct summonBlock_t
-{
-	std::string name;
-	uint32_t chance;
-	uint32_t speed;
-	uint32_t max;
-	bool force = false;
-};
-
 struct targetSeekBlock_t
 {
 	std::string cid;
 	uint32_t priority = 1;
 };
-
-class LuaScriptInterface;
 
 class MonsterType : public virtual XMLElementBuilder<MonsterType*>
 {
@@ -48,7 +38,7 @@ class MonsterType : public virtual XMLElementBuilder<MonsterType*>
 		std::vector<std::string> scripts;
 		std::vector<MonsterSpell> attackSpells;
 		std::vector<MonsterSpell> defenseSpells;
-		std::vector<summonBlock_t> summons;
+		std::vector<MonsterSummon> summons;
 		std::vector<targetSeekBlock_t> targetSeeks;
 
 		Skulls_t skull = SKULL_NONE;
@@ -660,6 +650,18 @@ public:
 		Builder* addLoot(MonsterLoot loot)
 		{
 			this->mType->info.lootItems.emplace_back(std::move(loot));
+			return this;
+		}
+
+		Builder* setMaxSummons(uint32_t maxSummons)
+		{
+			this->mType->info.maxSummons = std::min(maxSummons, MAX_SUMMONS);
+			return this;
+		}
+
+		Builder* addSummon(MonsterSummon summon)
+		{
+			this->mType->info.summons.emplace_back(std::move(summon));
 			return this;
 		}
 	};

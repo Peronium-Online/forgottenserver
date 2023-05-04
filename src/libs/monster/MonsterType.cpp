@@ -396,4 +396,40 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 			}
 		}
 	}
+
+	if (pugi::xml_node summonsNode = node.child("summons")) {
+		if (attr = summonsNode.attribute("maxSummons")) {
+			this->setMaxSummons(pugi::cast<uint32_t>(attr.value()));
+		} else {
+			std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing summons maxSummons. " << this->mType->name
+			          << std::endl;
+		}
+
+		for (auto summonNode : summonsNode.children()) {
+			if (attr = summonNode.attribute("name")) {
+				MonsterSummon* summon = new MonsterSummon(attr.as_string());
+
+				if (attr = summonNode.attribute("chance")) {
+					summon->setChance(pugi::cast<int32_t>(attr.value()));
+				}
+
+				if ((attr = summonNode.attribute("speed")) || (attr = summonNode.attribute("interval"))) {
+					summon->setSpeed(pugi::cast<int32_t>(attr.value()));
+				}
+
+				if (attr = summonNode.attribute("max")) {
+					summon->setMax(pugi::cast<uint32_t>(attr.value()));
+				}
+
+				if (attr = summonNode.attribute("force")) {
+					summon->setForce(attr.as_bool());
+				}
+
+				this->addSummon(*summon);
+			} else {
+				std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing summon name. " << this->mType->name
+				          << std::endl;
+			}
+		}
+	}
 }

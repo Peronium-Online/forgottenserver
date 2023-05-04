@@ -1,5 +1,5 @@
-#ifndef PR_MONSTER_SPELL
-#define PR_MONSTER_SPELL
+#ifndef PR_MONSTER_SPELL_H
+#define PR_MONSTER_SPELL_H
 
 #include "../../../src/combat.h"
 #include "../../../src/spells.h"
