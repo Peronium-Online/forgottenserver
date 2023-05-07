@@ -11,7 +11,6 @@
 #include "iomap.h"
 #include "iomapserialize.h"
 #include "libs/util/tools/random.h"
-#include "monster.h"
 #include "spectators.h"
 
 extern Game g_game;

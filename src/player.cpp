@@ -16,7 +16,6 @@
 #include "inbox.h"
 #include "iologindata.h"
 #include "libs/util/tools/random.h"
-#include "monster.h"
 #include "movement.h"
 #include "npc.h"
 #include "outfit.h"

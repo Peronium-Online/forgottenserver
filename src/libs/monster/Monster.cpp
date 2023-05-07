@@ -1,14 +1,33 @@
 #include "libs/monster/Monster.h"
 
-#include "libs/monster/Monsters.h"
-
-#include <boost/algorithm/string.hpp>
+#include "game.h"
 
 extern Monsters g_monsters;
+extern Game g_game;
 
-bool Monster::load(pugi::xml_node node, bool reloading)
+Monster* Monster::createMonsterByName(const std::string& name)
 {
-	MonsterType* mType = MonsterType::Builder().loadFromXMLNode(node, reloading);
+	MonsterType* mType = g_monsters.findMonsterTypeByName(name);
+	if (!mType) {
+		return nullptr;
+	}
 
-	return true;
+	return new Monster(mType);
 }
+
+const std::string& Monster::getName() const { return mType->name; }
+
+std::string Monster::getDescription(int32_t) const { return this->mType->nameDescription + '.'; }
+
+const std::string& Monster::getNameDescription() const { return mType->nameDescription; }
+
+void Monster::setID()
+{
+	if (id == 0) {
+		id = MONSTER_AUTO_ID++;
+	}
+}
+
+void Monster::addList() { g_game.addMonster(this); }
+
+void Monster::removeList() { g_game.removeMonster(this); }

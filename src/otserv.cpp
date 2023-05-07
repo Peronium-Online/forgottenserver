@@ -9,7 +9,6 @@
 #include "game.h"
 #include "iomarket.h"
 #include "libs/vocation/Vocations.h"
-#include "monsters.h"
 #include "outfit.h"
 #include "protocollogin.h"
 #include "protocolold.h"

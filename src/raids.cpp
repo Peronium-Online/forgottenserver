@@ -10,7 +10,6 @@
 #include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/random.h"
 #include "libs/util/tools/xml.h"
-#include "monster.h"
 #include "scheduler.h"
 
 extern Game g_game;

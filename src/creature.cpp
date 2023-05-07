@@ -9,7 +9,6 @@
 #include "configmanager.h"
 #include "game.h"
 #include "libs/util/tools/random.h"
-#include "monster.h"
 #include "party.h"
 #include "scheduler.h"
 #include "spectators.h"

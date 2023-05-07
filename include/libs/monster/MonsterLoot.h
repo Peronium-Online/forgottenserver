@@ -10,17 +10,6 @@ const uint32_t MAX_LOOTCHANCE = 100000;
 
 class MonsterLoot : virtual public XMLElementBuilder<MonsterLoot*>
 {
-private:
-	uint16_t itemId;
-	uint32_t countMax;
-	uint32_t chance;
-
-	// optional
-	int32_t subType;
-	int32_t actionId;
-	std::string text;
-	std::vector<MonsterLoot> childrenLoots;
-
 public:
 	MonsterLoot()
 	{
@@ -31,6 +20,16 @@ public:
 		actionId = -1;
 	};
 	~MonsterLoot();
+
+	uint16_t itemId;
+	uint32_t countMax;
+	uint32_t chance;
+
+	// optional
+	int32_t subType;
+	int32_t actionId;
+	std::string text;
+	std::vector<MonsterLoot> childrenLoots;
 
 	virtual MonsterLoot* loadFromXMLNode(pugi::xml_node node, bool reloading) override;
 

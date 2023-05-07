@@ -1,20 +1,19 @@
 #ifndef PR_MONSTER_H
 #define PR_MONSTER_H
 
+#include "creature.h"
 #include "libs/monster/MonsterType.h"
 #include "libs/util/xml/XMLLoadable.h"
 
-#include <string>
+uint32_t MONSTER_AUTO_ID = 0x21000000;
 
-class Monster final : virtual public XMLLoadable
+class Monster final : public Creature
 {
+private:
+	MonsterType* mType;
+
 public:
-	Monster();
-	Monster(std::string filepath, std::string childNode)
-	{
-		this->filepath = filepath;
-		this->childNode = childNode;
-	};
+	Monster() = default;
 	explicit Monster(MonsterType* mType);
 	~Monster();
 
@@ -22,10 +21,18 @@ public:
 	Monster(const Monster&) = delete;
 	Monster& operator=(const Monster&) = delete;
 
-private:
-	MonsterType* mType;
+	static Monster* createMonsterByName(const std::string& name);
 
-	virtual bool load(pugi::xml_node node, bool reloading) override;
+	CreatureType_t getType() const override { return CREATURETYPE_MONSTER; }
+
+	std::string getDescription(int32_t) const override;
+	const std::string& getName() const override;
+	const std::string& getNameDescription() const override;
+
+	void setID() override;
+
+	void addList() override;
+	void removeList() override;
 };
 
 #endif

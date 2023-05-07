@@ -14,9 +14,13 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/strings.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monster.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterLoot.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monsters.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterSeek.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterSpell.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterSummon.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterType.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterVoice.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocation.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocations.h
 )

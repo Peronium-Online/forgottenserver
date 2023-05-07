@@ -11,7 +11,6 @@
 #include "libs/util/tools/direction.h"
 #include "libs/util/tools/pugicast.h"
 #include "luavariant.h"
-#include "monsters.h"
 
 extern Game g_game;
 extern Spells* g_spells;

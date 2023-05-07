@@ -6,6 +6,7 @@
 
 #include "constants/enums.h"
 #include "database.h"
+#include "libs/monster/MonsterLoot.h"
 #include "position.h"
 
 #if LUA_VERSION_NUM >= 502
@@ -351,7 +352,7 @@ public:
 	static void pushOutfit(lua_State* L, const Outfit_t& outfit);
 	static void pushOutfit(lua_State* L, const Outfit* outfit);
 	static void pushMount(lua_State* L, const Mount* mount);
-	static void pushLoot(lua_State* L, const std::vector<LootBlock>& lootList);
+	static void pushLoot(lua_State* L, const std::vector<MonsterLoot>& lootList);
 	static void pushReflect(lua_State* L, const Reflect& reflect);
 
 	//

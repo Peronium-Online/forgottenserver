@@ -11,7 +11,6 @@
 #include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/random.h"
 #include "libs/util/tools/xml.h"
-#include "monster.h"
 #include "npc.h"
 #include "scheduler.h"
 #include "spectators.h"

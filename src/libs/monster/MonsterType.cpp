@@ -19,12 +19,12 @@ MonsterType* MonsterType::Builder::build()
 	return this->mType;
 }
 
-MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool reloading)
+bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 {
 	pugi::xml_attribute attr;
 	if (!(attr = node.attribute("name"))) {
 		std::cout << "[Error - MonsterType::loadFromXMLNode] Missing name in: " << node.name() << std::endl;
-		return nullptr;
+		return false;
 	}
 	std::string lowerCasedMonsterName = boost::algorithm::to_lower_copy(std::string(attr.as_string()));
 
@@ -469,5 +469,5 @@ MonsterType* MonsterType::Builder::loadFromXMLNode(pugi::xml_node node, bool rel
 		}
 	}
 
-	return this->build();
+	return true;
 }

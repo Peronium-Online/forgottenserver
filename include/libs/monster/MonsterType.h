@@ -19,7 +19,7 @@
 
 extern Monsters g_monsters;
 
-class MonsterType : public virtual XMLElementBuilder<MonsterType*>
+class MonsterType
 {
 	struct MonsterInfo
 	{
@@ -101,13 +101,19 @@ public:
 
 	MonsterInfo info;
 
-	class Builder : public virtual XMLElementBuilder<MonsterType*>
+	class Builder : virtual public XMLLoadable
 	{
 	private:
 		MonsterType* mType;
 
+		virtual bool load(pugi::xml_node node, bool reloading) override;
+
 	public:
-		virtual MonsterType* loadFromXMLNode(pugi::xml_node node, bool reloading) override;
+		Builder(std::string filepath)
+		{
+			this->filepath = filepath;
+			this->childNode = "monster";
+		};
 
 		virtual MonsterType* build();
 

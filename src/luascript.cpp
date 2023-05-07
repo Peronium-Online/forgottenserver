@@ -19,9 +19,10 @@
 #include "iologindata.h"
 #include "iomapserialize.h"
 #include "iomarket.h"
+#include "libs/monster/Monster.h"
+#include "libs/monster/Monsters.h"
 #include "libs/util/tools/random.h"
 #include "luavariant.h"
-#include "monster.h"
 #include "movement.h"
 #include "npc.h"
 #include "outfit.h"
@@ -990,22 +991,22 @@ void LuaScriptInterface::pushMount(lua_State* L, const Mount* mount)
 	setField(L, "premium", mount->premium);
 }
 
-void LuaScriptInterface::pushLoot(lua_State* L, const std::vector<LootBlock>& lootList)
+void LuaScriptInterface::pushLoot(lua_State* L, const std::vector<MonsterLoot>& lootList)
 {
 	lua_createtable(L, lootList.size(), 0);
 
 	int index = 0;
-	for (const auto& lootBlock : lootList) {
+	for (const auto& loot : lootList) {
 		lua_createtable(L, 0, 7);
 
-		setField(L, "itemId", lootBlock.id);
-		setField(L, "chance", lootBlock.chance);
-		setField(L, "subType", lootBlock.subType);
-		setField(L, "maxCount", lootBlock.countmax);
-		setField(L, "actionId", lootBlock.actionId);
-		setField(L, "text", lootBlock.text);
+		setField(L, "itemId", loot.itemId);
+		setField(L, "chance", loot.chance);
+		setField(L, "subType", loot.subType);
+		setField(L, "maxCount", loot.countMax);
+		setField(L, "actionId", loot.actionId);
+		setField(L, "text", loot.text);
 
-		pushLoot(L, lootBlock.childLoot);
+		pushLoot(L, loot.childrenLoots);
 		lua_setfield(L, -2, "childLoot");
 
 		lua_rawseti(L, -2, ++index);
@@ -4564,7 +4565,7 @@ int LuaScriptInterface::luaGameGetNpcCount(lua_State* L)
 int LuaScriptInterface::luaGameGetMonsterTypes(lua_State* L)
 {
 	// Game.getMonsterTypes()
-	auto& type = g_monsters.monsters;
+	auto& type = g_monsters.monsterTypes;
 	lua_createtable(L, type.size(), 0);
 
 	for (auto& mType : type) {
@@ -4830,7 +4831,7 @@ int LuaScriptInterface::luaGameCreateContainer(lua_State* L)
 int LuaScriptInterface::luaGameCreateMonster(lua_State* L)
 {
 	// Game.createMonster(monsterName, position[, extended = false[, force = false[, magicEffect = CONST_ME_TELEPORT]]])
-	Monster* monster = Monster::createMonster(getString(L, 1));
+	Monster* monster = new Monster(getString(L, 1));
 	if (!monster) {
 		lua_pushnil(L);
 		return 1;

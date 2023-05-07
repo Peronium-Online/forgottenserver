@@ -82,6 +82,7 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/strings.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monster.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterLoot.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monsters.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterSpell.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterType.cpp

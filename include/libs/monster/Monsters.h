@@ -10,7 +10,11 @@
 
 class Monsters final : virtual public XMLLoadable
 {
+private:
+	virtual bool load(pugi::xml_node node, bool reloading) override;
+
 public:
+	std::map<std::string, MonsterType> monsterTypes;
 	std::unique_ptr<LuaScriptInterface> scriptInterface;
 
 	Monsters()
@@ -24,10 +28,10 @@ public:
 
 	virtual MonsterType* findMonsterTypeByName(std::string name);
 
-private:
-	std::map<std::string, MonsterType> monsters;
-
-	virtual bool load(pugi::xml_node node, bool reloading) override;
+	void addMonsterType(MonsterType* monsterType)
+	{
+		this->monsterTypes.emplace(monsterType->name, std::move(*monsterType));
+	}
 };
 
 #endif

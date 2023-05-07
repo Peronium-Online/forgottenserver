@@ -11,7 +11,6 @@
 #include "game.h"
 #include "housetile.h"
 #include "mailbox.h"
-#include "monster.h"
 #include "movement.h"
 #include "spectators.h"
 #include "teleport.h"
