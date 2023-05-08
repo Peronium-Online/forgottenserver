@@ -109,6 +109,7 @@ public:
 		virtual bool load(pugi::xml_node node, bool reloading) override;
 
 	public:
+		Builder() = default;
 		Builder(std::string filepath)
 		{
 			this->filepath = filepath;

@@ -4831,7 +4831,7 @@ int LuaScriptInterface::luaGameCreateContainer(lua_State* L)
 int LuaScriptInterface::luaGameCreateMonster(lua_State* L)
 {
 	// Game.createMonster(monsterName, position[, extended = false[, force = false[, magicEffect = CONST_ME_TELEPORT]]])
-	Monster* monster = new Monster(getString(L, 1));
+	Monster* monster = Monster::createMonsterByName(getString(L, 1));
 	if (!monster) {
 		lua_pushnil(L);
 		return 1;
@@ -4926,11 +4926,10 @@ int LuaScriptInterface::luaGameCreateMonsterType(lua_State* L)
 		return 1;
 	}
 
-	MonsterType* monsterType = g_monsters.getMonsterType(name, false);
+	MonsterType* monsterType = g_monsters.findMonsterTypeByName(name);
 	if (!monsterType) {
-		monsterType = &g_monsters.monsters[boost::algorithm::to_lower_copy(name)];
-		monsterType->name = name;
-		monsterType->nameDescription = "a " + name;
+		monsterType = (new MonsterType::Builder())->setName(name)->setNameDescription("a " + name)->build();
+		g_monsters.addMonsterType(monsterType);
 	} else {
 		monsterType->info.lootItems.clear();
 		monsterType->info.attackSpells.clear();
@@ -10887,7 +10886,7 @@ int LuaScriptInterface::luaMonsterGetType(lua_State* L)
 	// monster:getType()
 	const Monster* monster = getUserdata<const Monster>(L, 1);
 	if (monster) {
-		pushUserdata<MonsterType>(L, monster->mType);
+		pushUserdata<MonsterType>(L, monster->getMonsterType());
 		setMetatable(L, -1, "MonsterType");
 	} else {
 		lua_pushnil(L);
@@ -10942,7 +10941,7 @@ int LuaScriptInterface::luaMonsterIsIdle(lua_State* L)
 	// monster:isIdle()
 	Monster* monster = getUserdata<Monster>(L, 1);
 	if (monster) {
-		pushBoolean(L, monster->getIdleStatus());
+		pushBoolean(L, monster->isIdle());
 	} else {
 		lua_pushnil(L);
 	}

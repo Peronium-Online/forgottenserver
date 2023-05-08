@@ -13,6 +13,8 @@ public:
 	MonsterSeek(std::string name) : name(name){};
 	~MonsterSeek();
 
+	std::string getName() { return name; }
+
 	void setPriority(uint32_t priority) { this->priority = priority; }
 };
 
