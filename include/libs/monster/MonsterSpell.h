@@ -39,7 +39,7 @@ public:
 
 	virtual MonsterSpell* loadFromXMLNode(pugi::xml_node node, bool reloading) override;
 
-	virtual bool deserializeSpellFromLua(LMonsterSpell* spell, MonsterSpell& sb, const std::string& description);
+	virtual MonsterSpell* deserializeSpellFromLua(LMonsterSpell* spell);
 
 	virtual std::string getName();
 
@@ -73,7 +73,7 @@ public:
 		}
 
 	public:
-		Combat_ptr getInstance() { return combat; }
+		Combat_ptr build() { return combat; }
 
 		bool isTargetNeeded() { return needTarget; }
 
@@ -82,11 +82,11 @@ public:
 		CombatBuilder* withLength(int32_t length, int32_t spread = 3)
 		{
 			if (length <= 0) {
-				return nullptr;
+				return this;
 			}
 
 			AreaCombat* area = new AreaCombat();
-			area->setupArea(length, spread);
+			area->setupArea(length, std::max<int32_t>(0, spread));
 			combat->setArea(area);
 
 			needDirection = true;
@@ -96,6 +96,10 @@ public:
 
 		CombatBuilder* withRadius(int32_t radius, bool needTarget = false)
 		{
+			if (radius <= 0) {
+				return this;
+			}
+
 			AreaCombat* area = new AreaCombat();
 			area->setupArea(radius);
 			combat->setArea(area);
@@ -107,6 +111,10 @@ public:
 
 		CombatBuilder* withRing(int32_t ring, bool needTarget = false)
 		{
+			if (ring <= 0) {
+				return this;
+			}
+
 			AreaCombat* area = new AreaCombat();
 			area->setupAreaRing(ring);
 			combat->setArea(area);
@@ -126,6 +134,22 @@ public:
 			return this;
 		}
 
+		CombatBuilder* withCondition(ConditionType_t type, int32_t minDamage, int32_t maxDamage,
+		                             uint32_t tickInterval = 2000, int32_t startDamage = 0)
+		{
+			if (type == CONDITION_NONE) {
+				return this;
+			}
+
+			if (tickInterval <= 0) {
+				tickInterval = 2000;
+			}
+
+			Condition* condition = getDamageCondition(type, maxDamage, minDamage, startDamage, tickInterval);
+			combat->addCondition(condition);
+			return this;
+		}
+
 		CombatBuilder* withConditionFire(int32_t damage, uint32_t tickInterval = 9000)
 		{
 			return this->withConditionFire(damage, damage, tickInterval);
@@ -138,10 +162,7 @@ public:
 				tickInterval = 10000;
 			}
 
-			Condition* condition = getDamageCondition(CONDITION_FIRE, maxDamage, minDamage, startDamage, tickInterval);
-			combat->addCondition(condition);
-
-			return this;
+			return this->withCondition(CONDITION_FIRE, minDamage, maxDamage, tickInterval, startDamage);
 		}
 
 		CombatBuilder* withConditionPoison(int32_t damage, uint32_t tickInterval = 4000)
@@ -156,11 +177,7 @@ public:
 				tickInterval = 4000;
 			}
 
-			Condition* condition =
-			    getDamageCondition(CONDITION_POISON, maxDamage, minDamage, startDamage, tickInterval);
-			combat->addCondition(condition);
-
-			return this;
+			return this->withCondition(CONDITION_POISON, minDamage, maxDamage, tickInterval, startDamage);
 		}
 
 		CombatBuilder* withConditionEnergy(int32_t damage, uint32_t tickInterval = 10000)
@@ -175,11 +192,7 @@ public:
 				tickInterval = 10000;
 			}
 
-			Condition* condition =
-			    getDamageCondition(CONDITION_ENERGY, maxDamage, minDamage, startDamage, tickInterval);
-			combat->addCondition(condition);
-
-			return this;
+			return this->withCondition(CONDITION_ENERGY, minDamage, maxDamage, tickInterval, startDamage);
 		}
 
 		CombatBuilder* withConditionDrown(int32_t damage, uint32_t tickInterval = 5000)
@@ -194,10 +207,7 @@ public:
 				tickInterval = 5000;
 			}
 
-			Condition* condition = getDamageCondition(CONDITION_DROWN, maxDamage, minDamage, startDamage, tickInterval);
-			combat->addCondition(condition);
-
-			return this;
+			return this->withCondition(CONDITION_DROWN, minDamage, maxDamage, tickInterval, startDamage);
 		}
 
 		CombatBuilder* withConditionFreeze(int32_t damage, uint32_t tickInterval = 8000)
@@ -212,11 +222,7 @@ public:
 				tickInterval = 8000;
 			}
 
-			Condition* condition =
-			    getDamageCondition(CONDITION_FREEZING, maxDamage, minDamage, startDamage, tickInterval);
-			combat->addCondition(condition);
-
-			return this;
+			return this->withCondition(CONDITION_FREEZING, minDamage, maxDamage, tickInterval, startDamage);
 		}
 
 		CombatBuilder* withConditionDazzle(int32_t damage, uint32_t tickInterval = 10000)
@@ -231,11 +237,7 @@ public:
 				tickInterval = 10000;
 			}
 
-			Condition* condition =
-			    getDamageCondition(CONDITION_DAZZLED, maxDamage, minDamage, startDamage, tickInterval);
-			combat->addCondition(condition);
-
-			return this;
+			return this->withCondition(CONDITION_DAZZLED, minDamage, maxDamage, tickInterval, startDamage);
 		}
 
 		CombatBuilder* withConditionCurse(int32_t damage, uint32_t tickInterval = 4000)
@@ -250,11 +252,7 @@ public:
 				tickInterval = 4000;
 			}
 
-			Condition* condition =
-			    getDamageCondition(CONDITION_CURSED, maxDamage, minDamage, startDamage, tickInterval);
-			combat->addCondition(condition);
-
-			return this;
+			return this->withCondition(CONDITION_CURSED, minDamage, maxDamage, tickInterval, startDamage);
 		}
 
 		CombatBuilder* withConditionBleed(int32_t damage, uint32_t tickInterval = 4000)
@@ -269,11 +267,7 @@ public:
 				tickInterval = 4000;
 			}
 
-			Condition* condition =
-			    getDamageCondition(CONDITION_BLEEDING, maxDamage, minDamage, startDamage, tickInterval);
-			combat->addCondition(condition);
-
-			return this;
+			return this->withCondition(CONDITION_BLEEDING, minDamage, maxDamage, tickInterval, startDamage);
 		}
 
 		CombatBuilder* withPhysicalDamage()

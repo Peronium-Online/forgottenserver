@@ -5,6 +5,8 @@
 #include "libs/monster/MonsterType.h"
 #include "libs/util/xml/XMLLoadable.h"
 
+#include <unordered_set>
+
 using CreatureHashSet = std::unordered_set<Creature*>;
 using CreatureList = std::list<Creature*>;
 
@@ -29,6 +31,7 @@ private:
 	Position masterPos;
 	Spawn* spawn = nullptr;
 	bool idle = false;
+	bool walkingToSpawn = false;
 
 	CreatureHashSet friendList;
 	CreatureList targetList;
@@ -65,6 +68,8 @@ public:
 	void setMasterPos(Position pos) { masterPos = pos; }
 
 	bool isInSpawnRange(const Position& pos) const;
+	bool isWalkingToSpawn() const { return walkingToSpawn; }
+	bool walkToSpawn();
 
 	bool isIdle() const { return idle; }
 	void setIdle(bool idle);

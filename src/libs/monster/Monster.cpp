@@ -373,3 +373,25 @@ bool Monster::canUseAttack(const Position& pos, const Creature* target) const
 	}
 	return true;
 }
+
+bool Monster::walkToSpawn()
+{
+	if (walkingToSpawn || !spawn || !targetList.empty()) {
+		return false;
+	}
+
+	int32_t distance =
+	    std::max<int32_t>(Position::getDistanceX(position, masterPos), Position::getDistanceY(position, masterPos));
+	if (distance == 0) {
+		return false;
+	}
+
+	listWalkDir.clear();
+	if (!getPathTo(masterPos, listWalkDir, 0, std::max<int32_t>(0, distance - 5), true, true, distance)) {
+		return false;
+	}
+
+	walkingToSpawn = true;
+	startAutoWalk();
+	return true;
+}

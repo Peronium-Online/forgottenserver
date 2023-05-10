@@ -13807,7 +13807,7 @@ int LuaScriptInterface::luaOutfitCompare(lua_State* L)
 int LuaScriptInterface::luaMonsterTypeCreate(lua_State* L)
 {
 	// MonsterType(name)
-	MonsterType* monsterType = g_monsters.getMonsterType(getString(L, 2));
+	MonsterType* monsterType = g_monsters.findMonsterTypeByName(getString(L, 2));
 	if (monsterType) {
 		pushUserdata<MonsterType>(L, monsterType);
 		setMetatable(L, -1, "MonsterType");
@@ -14341,7 +14341,7 @@ int LuaScriptInterface::luaMonsterTypeAddAttack(lua_State* L)
 	// monsterType:addAttack(monsterspell)
 	MonsterType* monsterType = getUserdata<MonsterType>(L, 1);
 	if (monsterType) {
-		MonsterSpell* spell = getUserdata<MonsterSpell>(L, 2);
+		LMonsterSpell* spell = getUserdata<MonsterSpell>(L, 2);
 		if (spell) {
 			MonsterSpell sb;
 			if (g_monsters.deserializeSpell(spell, sb, monsterType->name)) {

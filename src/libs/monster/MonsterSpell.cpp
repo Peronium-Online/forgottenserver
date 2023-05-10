@@ -190,7 +190,7 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 		int32_t spread = 3;
 		// need direction spell
 		if ((attr = node.attribute("spread"))) {
-			spread = std::max<int32_t>(0, pugi::cast<int32_t>(attr.value()));
+			spread = pugi::cast<int32_t>(attr.value());
 		}
 
 		combatBuilder.withLength(length, spread);
@@ -420,7 +420,7 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 		}
 	}
 
-	auto combatPtr = combatBuilder.getInstance();
+	auto combatPtr = combatBuilder.build();
 	combatPtr->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, this->minCombatValue, 0, this->maxCombatValue, 0);
 
 	auto combatSpell = new CombatSpell(combatPtr, combatBuilder.isTargetNeeded(), combatBuilder.isDirectionNeeded());
@@ -430,6 +430,41 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 	}
 
 	return this;
+}
+
+MonsterSpell* MonsterSpell::deserializeSpellFromLua(LMonsterSpell* lSpell)
+{
+	if (!lSpell->scriptName.empty()) {
+		lSpell->isScripted = true;
+	} else if (!lSpell->name.empty()) {
+		lSpell->isScripted = false;
+	} else {
+		return nullptr;
+	}
+
+	this->setSpeed(lSpell->interval)
+	    ->setChance(lSpell->chance)
+	    ->setRange(lSpell->range)
+	    ->setMinCombatValue(lSpell->minCombatValue)
+	    ->setMaxCombatValue(lSpell->maxCombatValue);
+
+	if (auto spell = g_spells->getSpellByName(name)) {
+		this->setBaseSpell(spell);
+		return this;
+	}
+
+	if (lSpell->isScripted) {
+		return this->setSpellFromScript(lSpell->needTarget, lSpell->needDirection);
+	}
+
+	this->combatSpell = true;
+	auto combatBuilder = new MonsterSpell::CombatBuilder();
+	combatBuilder->withLength(lSpell->length, lSpell->spread)
+	    ->withRadius(lSpell->radius, lSpell->needTarget)
+	    ->withRing(lSpell->ring, lSpell->needTarget)
+	    ->withCondition(lSpell->conditionType, std::abs(lSpell->conditionMinDamage),
+	                    std::abs(lSpell->conditionMaxDamage), lSpell->tickInterval,
+	                    std::abs(lSpell->conditionStartDamage));
 }
 
 damage_condition_params getDamageConditionParamsFromXML(const pugi::xml_node node, const MonsterSpell* spell)
