@@ -4,7 +4,7 @@
 #include "../../../src/combat.h"
 #include "../../../src/spells.h"
 
-class MonsterSpell : virtual public XMLElementBuilder<MonsterSpell*>
+class MonsterSpell : virtual public XMLElementBuilder<std::shared_ptr<MonsterSpell>>
 {
 public:
 	MonsterSpell() = default;
@@ -37,9 +37,9 @@ public:
 	bool combatSpell = false;
 	bool isMelee = false;
 
-	virtual MonsterSpell* loadFromXMLNode(pugi::xml_node node, bool reloading) override;
+	virtual std::shared_ptr<MonsterSpell> loadFromXMLNode(pugi::xml_node node, bool reloading) override;
 
-	virtual MonsterSpell* deserializeSpellFromLua(LMonsterSpell* spell);
+	static std::shared_ptr<MonsterSpell> deserializeSpellFromLua(LMonsterSpell* spell);
 
 	virtual std::string getName();
 
@@ -49,7 +49,7 @@ public:
 	virtual MonsterSpell* setMinCombatValue(int32_t value);
 	virtual MonsterSpell* setMaxCombatValue(int32_t value);
 	virtual MonsterSpell* setBaseSpell(BaseSpell* spell);
-	virtual MonsterSpell* setSpellFromScript(bool needTarget, bool needDirection);
+	virtual std::shared_ptr<MonsterSpell> setSpellFromScript(bool needTarget, bool needDirection);
 	virtual MonsterSpell* setMeleeAttack(int32_t attack, int32_t skill);
 
 	class CombatBuilder
@@ -270,6 +270,12 @@ public:
 			return this->withCondition(CONDITION_BLEEDING, minDamage, maxDamage, tickInterval, startDamage);
 		}
 
+		CombatBuilder* withCombatType(CombatType_t type)
+		{
+			combat->setParam(COMBAT_PARAM_TYPE, type);
+			return this;
+		}
+
 		CombatBuilder* withPhysicalDamage()
 		{
 			combat->setParam(COMBAT_PARAM_TYPE, COMBAT_PHYSICALDAMAGE);
@@ -366,7 +372,7 @@ public:
 			}
 
 			if (max == 0 || max < min) {
-				max = min; // static speedchange value
+				max = min; // static speed change value
 			}
 
 			ConditionType_t conditionType;
@@ -387,6 +393,10 @@ public:
 
 		CombatBuilder* withOutfitChange(Outfit_t outfit, int32_t duration = 10000)
 		{
+			if (duration <= 0) {
+				duration = 10000;
+			}
+
 			ConditionOutfit* condition = static_cast<ConditionOutfit*>(
 			    Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
 			condition->setOutfit(outfit);
@@ -406,6 +416,10 @@ public:
 
 		CombatBuilder* withInvisibility(int32_t duration = 10000)
 		{
+			if (duration <= 0) {
+				duration = 10000;
+			}
+
 			Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_INVISIBLE, duration, 0);
 			combat->setParam(COMBAT_PARAM_AGGRESSIVE, 0);
 			combat->addCondition(condition);
@@ -415,6 +429,14 @@ public:
 
 		CombatBuilder* withDrunk(int32_t duration = 10000, uint8_t level = 25)
 		{
+			if (duration <= 0) {
+				duration = 10000;
+			}
+
+			if (level <= 0) {
+				level = 25;
+			}
+
 			Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, level);
 			combat->addCondition(condition);
 
@@ -441,13 +463,17 @@ public:
 
 		CombatBuilder* withShootType(ShootType_t shoot)
 		{
-			combat->setParam(COMBAT_PARAM_DISTANCEEFFECT, shoot);
+			if (shoot != CONST_ANI_NONE) {
+				combat->setParam(COMBAT_PARAM_DISTANCEEFFECT, shoot);
+			}
 			return this;
 		}
 
 		CombatBuilder* withMagicEffect(MagicEffectClasses effect)
 		{
-			combat->setParam(COMBAT_PARAM_EFFECT, effect);
+			if (effect != CONST_ME_NONE) {
+				combat->setParam(COMBAT_PARAM_EFFECT, effect);
+			}
 			return this;
 		}
 	};

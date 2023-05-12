@@ -14341,11 +14341,11 @@ int LuaScriptInterface::luaMonsterTypeAddAttack(lua_State* L)
 	// monsterType:addAttack(monsterspell)
 	MonsterType* monsterType = getUserdata<MonsterType>(L, 1);
 	if (monsterType) {
-		LMonsterSpell* spell = getUserdata<MonsterSpell>(L, 2);
+		LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 2);
 		if (spell) {
-			MonsterSpell sb;
-			if (g_monsters.deserializeSpell(spell, sb, monsterType->name)) {
-				monsterType->info.attackSpells.push_back(std::move(sb));
+			auto mSpell = MonsterSpell::deserializeSpellFromLua(spell);
+			if (mSpell) {
+				monsterType->info.attackSpells.push_back(std::move(*mSpell));
 			} else {
 				std::cout << monsterType->name << std::endl;
 				std::cout << "[Warning - Monsters::loadMonster] Cant load spell. " << spell->name << std::endl;
