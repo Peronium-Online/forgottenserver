@@ -8,6 +8,7 @@
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
+#include "libs/monster/Monster.h"
 #include "libs/util/tools/direction.h"
 #include "libs/util/tools/random.h"
 #include "spectators.h"

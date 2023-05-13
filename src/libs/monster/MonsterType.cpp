@@ -1,5 +1,9 @@
 #include "libs/monster/MonsterType.h"
 
+#include "libs/monster/Monsters.h"
+
+extern Monsters g_monsters;
+
 MonsterType* MonsterType::Builder::build()
 {
 	if (this->mType->info.manaCost == 0 && (this->mType->info.isSummonable || this->mType->info.isConvinceable)) {
@@ -469,5 +473,35 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 		}
 	}
 
+	return true;
+}
+
+MonsterType::Builder* MonsterType::Builder::setScript(std::string filename)
+{
+	g_monsters.setMonsterTypeScript(*(this->mType), filename);
+
+	return this;
+}
+
+bool MonsterType::loadCallback(LuaScriptInterface* scriptInterface)
+{
+	int32_t id = scriptInterface->getEvent();
+	if (id == -1) {
+		std::cout << "[Warning - MonsterType::loadCallback] Event not found. " << std::endl;
+		return false;
+	}
+
+	info.scriptInterface = scriptInterface;
+	if (info.eventType == MONSTERS_EVENT_THINK) {
+		info.thinkEvent = id;
+	} else if (info.eventType == MONSTERS_EVENT_APPEAR) {
+		info.creatureAppearEvent = id;
+	} else if (info.eventType == MONSTERS_EVENT_DISAPPEAR) {
+		info.creatureDisappearEvent = id;
+	} else if (info.eventType == MONSTERS_EVENT_MOVE) {
+		info.creatureMoveEvent = id;
+	} else if (info.eventType == MONSTERS_EVENT_SAY) {
+		info.creatureSayEvent = id;
+	}
 	return true;
 }

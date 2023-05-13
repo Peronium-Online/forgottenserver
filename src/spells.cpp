@@ -8,6 +8,7 @@
 #include "combat.h"
 #include "configmanager.h"
 #include "game.h"
+#include "libs/monster/Monsters.h"
 #include "libs/util/tools/direction.h"
 #include "libs/util/tools/pugicast.h"
 #include "luavariant.h"

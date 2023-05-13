@@ -10,6 +10,7 @@
 #include "game.h"
 #include "iomap.h"
 #include "iomapserialize.h"
+#include "libs/monster/Monster.h"
 #include "libs/util/tools/random.h"
 #include "spectators.h"
 

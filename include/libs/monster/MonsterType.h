@@ -8,7 +8,6 @@
 #include "libs/monster/MonsterSpell.h"
 #include "libs/monster/MonsterSummon.h"
 #include "libs/monster/MonsterVoice.h"
-#include "libs/monster/Monsters.h"
 #include "libs/util/tools/gamehelpers.h"
 #include "libs/util/xml/XMLElementBuilder.h"
 
@@ -16,8 +15,6 @@
 #include <map>
 #include <string>
 #include <vector>
-
-extern Monsters g_monsters;
 
 class MonsterType
 {
@@ -198,27 +195,7 @@ public:
 			return this;
 		}
 
-		Builder* setScript(std::string filename)
-		{
-			if (!g_monsters.scriptInterface) {
-				g_monsters.scriptInterface.reset(new LuaScriptInterface("Monster Interface"));
-				g_monsters.scriptInterface->initState();
-			}
-
-			if (g_monsters.scriptInterface->loadFile("data/monster/scripts/" + filename) == 0) {
-				mType->info.scriptInterface = g_monsters.scriptInterface.get();
-				mType->info.creatureAppearEvent = g_monsters.scriptInterface->getEvent("onCreatureAppear");
-				mType->info.creatureDisappearEvent = g_monsters.scriptInterface->getEvent("onCreatureDisappear");
-				mType->info.creatureMoveEvent = g_monsters.scriptInterface->getEvent("onCreatureMove");
-				mType->info.creatureSayEvent = g_monsters.scriptInterface->getEvent("onCreatureSay");
-				mType->info.thinkEvent = g_monsters.scriptInterface->getEvent("onThink");
-			} else {
-				std::cout << "[Warning - MonsterType::setScript] Can not load script: " << filename << std::endl;
-				std::cout << g_monsters.scriptInterface->getLastLuaError() << std::endl;
-			}
-
-			return this;
-		}
+		Builder* setScript(std::string filename);
 
 		Builder* setHealthNow(int32_t healthNow)
 		{

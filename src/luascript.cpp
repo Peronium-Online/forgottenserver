@@ -4931,7 +4931,7 @@ int LuaScriptInterface::luaGameCreateMonsterType(lua_State* L)
 	MonsterType* monsterType = g_monsters.findMonsterTypeByName(name);
 	if (!monsterType) {
 		monsterType = (new MonsterType::Builder())->setName(name)->setNameDescription("a " + name)->build();
-		g_monsters.addMonsterType(monsterType);
+		g_monsters.addMonsterType(*monsterType);
 	} else {
 		monsterType->info.lootItems.clear();
 		monsterType->info.attackSpells.clear();
@@ -14630,13 +14630,13 @@ int LuaScriptInterface::luaMonsterTypeAddSummon(lua_State* L)
 	// monsterType:addSummon(name, interval, chance[, max = -1])
 	MonsterType* monsterType = getUserdata<MonsterType>(L, 1);
 	if (monsterType) {
-		auto summon = std::make_unique<MonsterSummon>(getString(L, 2));
+		auto summon = new MonsterSummon(getString(L, 2));
 
 		summon->setSpeed(getNumber<int32_t>(L, 3));
 		summon->setChance(getNumber<int32_t>(L, 4));
 		summon->setMax(getNumber<int32_t>(L, 5, -1));
 
-		monsterType->info.summons.emplace_back(std::move(summon));
+		monsterType->info.summons.emplace_back(std::move(*summon));
 
 		pushBoolean(L, true);
 	} else {
@@ -15332,7 +15332,7 @@ int LuaScriptInterface::luaMonsterSpellSetConditionDrunkenness(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetConditionTickInterval(lua_State* L)
 {
 	// monsterSpell:setConditionTickInterval(interval)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->tickInterval = getNumber<int32_t>(L, 2);
 		pushBoolean(L, true);
@@ -15345,7 +15345,7 @@ int LuaScriptInterface::luaMonsterSpellSetConditionTickInterval(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetCombatShootEffect(lua_State* L)
 {
 	// monsterSpell:setCombatShootEffect(effect)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->shoot = getNumber<ShootType_t>(L, 2);
 		pushBoolean(L, true);
@@ -15358,7 +15358,7 @@ int LuaScriptInterface::luaMonsterSpellSetCombatShootEffect(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetCombatEffect(lua_State* L)
 {
 	// monsterSpell:setCombatEffect(effect)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->effect = getNumber<MagicEffectClasses>(L, 2);
 		pushBoolean(L, true);
@@ -15371,14 +15371,14 @@ int LuaScriptInterface::luaMonsterSpellSetCombatEffect(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetOutfit(lua_State* L)
 {
 	// monsterSpell:setOutfit(outfit)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		if (isTable(L, 2)) {
 			spell->outfit = getOutfit(L, 2);
 		} else if (isNumber(L, 2)) {
 			spell->outfit.lookTypeEx = getNumber<uint16_t>(L, 2);
 		} else if (isString(L, 2)) {
-			MonsterType* mType = g_monsters.getMonsterType(getString(L, 2));
+			MonsterType* mType = g_monsters.findMonsterTypeByName(getString(L, 2));
 			if (mType) {
 				spell->outfit = mType->info.outfit;
 			}

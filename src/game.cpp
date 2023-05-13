@@ -19,6 +19,8 @@
 #include "iologindata.h"
 #include "iomarket.h"
 #include "items.h"
+#include "libs/monster/Monster.h"
+#include "libs/monster/Monsters.h"
 #include "libs/util/tools/direction.h"
 #include "libs/util/tools/random.h"
 #include "movement.h"
@@ -356,7 +358,7 @@ Creature* Game::getCreatureByID(uint32_t id)
 		return getPlayerByID(id);
 	} else if (id <= Npc::npcAutoID) {
 		return getNpcByID(id);
-	} else if (id <= Monster::monsterAutoID) {
+	} else if (id <= MONSTER_AUTO_ID) {
 		return getMonsterByID(id);
 	}
 	return nullptr;

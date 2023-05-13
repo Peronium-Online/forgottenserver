@@ -8,6 +8,7 @@
 #include "combat.h"
 #include "configmanager.h"
 #include "game.h"
+#include "libs/monster/Monster.h"
 #include "libs/util/tools/random.h"
 #include "party.h"
 #include "scheduler.h"

@@ -36,8 +36,6 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/luascript.cpp
 	${CMAKE_CURRENT_LIST_DIR}/mailbox.cpp
 	${CMAKE_CURRENT_LIST_DIR}/map.cpp
-	${CMAKE_CURRENT_LIST_DIR}/monster.cpp
-	${CMAKE_CURRENT_LIST_DIR}/monsters.cpp
 	${CMAKE_CURRENT_LIST_DIR}/mounts.cpp
 	${CMAKE_CURRENT_LIST_DIR}/movement.cpp
 	${CMAKE_CURRENT_LIST_DIR}/networkmessage.cpp
@@ -134,8 +132,6 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/luavariant.h
 	${CMAKE_CURRENT_LIST_DIR}/mailbox.h
 	${CMAKE_CURRENT_LIST_DIR}/map.h
-	${CMAKE_CURRENT_LIST_DIR}/monster.h
-	${CMAKE_CURRENT_LIST_DIR}/monsters.h
 	${CMAKE_CURRENT_LIST_DIR}/mounts.h
 	${CMAKE_CURRENT_LIST_DIR}/movement.h
 	${CMAKE_CURRENT_LIST_DIR}/networkmessage.h

@@ -25,11 +25,40 @@ bool Monsters::load(pugi::xml_node node, bool reloading)
 	if (forceLoad || reloading) {
 		auto mTypeBuilder = new MonsterType::Builder(file);
 		if (mTypeBuilder->loadFromXML(reloading)) {
-			this->addMonsterType(mTypeBuilder->build());
+			const auto mType = mTypeBuilder->build();
+			this->addMonsterType(*mType);
 		} else {
 			std::cout << "[Error - Monsters::load] Failed to load monster: " << file << std::endl;
 		}
 	}
 
 	return true;
+}
+
+bool Monsters::reload()
+{
+	loaded = false;
+
+	scriptInterface.reset();
+
+	return loadFromXML(true);
+}
+
+void Monsters::setMonsterTypeScript(MonsterType& mType, std::string filename)
+{
+	if (!this->scriptInterface) {
+		this->initializeScriptInterface();
+	}
+
+	if (this->scriptInterface->loadFile("data/monster/scripts/" + filename) == 0) {
+		mType.info.scriptInterface = this->scriptInterface.get();
+		mType.info.creatureAppearEvent = this->scriptInterface->getEvent("onCreatureAppear");
+		mType.info.creatureDisappearEvent = this->scriptInterface->getEvent("onCreatureDisappear");
+		mType.info.creatureMoveEvent = this->scriptInterface->getEvent("onCreatureMove");
+		mType.info.creatureSayEvent = this->scriptInterface->getEvent("onCreatureSay");
+		mType.info.thinkEvent = this->scriptInterface->getEvent("onThink");
+	} else {
+		std::cout << "[Warning - MonsterType::setScript] Can not load script: " << filename << std::endl;
+		std::cout << this->scriptInterface->getLastLuaError() << std::endl;
+	}
 }

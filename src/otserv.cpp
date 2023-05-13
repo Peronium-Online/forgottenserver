@@ -8,6 +8,7 @@
 #include "databasetasks.h"
 #include "game.h"
 #include "iomarket.h"
+#include "libs/monster/Monsters.h"
 #include "libs/vocation/Vocations.h"
 #include "outfit.h"
 #include "protocollogin.h"
@@ -31,7 +32,7 @@ Scheduler g_scheduler;
 
 Game g_game;
 ConfigManager g_config;
-Monsters g_monsters;
+extern Monsters g_monsters;
 Vocations g_vocations;
 extern Scripts* g_scripts;
 RSA g_RSA;
@@ -288,7 +289,7 @@ void mainLoader(int, char*[], ServiceManager* services)
 	}
 
 	std::cout << ">> Loading monsters" << std::endl;
-	if (!g_monsters.loadFromXml()) {
+	if (!g_monsters.loadFromXML()) {
 		startupErrorMessage("Unable to load monsters!");
 		return;
 	}

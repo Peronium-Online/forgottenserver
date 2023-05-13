@@ -11,6 +11,7 @@
 #include "events.h"
 #include "game.h"
 #include "globalevent.h"
+#include "libs/monster/Monsters.h"
 #include "mounts.h"
 #include "movement.h"
 #include "npc.h"

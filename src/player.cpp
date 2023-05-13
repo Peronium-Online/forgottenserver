@@ -15,6 +15,7 @@
 #include "game.h"
 #include "inbox.h"
 #include "iologindata.h"
+#include "libs/monster/Monster.h"
 #include "libs/util/tools/random.h"
 #include "movement.h"
 #include "npc.h"

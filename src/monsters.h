@@ -10,7 +10,6 @@
 class ConditionDamage;
 class LuaScriptInterface;
 
-const uint32_t MAX_LOOTCHANCE = 100000;
 
 struct LootBlock
 {

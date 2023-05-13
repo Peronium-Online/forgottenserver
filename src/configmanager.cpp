@@ -7,6 +7,7 @@
 #include "configmanager.h"
 
 #include "game.h"
+#include "libs/monster/Monster.h"
 #include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/strings.h"
 #include "libs/util/tools/xml.h"

@@ -8,6 +8,9 @@
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
+#include "libs/monster/Monster.h"
+#include "libs/monster/MonsterType.h"
+#include "libs/monster/Monsters.h"
 #include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/random.h"
 #include "libs/util/tools/xml.h"
@@ -101,7 +104,7 @@ bool Spawns::loadFromXml(const std::string& filename)
 						continue;
 					}
 
-					MonsterType* mType = g_monsters.getMonsterType(nameAttribute.as_string());
+					MonsterType* mType = g_monsters.findMonsterTypeByName(nameAttribute.as_string());
 					if (!mType) {
 						std::cout << "[Warning - Spawn::loadFromXml] " << pos << " can not find "
 						          << nameAttribute.as_string() << std::endl;
@@ -415,7 +418,7 @@ bool Spawn::addBlock(spawnBlock_t sb)
 
 bool Spawn::addMonster(const std::string& name, const Position& pos, Direction dir, uint32_t interval)
 {
-	MonsterType* mType = g_monsters.getMonsterType(name);
+	MonsterType* mType = g_monsters.findMonsterTypeByName(name);
 	if (!mType) {
 		std::cout << "[Warning - Spawn::addMonster] Can not find " << name << std::endl;
 		return false;

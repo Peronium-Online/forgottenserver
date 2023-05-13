@@ -1,7 +1,7 @@
 #ifndef PR_MONSTER_H
 #define PR_MONSTER_H
 
-#include "creature.h"
+#include "../../../src/creature.h"
 #include "libs/monster/MonsterType.h"
 #include "libs/util/xml/XMLLoadable.h"
 
@@ -36,6 +36,9 @@ private:
 	CreatureHashSet friendList;
 	CreatureList targetList;
 
+	int32_t challengeFocusDuration = 0;
+	int32_t stepDuration = 0;
+
 public:
 	Monster() = default;
 	explicit Monster(MonsterType* mType);
@@ -45,8 +48,8 @@ public:
 	Monster& operator=(const Monster&) = delete;
 
 	static Monster* createMonsterByName(const std::string& name);
-	const static int32_t despawnRange;
-	const static int32_t despawnRadius;
+	static int32_t despawnRange;
+	static int32_t despawnRadius;
 
 	bool isHostile() const { return mType->info.isHostile; }
 
@@ -94,6 +97,20 @@ public:
 	bool selectTarget(Creature* creature);
 
 	bool canUseAttack(const Position& pos, const Creature* target) const;
+
+	void setSpawn(Spawn* spawn) { this->spawn = spawn; }
+
+	bool isFleeing() const
+	{
+		return !isSummon() && getHealth() <= mType->info.runAwayHealth && challengeFocusDuration <= 0;
+	}
+
+	bool getDistanceStep(const Position& targetPos, Direction& direction, bool flee = false);
+	bool getRandomStep(const Position& creaturePos, Direction& direction) const;
+	bool canWalkTo(Position pos, Direction direction) const;
+	bool canWalkOnFieldType(CombatType_t combatType) const;
+
+	bool isTargetNearby() const { return stepDuration >= 1; }
 };
 
 #endif

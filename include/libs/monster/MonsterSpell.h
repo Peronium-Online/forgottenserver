@@ -4,6 +4,52 @@
 #include "../../../src/combat.h"
 #include "../../../src/spells.h"
 
+class LMonsterSpell
+{
+public:
+	LMonsterSpell() = default;
+
+	LMonsterSpell(const LMonsterSpell&) = delete;
+	LMonsterSpell& operator=(const LMonsterSpell&) = delete;
+
+	std::string name = "";
+	std::string scriptName = "";
+
+	uint8_t chance = 100;
+	uint8_t range = 0;
+	uint8_t drunkenness = 0;
+
+	uint16_t interval = 2000;
+
+	int32_t minCombatValue = 0;
+	int32_t maxCombatValue = 0;
+	int32_t attack = 0;
+	int32_t skill = 0;
+	int32_t length = 0;
+	int32_t spread = 0;
+	int32_t radius = 0;
+	int32_t ring = 0;
+	int32_t conditionMinDamage = 0;
+	int32_t conditionMaxDamage = 0;
+	int32_t conditionStartDamage = 0;
+	int32_t tickInterval = 0;
+	int32_t minSpeedChange = 0;
+	int32_t maxSpeedChange = 0;
+	int32_t duration = 0;
+
+	bool isScripted = false;
+	bool needTarget = false;
+	bool needDirection = false;
+	bool combatSpell = false;
+	bool isMelee = false;
+
+	Outfit_t outfit = {};
+	ShootType_t shoot = CONST_ANI_NONE;
+	MagicEffectClasses effect = CONST_ME_NONE;
+	ConditionType_t conditionType = CONDITION_NONE;
+	CombatType_t combatType = COMBAT_UNDEFINEDDAMAGE;
+};
+
 class MonsterSpell : virtual public XMLElementBuilder<std::shared_ptr<MonsterSpell>>
 {
 public:
@@ -480,50 +526,5 @@ public:
 };
 
 // Lua reference data struct
-class LMonsterSpell
-{
-public:
-	LMonsterSpell() = default;
-
-	LMonsterSpell(const LMonsterSpell&) = delete;
-	LMonsterSpell& operator=(const LMonsterSpell&) = delete;
-
-	std::string name = "";
-	std::string scriptName = "";
-
-	uint8_t chance = 100;
-	uint8_t range = 0;
-	uint8_t drunkenness = 0;
-
-	uint16_t interval = 2000;
-
-	int32_t minCombatValue = 0;
-	int32_t maxCombatValue = 0;
-	int32_t attack = 0;
-	int32_t skill = 0;
-	int32_t length = 0;
-	int32_t spread = 0;
-	int32_t radius = 0;
-	int32_t ring = 0;
-	int32_t conditionMinDamage = 0;
-	int32_t conditionMaxDamage = 0;
-	int32_t conditionStartDamage = 0;
-	int32_t tickInterval = 0;
-	int32_t minSpeedChange = 0;
-	int32_t maxSpeedChange = 0;
-	int32_t duration = 0;
-
-	bool isScripted = false;
-	bool needTarget = false;
-	bool needDirection = false;
-	bool combatSpell = false;
-	bool isMelee = false;
-
-	Outfit_t outfit = {};
-	ShootType_t shoot = CONST_ANI_NONE;
-	MagicEffectClasses effect = CONST_ME_NONE;
-	ConditionType_t conditionType = CONDITION_NONE;
-	CombatType_t combatType = COMBAT_UNDEFINEDDAMAGE;
-};
 
 #endif

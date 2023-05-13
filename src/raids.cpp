@@ -7,6 +7,7 @@
 
 #include "configmanager.h"
 #include "game.h"
+#include "libs/monster/Monster.h"
 #include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/random.h"
 #include "libs/util/tools/xml.h"
@@ -371,7 +372,7 @@ bool SingleSpawnEvent::configureRaidEvent(const pugi::xml_node& eventNode)
 
 bool SingleSpawnEvent::executeEvent()
 {
-	Monster* monster = Monster::createMonster(monsterName);
+	Monster* monster = Monster::createMonsterByName(monsterName);
 	if (!monster) {
 		std::cout << "[Error] Raids: Cant create monster " << monsterName << std::endl;
 		return false;
@@ -512,7 +513,7 @@ bool AreaSpawnEvent::executeEvent()
 	for (const MonsterSpawn& spawn : spawnList) {
 		uint32_t amount = uniform_random(spawn.minAmount, spawn.maxAmount);
 		for (uint32_t i = 0; i < amount; ++i) {
-			Monster* monster = Monster::createMonster(spawn.name);
+			Monster* monster = Monster::createMonsterByName(spawn.name);
 			if (!monster) {
 				std::cout << "[Error - AreaSpawnEvent::executeEvent] Can't create monster " << spawn.name << std::endl;
 				return false;
