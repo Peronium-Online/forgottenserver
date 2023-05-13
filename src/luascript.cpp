@@ -20,6 +20,8 @@
 #include "iomapserialize.h"
 #include "iomarket.h"
 #include "libs/monster/Monster.h"
+#include "libs/monster/MonsterSeek.h"
+#include "libs/monster/MonsterSummon.h"
 #include "libs/monster/Monsters.h"
 #include "libs/util/tools/random.h"
 #include "luavariant.h"
@@ -14368,10 +14370,9 @@ int LuaScriptInterface::luaMonsterTypeAddTargetSeek(lua_State* L)
 		uint32_t priority = getNumber<uint32_t>(L, 3);
 
 		if (creature) {
-			targetSeekBlock_t targetSeek;
-			targetSeek.cid = creature->getID();
-			targetSeek.priority = priority;
-			monsterType->info.targetSeeks.push_back(targetSeek);
+			MonsterSeek* targetSeek = new MonsterSeek(creature->getName());
+			targetSeek->setPriority(priority);
+			monsterType->info.seeks.push_back(std::move(*targetSeek));
 			pushBoolean(L, true);
 		} else {
 			lua_pushnil(L);
@@ -14419,11 +14420,11 @@ int LuaScriptInterface::luaMonsterTypeAddDefense(lua_State* L)
 	// monsterType:addDefense(monsterspell)
 	MonsterType* monsterType = getUserdata<MonsterType>(L, 1);
 	if (monsterType) {
-		MonsterSpell* spell = getUserdata<MonsterSpell>(L, 2);
+		LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 2);
 		if (spell) {
-			MonsterSpell sb;
-			if (g_monsters.deserializeSpell(spell, sb, monsterType->name)) {
-				monsterType->info.defenseSpells.push_back(std::move(sb));
+			auto mSpell = MonsterSpell::deserializeSpellFromLua(spell);
+			if (mSpell) {
+				monsterType->info.defenseSpells.push_back(std::move(*mSpell));
 			} else {
 				std::cout << monsterType->name << std::endl;
 				std::cout << "[Warning - Monsters::loadMonster] Cant load spell. " << spell->name << std::endl;
@@ -14478,13 +14479,16 @@ int LuaScriptInterface::luaMonsterTypeGetVoices(lua_State* L)
 	}
 
 	int index = 0;
-	lua_createtable(L, monsterType->info.voiceVector.size(), 0);
-	for (const auto& voiceBlock : monsterType->info.voiceVector) {
+	lua_createtable(L, monsterType->info.voice.numberOfSentences(), 0);
+
+	const auto serialize = [=, &index, &L](const std::string& text, bool yellText) {
 		lua_createtable(L, 0, 2);
-		setField(L, "text", voiceBlock.text);
-		setField(L, "yellText", voiceBlock.yellText);
+		setField(L, "text", text);
+		setField(L, "yellText", yellText);
 		lua_rawseti(L, -2, ++index);
-	}
+	};
+	monsterType->info.voice.forEachVoice(serialize);
+
 	return 1;
 }
 
@@ -14493,12 +14497,11 @@ int LuaScriptInterface::luaMonsterTypeAddVoice(lua_State* L)
 	// monsterType:addVoice(sentence, interval, chance, yell)
 	MonsterType* monsterType = getUserdata<MonsterType>(L, 1);
 	if (monsterType) {
-		voiceBlock_t voice;
-		voice.text = getString(L, 2);
+		auto text = getString(L, 2);
 		monsterType->info.yellSpeedTicks = getNumber<uint32_t>(L, 3);
 		monsterType->info.yellChance = getNumber<uint32_t>(L, 4);
-		voice.yellText = getBoolean(L, 5);
-		monsterType->info.voiceVector.push_back(voice);
+		auto yellText = getBoolean(L, 5);
+		monsterType->info.voice.addVoiceBlock(text, yellText);
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -14524,9 +14527,9 @@ int LuaScriptInterface::luaMonsterTypeAddLoot(lua_State* L)
 	// monsterType:addLoot(loot)
 	MonsterType* monsterType = getUserdata<MonsterType>(L, 1);
 	if (monsterType) {
-		Loot* loot = getUserdata<Loot>(L, 2);
+		MonsterLoot* loot = getUserdata<MonsterLoot>(L, 2);
 		if (loot) {
-			monsterType->loadLoot(monsterType, loot->lootBlock);
+			monsterType->info.lootItems.emplace_back(*loot);
 			pushBoolean(L, true);
 		} else {
 			lua_pushnil(L);
@@ -14614,9 +14617,9 @@ int LuaScriptInterface::luaMonsterTypeGetSummonList(lua_State* L)
 	lua_createtable(L, monsterType->info.summons.size(), 0);
 	for (const auto& summonBlock : monsterType->info.summons) {
 		lua_createtable(L, 0, 3);
-		setField(L, "name", summonBlock.name);
-		setField(L, "speed", summonBlock.speed);
-		setField(L, "chance", summonBlock.chance);
+		setField(L, "name", summonBlock.getName());
+		setField(L, "speed", summonBlock.getSpeed());
+		setField(L, "chance", summonBlock.getChance());
 		lua_rawseti(L, -2, ++index);
 	}
 	return 1;
@@ -14627,12 +14630,14 @@ int LuaScriptInterface::luaMonsterTypeAddSummon(lua_State* L)
 	// monsterType:addSummon(name, interval, chance[, max = -1])
 	MonsterType* monsterType = getUserdata<MonsterType>(L, 1);
 	if (monsterType) {
-		summonBlock_t summon;
-		summon.name = getString(L, 2);
-		summon.speed = getNumber<int32_t>(L, 3);
-		summon.chance = getNumber<int32_t>(L, 4);
-		summon.max = getNumber<int32_t>(L, 5, -1);
-		monsterType->info.summons.push_back(summon);
+		auto summon = std::make_unique<MonsterSummon>(getString(L, 2));
+
+		summon->setSpeed(getNumber<int32_t>(L, 3));
+		summon->setChance(getNumber<int32_t>(L, 4));
+		summon->setMax(getNumber<int32_t>(L, 5, -1));
+
+		monsterType->info.summons.emplace_back(std::move(summon));
+
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -14917,9 +14922,9 @@ int LuaScriptInterface::luaMonsterTypeChangeTargetSpeed(lua_State* L)
 int LuaScriptInterface::luaCreateLoot(lua_State* L)
 {
 	// Loot() will create a new loot item
-	Loot* loot = new Loot();
+	MonsterLoot* loot = new MonsterLoot();
 	if (loot) {
-		pushUserdata<Loot>(L, loot);
+		pushUserdata<MonsterLoot>(L, loot);
 		setMetatable(L, -1, "Loot");
 	} else {
 		lua_pushnil(L);
@@ -14930,7 +14935,7 @@ int LuaScriptInterface::luaCreateLoot(lua_State* L)
 int LuaScriptInterface::luaDeleteLoot(lua_State* L)
 {
 	// loot:delete() loot:__gc()
-	Loot** lootPtr = getRawUserdata<Loot>(L, 1);
+	MonsterLoot** lootPtr = getRawUserdata<MonsterLoot>(L, 1);
 	if (lootPtr && *lootPtr) {
 		delete *lootPtr;
 		*lootPtr = nullptr;
@@ -14941,10 +14946,10 @@ int LuaScriptInterface::luaDeleteLoot(lua_State* L)
 int LuaScriptInterface::luaLootSetId(lua_State* L)
 {
 	// loot:setId(id or name)
-	Loot* loot = getUserdata<Loot>(L, 1);
+	MonsterLoot* loot = getUserdata<MonsterLoot>(L, 1);
 	if (loot) {
 		if (isNumber(L, 2)) {
-			loot->lootBlock.id = getNumber<uint16_t>(L, 2);
+			loot->setItemId(getNumber<uint16_t>(L, 2));
 		} else {
 			auto name = getString(L, 2);
 			auto ids = Item::items.nameToItems.equal_range(boost::algorithm::to_lower_copy(name));
@@ -14961,7 +14966,7 @@ int LuaScriptInterface::luaLootSetId(lua_State* L)
 				return 1;
 			}
 
-			loot->lootBlock.id = ids.first->second;
+			loot->setItemId(ids.first->second);
 		}
 		pushBoolean(L, true);
 	} else {
@@ -14973,9 +14978,9 @@ int LuaScriptInterface::luaLootSetId(lua_State* L)
 int LuaScriptInterface::luaLootSetSubType(lua_State* L)
 {
 	// loot:setSubType(type)
-	Loot* loot = getUserdata<Loot>(L, 1);
+	MonsterLoot* loot = getUserdata<MonsterLoot>(L, 1);
 	if (loot) {
-		loot->lootBlock.subType = getNumber<uint16_t>(L, 2);
+		loot->setSubType(getNumber<uint16_t>(L, 2));
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -14986,9 +14991,9 @@ int LuaScriptInterface::luaLootSetSubType(lua_State* L)
 int LuaScriptInterface::luaLootSetChance(lua_State* L)
 {
 	// loot:setChance(chance)
-	Loot* loot = getUserdata<Loot>(L, 1);
+	MonsterLoot* loot = getUserdata<MonsterLoot>(L, 1);
 	if (loot) {
-		loot->lootBlock.chance = getNumber<uint32_t>(L, 2);
+		loot->setChance(getNumber<uint32_t>(L, 2));
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -14999,9 +15004,9 @@ int LuaScriptInterface::luaLootSetChance(lua_State* L)
 int LuaScriptInterface::luaLootSetMaxCount(lua_State* L)
 {
 	// loot:setMaxCount(max)
-	Loot* loot = getUserdata<Loot>(L, 1);
+	MonsterLoot* loot = getUserdata<MonsterLoot>(L, 1);
 	if (loot) {
-		loot->lootBlock.countmax = getNumber<uint32_t>(L, 2);
+		loot->setCountMax(getNumber<uint32_t>(L, 2));
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -15012,9 +15017,9 @@ int LuaScriptInterface::luaLootSetMaxCount(lua_State* L)
 int LuaScriptInterface::luaLootSetActionId(lua_State* L)
 {
 	// loot:setActionId(actionid)
-	Loot* loot = getUserdata<Loot>(L, 1);
+	MonsterLoot* loot = getUserdata<MonsterLoot>(L, 1);
 	if (loot) {
-		loot->lootBlock.actionId = getNumber<uint32_t>(L, 2);
+		loot->setActionId(getNumber<uint32_t>(L, 2));
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -15025,9 +15030,9 @@ int LuaScriptInterface::luaLootSetActionId(lua_State* L)
 int LuaScriptInterface::luaLootSetDescription(lua_State* L)
 {
 	// loot:setDescription(desc)
-	Loot* loot = getUserdata<Loot>(L, 1);
+	MonsterLoot* loot = getUserdata<MonsterLoot>(L, 1);
 	if (loot) {
-		loot->lootBlock.text = getString(L, 2);
+		loot->setText(getString(L, 2));
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -15038,9 +15043,9 @@ int LuaScriptInterface::luaLootSetDescription(lua_State* L)
 int LuaScriptInterface::luaLootAddChildLoot(lua_State* L)
 {
 	// loot:addChildLoot(loot)
-	Loot* loot = getUserdata<Loot>(L, 1);
+	MonsterLoot* loot = getUserdata<MonsterLoot>(L, 1);
 	if (loot) {
-		loot->lootBlock.childLoot.push_back(getUserdata<Loot>(L, 2)->lootBlock);
+		loot->addChildLoot(*getUserdata<MonsterLoot>(L, 2));
 	} else {
 		lua_pushnil(L);
 	}
@@ -15116,7 +15121,7 @@ int LuaScriptInterface::luaMonsterSpellSetInterval(lua_State* L)
 	// monsterSpell:setInterval(interval)
 	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
 	if (spell) {
-		spell->interval = getNumber<uint16_t>(L, 2);
+		spell->setSpeed(getNumber<uint16_t>(L, 2));
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -15154,7 +15159,7 @@ int LuaScriptInterface::luaMonsterSpellSetCombatValue(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetCombatType(lua_State* L)
 {
 	// monsterSpell:setCombatType(combatType_t)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->combatType = getNumber<CombatType_t>(L, 2);
 		pushBoolean(L, true);
@@ -15167,7 +15172,7 @@ int LuaScriptInterface::luaMonsterSpellSetCombatType(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetAttackValue(lua_State* L)
 {
 	// monsterSpell:setAttackValue(attack, skill)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->attack = getNumber<int32_t>(L, 2);
 		spell->skill = getNumber<int32_t>(L, 3);
@@ -15181,7 +15186,7 @@ int LuaScriptInterface::luaMonsterSpellSetAttackValue(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetNeedTarget(lua_State* L)
 {
 	// monsterSpell:setNeedTarget(bool)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->needTarget = getBoolean(L, 2);
 		pushBoolean(L, true);
@@ -15194,7 +15199,7 @@ int LuaScriptInterface::luaMonsterSpellSetNeedTarget(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetNeedDirection(lua_State* L)
 {
 	// monsterSpell:setNeedDirection(bool)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->needDirection = getBoolean(L, 2);
 		pushBoolean(L, true);
@@ -15207,7 +15212,7 @@ int LuaScriptInterface::luaMonsterSpellSetNeedDirection(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetCombatLength(lua_State* L)
 {
 	// monsterSpell:setCombatLength(length)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->length = getNumber<int32_t>(L, 2);
 		pushBoolean(L, true);
@@ -15220,7 +15225,7 @@ int LuaScriptInterface::luaMonsterSpellSetCombatLength(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetCombatSpread(lua_State* L)
 {
 	// monsterSpell:setCombatSpread(spread)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->spread = getNumber<int32_t>(L, 2);
 		pushBoolean(L, true);
@@ -15233,7 +15238,7 @@ int LuaScriptInterface::luaMonsterSpellSetCombatSpread(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetCombatRadius(lua_State* L)
 {
 	// monsterSpell:setCombatRadius(radius)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->radius = getNumber<int32_t>(L, 2);
 		pushBoolean(L, true);
@@ -15246,7 +15251,7 @@ int LuaScriptInterface::luaMonsterSpellSetCombatRadius(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetCombatRing(lua_State* L)
 {
 	// monsterSpell:setCombatRing(ring)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->ring = getNumber<int32_t>(L, 2);
 		pushBoolean(L, true);
@@ -15259,7 +15264,7 @@ int LuaScriptInterface::luaMonsterSpellSetCombatRing(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetConditionType(lua_State* L)
 {
 	// monsterSpell:setConditionType(type)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->conditionType = getNumber<ConditionType_t>(L, 2);
 		pushBoolean(L, true);
@@ -15272,7 +15277,7 @@ int LuaScriptInterface::luaMonsterSpellSetConditionType(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetConditionDamage(lua_State* L)
 {
 	// monsterSpell:setConditionDamage(min, max, start)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->conditionMinDamage = getNumber<int32_t>(L, 2);
 		spell->conditionMaxDamage = getNumber<int32_t>(L, 3);
@@ -15287,7 +15292,7 @@ int LuaScriptInterface::luaMonsterSpellSetConditionDamage(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetConditionSpeedChange(lua_State* L)
 {
 	// monsterSpell:setConditionSpeedChange(minSpeed[, maxSpeed])
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->minSpeedChange = getNumber<int32_t>(L, 2);
 		spell->maxSpeedChange = getNumber<int32_t>(L, 3, 0);
@@ -15301,7 +15306,7 @@ int LuaScriptInterface::luaMonsterSpellSetConditionSpeedChange(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetConditionDuration(lua_State* L)
 {
 	// monsterSpell:setConditionDuration(duration)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->duration = getNumber<int32_t>(L, 2);
 		pushBoolean(L, true);
@@ -15314,7 +15319,7 @@ int LuaScriptInterface::luaMonsterSpellSetConditionDuration(lua_State* L)
 int LuaScriptInterface::luaMonsterSpellSetConditionDrunkenness(lua_State* L)
 {
 	// monsterSpell:setConditionDrunkenness(drunkenness)
-	MonsterSpell* spell = getUserdata<MonsterSpell>(L, 1);
+	LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 1);
 	if (spell) {
 		spell->drunkenness = getNumber<uint8_t>(L, 2);
 		pushBoolean(L, true);

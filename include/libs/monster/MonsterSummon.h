@@ -19,6 +19,9 @@ public:
 	MonsterSummon(std::string name) : name(name) {}
 	~MonsterSummon();
 
+	std::string getName() const { return name; }
+
+	int32_t getChance() const { return chance; }
 	void setChance(int32_t chance)
 	{
 		if (chance > 100) {
@@ -29,8 +32,10 @@ public:
 		this->chance = chance;
 	}
 
+	int32_t getSpeed() const { return speed; }
 	void setSpeed(int32_t speed) { this->speed = std::max(speed, 1); }
 
+	uint32_t getMax() const { return max; }
 	void setMax(uint32_t max) { this->max = std::min(max, MAX_SUMMONS); }
 
 	void setForce(bool force) { this->force = force; }

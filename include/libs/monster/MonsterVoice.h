@@ -40,6 +40,15 @@ public:
 	}
 
 	void shrinkToFit() { this->voiceBlocks.shrink_to_fit(); }
+
+	uint32_t numberOfSentences() { return this->voiceBlocks.size(); }
+
+	void forEachVoice(const std::function<void(const std::string&, bool)>& callback)
+	{
+		for (const auto& voiceBlock : voiceBlocks) {
+			callback(voiceBlock.text, voiceBlock.yellText);
+		}
+	}
 };
 
 #endif
