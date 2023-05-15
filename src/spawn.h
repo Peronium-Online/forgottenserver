@@ -6,6 +6,8 @@
 
 #include "position.h"
 
+#include <forward_list>
+
 class Monster;
 class MonsterType;
 class Npc;

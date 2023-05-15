@@ -16,6 +16,31 @@ struct damage_condition_params
 	int32_t minDamage;
 	int32_t maxDamage;
 };
+damage_condition_params getDamageConditionParamsFromXML(const pugi::xml_node node, const MonsterSpell* spell)
+{
+	int32_t tickInterval = -1;
+	if (pugi::xml_attribute attr = node.attribute("tick")) {
+		int32_t value = pugi::cast<int32_t>(attr.value());
+		if (value > 0) {
+			tickInterval = value;
+		}
+	}
+
+	int32_t startDamage = 0;
+	if (pugi::xml_attribute attr = node.attribute("start")) {
+		int32_t value = std::abs(pugi::cast<int32_t>(attr.value()));
+		if (value <= spell->minCombatValue) {
+			startDamage = value;
+		}
+	}
+
+	return damage_condition_params{
+		startDamage = startDamage,
+		tickInterval = tickInterval,
+		minDamage : std::abs(spell->minCombatValue),
+		maxDamage : std::abs(spell->maxCombatValue),
+	};
+}
 
 std::string MonsterSpell::getName()
 {
@@ -88,7 +113,7 @@ MonsterSpell* MonsterSpell::setBaseSpell(BaseSpell* spell)
 	return this;
 }
 
-std::shared_ptr<MonsterSpell> MonsterSpell::setSpellFromScript(bool needTarget, bool needDirection)
+MonsterSpell* MonsterSpell::setSpellFromScript(bool needTarget, bool needDirection)
 {
 	CombatSpell* combatSpell = nullptr;
 
@@ -112,7 +137,7 @@ std::shared_ptr<MonsterSpell> MonsterSpell::setSpellFromScript(bool needTarget, 
 	this->setBaseSpell(combatSpell);
 	this->combatSpell = true;
 
-	return std::make_shared<MonsterSpell>(*this);
+	return this;
 }
 
 MonsterSpell* MonsterSpell::setMeleeAttack(int32_t attack, int32_t skill)
@@ -128,7 +153,7 @@ MonsterSpell* MonsterSpell::setMeleeAttack(int32_t attack, int32_t skill)
 	return this;
 }
 
-std::shared_ptr<MonsterSpell> MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
+MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 {
 	bool isScripted;
 
@@ -169,7 +194,7 @@ std::shared_ptr<MonsterSpell> MonsterSpell::loadFromXMLNode(pugi::xml_node node,
 
 	if (auto spell = g_spells->getSpellByName(name)) {
 		this->setBaseSpell(spell);
-		return std::make_shared<MonsterSpell>(*this);
+		return this;
 	}
 
 	if (isScripted) {
@@ -314,9 +339,9 @@ std::shared_ptr<MonsterSpell> MonsterSpell::loadFromXMLNode(pugi::xml_node node,
 		}
 
 		if ((attr = node.attribute("monster"))) {
-			MonsterType* mType = g_monsters.findMonsterTypeByName(attr.as_string());
-			if (mType) {
-				combatBuilder->withOutfitChange(mType->info.outfit, duration);
+			const auto& mType = g_monsters.findMonsterTypeByName(attr.as_string());
+			if (!mType.isUndefined()) {
+				combatBuilder->withOutfitChange(mType.info.outfit, duration);
 			}
 		} else if ((attr = node.attribute("item"))) {
 			auto lookTypeEx = pugi::cast<uint16_t>(attr.value());
@@ -421,7 +446,7 @@ std::shared_ptr<MonsterSpell> MonsterSpell::loadFromXMLNode(pugi::xml_node node,
 		this->combatSpell = true;
 	}
 
-	return std::make_shared<MonsterSpell>(*this);
+	return this;
 }
 
 std::shared_ptr<MonsterSpell> MonsterSpell::deserializeSpellFromLua(LMonsterSpell* lSpell)
@@ -447,7 +472,8 @@ std::shared_ptr<MonsterSpell> MonsterSpell::deserializeSpellFromLua(LMonsterSpel
 	}
 
 	if (lSpell->isScripted) {
-		return mSpell->setSpellFromScript(lSpell->needTarget, lSpell->needDirection);
+		mSpell->setSpellFromScript(lSpell->needTarget, lSpell->needDirection);
+		return mSpell;
 	}
 
 	mSpell->combatSpell = true;
@@ -513,30 +539,4 @@ std::shared_ptr<MonsterSpell> MonsterSpell::deserializeSpellFromLua(LMonsterSpel
 	}
 
 	return mSpell;
-}
-
-damage_condition_params getDamageConditionParamsFromXML(const pugi::xml_node node, const MonsterSpell* spell)
-{
-	int32_t tickInterval = -1;
-	if (pugi::xml_attribute attr = node.attribute("tick")) {
-		int32_t value = pugi::cast<int32_t>(attr.value());
-		if (value > 0) {
-			tickInterval = value;
-		}
-	}
-
-	int32_t startDamage = 0;
-	if (pugi::xml_attribute attr = node.attribute("start")) {
-		int32_t value = std::abs(pugi::cast<int32_t>(attr.value()));
-		if (value <= spell->minCombatValue) {
-			startDamage = value;
-		}
-	}
-
-	return damage_condition_params{
-		startDamage = startDamage,
-		tickInterval = tickInterval,
-		minDamage : std::abs(spell->minCombatValue),
-		maxDamage : std::abs(spell->maxCombatValue),
-	};
 }

@@ -11,7 +11,7 @@
 class Monsters final : virtual public XMLLoadable
 {
 private:
-	std::map<std::string, MonsterType> monsterTypes;
+	std::map<std::string, const MonsterType&> monsterTypes;
 	std::unique_ptr<LuaScriptInterface> scriptInterface;
 
 	virtual bool load(pugi::xml_node node, bool reloading) override;
@@ -32,17 +32,24 @@ public:
 
 	Monsters& operator=(const Monsters&) = delete;
 
-	virtual MonsterType* findMonsterTypeByName(std::string name);
+	virtual const MonsterType& findMonsterTypeByName(std::string name);
 
 	virtual bool reload();
 
 	virtual void setMonsterTypeScript(MonsterType& monsterType, std::string script);
-	void addMonsterType(MonsterType& monsterType)
+	void addMonsterType(const MonsterType& monsterType)
 	{
-		this->monsterTypes.emplace(monsterType.name, std::move(monsterType));
+		this->monsterTypes.emplace(monsterType.name.substr(), std::move(monsterType));
+	}
+
+	uint32_t monsterTypeCount() const { return this->monsterTypes.size(); }
+
+	void forEachMonsterType(const std::function<void(const MonsterType&)>& callback)
+	{
+		for (const auto& monsterType : this->monsterTypes) {
+			callback(monsterType.second);
+		}
 	}
 };
-
-Monsters g_monsters;
 
 #endif

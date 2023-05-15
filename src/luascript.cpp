@@ -4567,14 +4567,15 @@ int LuaScriptInterface::luaGameGetNpcCount(lua_State* L)
 int LuaScriptInterface::luaGameGetMonsterTypes(lua_State* L)
 {
 	// Game.getMonsterTypes()
-	auto& type = g_monsters.monsterTypes;
-	lua_createtable(L, type.size(), 0);
+	const auto count = g_monsters.monsterTypeCount();
+	lua_createtable(L, count, 0);
 
-	for (auto& mType : type) {
-		pushUserdata<MonsterType>(L, &mType.second);
+	g_monsters.forEachMonsterType([&](const MonsterType& mType) {
+		pushUserdata<MonsterType>(L, const_cast<MonsterType*>(&mType));
 		setMetatable(L, -1, "MonsterType");
-		lua_setfield(L, -2, mType.first.c_str());
-	}
+		lua_setfield(L, -2, mType.name.c_str());
+	});
+
 	return 1;
 }
 
@@ -4928,23 +4929,17 @@ int LuaScriptInterface::luaGameCreateMonsterType(lua_State* L)
 		return 1;
 	}
 
-	MonsterType* monsterType = g_monsters.findMonsterTypeByName(name);
-	if (!monsterType) {
-		monsterType = (new MonsterType::Builder())->setName(name)->setNameDescription("a " + name)->build();
-		g_monsters.addMonsterType(*monsterType);
-	} else {
-		monsterType->info.lootItems.clear();
-		monsterType->info.attackSpells.clear();
-		monsterType->info.defenseSpells.clear();
-		monsterType->info.scripts.clear();
-		monsterType->info.thinkEvent = -1;
-		monsterType->info.creatureAppearEvent = -1;
-		monsterType->info.creatureDisappearEvent = -1;
-		monsterType->info.creatureMoveEvent = -1;
-		monsterType->info.creatureSayEvent = -1;
+	const auto& monsterType = g_monsters.findMonsterTypeByName(name);
+	if (monsterType.isUndefined()) {
+		auto newMonsterType = (new MonsterType::Builder())->setName(name)->build();
+		g_monsters.addMonsterType(*newMonsterType);
+
+		pushUserdata<MonsterType>(L, newMonsterType);
+		setMetatable(L, -1, "MonsterType");
+		return 1;
 	}
 
-	pushUserdata<MonsterType>(L, monsterType);
+	pushUserdata<MonsterType>(L, const_cast<MonsterType*>(&monsterType));
 	setMetatable(L, -1, "MonsterType");
 	return 1;
 }
@@ -10888,7 +10883,7 @@ int LuaScriptInterface::luaMonsterGetType(lua_State* L)
 	// monster:getType()
 	const Monster* monster = getUserdata<const Monster>(L, 1);
 	if (monster) {
-		pushUserdata<MonsterType>(L, monster->getMonsterType());
+		pushUserdata<MonsterType>(L, const_cast<MonsterType*>(monster->getMonsterType()));
 		setMetatable(L, -1, "MonsterType");
 	} else {
 		lua_pushnil(L);
@@ -13809,9 +13804,9 @@ int LuaScriptInterface::luaOutfitCompare(lua_State* L)
 int LuaScriptInterface::luaMonsterTypeCreate(lua_State* L)
 {
 	// MonsterType(name)
-	MonsterType* monsterType = g_monsters.findMonsterTypeByName(getString(L, 2));
-	if (monsterType) {
-		pushUserdata<MonsterType>(L, monsterType);
+	const auto& monsterType = g_monsters.findMonsterTypeByName(getString(L, 2));
+	if (!monsterType.isUndefined()) {
+		pushUserdata<MonsterType>(L, const_cast<MonsterType*>(&monsterType));
 		setMetatable(L, -1, "MonsterType");
 	} else {
 		lua_pushnil(L);
@@ -15378,9 +15373,9 @@ int LuaScriptInterface::luaMonsterSpellSetOutfit(lua_State* L)
 		} else if (isNumber(L, 2)) {
 			spell->outfit.lookTypeEx = getNumber<uint16_t>(L, 2);
 		} else if (isString(L, 2)) {
-			MonsterType* mType = g_monsters.findMonsterTypeByName(getString(L, 2));
-			if (mType) {
-				spell->outfit = mType->info.outfit;
+			const auto& mType = g_monsters.findMonsterTypeByName(getString(L, 2));
+			if (!mType.isUndefined()) {
+				spell->outfit = mType.info.outfit;
 			}
 		}
 		pushBoolean(L, true);

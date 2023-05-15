@@ -243,8 +243,8 @@ bool ConfigManager::load()
 
 	integer[MAX_PLAYERS] = getGlobalNumber(L, "maxPlayers");
 	integer[PZ_LOCKED] = getGlobalNumber(L, "pzLocked", 60000);
-	integer[DEFAULT_DESPAWNRANGE] = Monster::despawnRange = getGlobalNumber(L, "deSpawnRange", 2);
-	integer[DEFAULT_DESPAWNRADIUS] = Monster::despawnRadius = getGlobalNumber(L, "deSpawnRadius", 50);
+	integer[DEFAULT_DESPAWNRANGE] = Monster::DESPAWN_RANGE = getGlobalNumber(L, "deSpawnRange", 2);
+	integer[DEFAULT_DESPAWNRADIUS] = Monster::DESPAWN_RADIUS = getGlobalNumber(L, "deSpawnRadius", 50);
 	integer[DEFAULT_WALKTOSPAWNRADIUS] = getGlobalNumber(L, "walkToSpawnRadius", 15);
 	integer[RATE_EXPERIENCE] = getGlobalNumber(L, "rateExp", 5);
 	integer[RATE_SKILL] = getGlobalNumber(L, "rateSkill", 3);

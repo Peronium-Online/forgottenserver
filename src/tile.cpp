@@ -10,6 +10,7 @@
 #include "creature.h"
 #include "game.h"
 #include "housetile.h"
+#include "libs/monster/Monster.h"
 #include "mailbox.h"
 #include "movement.h"
 #include "spectators.h"

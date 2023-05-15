@@ -19,7 +19,6 @@ public:
 		subType = -1;
 		actionId = -1;
 	};
-	~MonsterLoot();
 
 	uint16_t itemId;
 	uint32_t countMax;

@@ -20,7 +20,6 @@ private:
 
 public:
 	MonsterVoice() = default;
-	~MonsterVoice();
 
 	void setYellSpeedTicks(uint32_t ticks) { this->yellSpeedTicks = ticks; }
 

@@ -86,17 +86,18 @@ class MonsterType
 
 public:
 	MonsterType() = default;
-
-	// non-copyable
 	MonsterType(const MonsterType&) = delete;
 	MonsterType& operator=(const MonsterType&) = delete;
 
-	bool loadCallback(LuaScriptInterface* scriptInterface);
-
-	std::string name;
+	std::string name = "undefined";
 	std::string nameDescription;
-
 	MonsterInfo info;
+
+	virtual bool loadCallback(LuaScriptInterface* scriptInterface);
+
+	bool isUndefined() const { return name == "undefined"; }
+
+	static MonsterType UNDEFINED_MONSTER_TYPE;
 
 	class Builder : virtual public XMLLoadable
 	{

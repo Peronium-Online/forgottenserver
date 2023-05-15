@@ -2,21 +2,26 @@
 
 #include "../../game.h"
 #include "../../position.h"
+#include "../../spectators.h"
+#include "libs/monster/Monsters.h"
 #include "libs/util/tools/direction.h"
 #include "libs/util/tools/random.h"
-#include "spectators.h"
 
 extern Monsters g_monsters;
 extern Game g_game;
 
+int32_t Monster::DESPAWN_RANGE;
+int32_t Monster::DESPAWN_RADIUS;
+uint32_t Monster::MONSTER_AUTO_ID = 0x21000000;
+
 Monster* Monster::createMonsterByName(const std::string& name)
 {
-	MonsterType* mType = g_monsters.findMonsterTypeByName(name);
-	if (!mType) {
+	const auto& mType = g_monsters.findMonsterTypeByName(name);
+	if (mType.isUndefined()) {
 		return nullptr;
 	}
 
-	return new Monster(mType);
+	return new Monster(&mType);
 }
 
 const std::string& Monster::getName() const
@@ -41,7 +46,7 @@ const std::string& Monster::getNameDescription() const
 void Monster::setID()
 {
 	if (id == 0) {
-		id = MONSTER_AUTO_ID++;
+		id = Monster::MONSTER_AUTO_ID++;
 	}
 }
 
@@ -73,19 +78,19 @@ bool Monster::isInSpawnRange(const Position& pos) const
 		return true;
 	}
 
-	if (Monster::despawnRadius == 0) {
+	if (Monster::DESPAWN_RADIUS == 0) {
 		return true;
 	}
 
-	if (!Spawns::isInZone(masterPos, Monster::despawnRadius, pos)) {
+	if (!Spawns::isInZone(masterPos, Monster::DESPAWN_RADIUS, pos)) {
 		return false;
 	}
 
-	if (Monster::despawnRange == 0) {
+	if (Monster::DESPAWN_RANGE == 0) {
 		return true;
 	}
 
-	if (Position::getDistanceZ(pos, masterPos) > Monster::despawnRange) {
+	if (Position::getDistanceZ(pos, masterPos) > Monster::DESPAWN_RANGE) {
 		return false;
 	}
 
@@ -116,7 +121,7 @@ void Monster::setIdle(bool idle)
 
 	this->idle = idle;
 
-	if (!isIdle) {
+	if (!isIdle()) {
 		g_game.addCreatureCheck(this);
 	} else {
 		onIdleStatus();
@@ -940,4 +945,14 @@ bool Monster::canWalkOnFieldType(CombatType_t combatType) const
 		default:
 			return true;
 	}
+}
+
+bool Monster::canPushItems() const
+{
+	Monster* master = this->master ? this->master->getMonster() : nullptr;
+	if (master) {
+		return master->mType->info.canPushItems;
+	}
+
+	return mType->info.canPushItems;
 }

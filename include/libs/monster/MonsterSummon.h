@@ -17,7 +17,6 @@ private:
 
 public:
 	MonsterSummon(std::string name) : name(name) {}
-	~MonsterSummon();
 
 	std::string getName() const { return name; }
 

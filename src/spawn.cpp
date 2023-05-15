@@ -104,8 +104,8 @@ bool Spawns::loadFromXml(const std::string& filename)
 						continue;
 					}
 
-					MonsterType* mType = g_monsters.findMonsterTypeByName(nameAttribute.as_string());
-					if (!mType) {
+					auto mType = &const_cast<MonsterType&>(g_monsters.findMonsterTypeByName(nameAttribute.as_string()));
+					if (mType->isUndefined()) {
 						std::cout << "[Warning - Spawn::loadFromXml] " << pos << " can not find "
 						          << nameAttribute.as_string() << std::endl;
 						continue;
@@ -418,8 +418,8 @@ bool Spawn::addBlock(spawnBlock_t sb)
 
 bool Spawn::addMonster(const std::string& name, const Position& pos, Direction dir, uint32_t interval)
 {
-	MonsterType* mType = g_monsters.findMonsterTypeByName(name);
-	if (!mType) {
+	auto mType = &const_cast<MonsterType&>(g_monsters.findMonsterTypeByName(name));
+	if (mType->isUndefined()) {
 		std::cout << "[Warning - Spawn::addMonster] Can not find " << name << std::endl;
 		return false;
 	}

@@ -3,6 +3,7 @@
 #include "libs/monster/Monsters.h"
 
 extern Monsters g_monsters;
+MonsterType MonsterType::UNDEFINED_MONSTER_TYPE;
 
 MonsterType* MonsterType::Builder::build()
 {
@@ -33,15 +34,15 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 	std::string lowerCasedMonsterName = boost::algorithm::to_lower_copy(std::string(attr.as_string()));
 
 	if (reloading) {
-		auto it = g_monsters.findMonsterTypeByName(lowerCasedMonsterName);
-		if (it != nullptr) {
-			mType = it;
+		const auto& it = g_monsters.findMonsterTypeByName(lowerCasedMonsterName);
+		if (!it.isUndefined()) {
+			mType = const_cast<MonsterType*>(&it);
 			mType->info = {};
 		}
 	}
 
 	if (!mType) {
-		mType = g_monsters.findMonsterTypeByName(lowerCasedMonsterName);
+		mType = const_cast<MonsterType*>(&(g_monsters.findMonsterTypeByName(lowerCasedMonsterName)));
 	}
 
 	this->setName(attr.as_string());
@@ -195,9 +196,9 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 
 	if (pugi::xml_node attacksNode = node.child("attacks")) {
 		for (auto attackNode : attacksNode.children()) {
-			MonsterSpell spell;
-			if (spell.loadFromXMLNode(attackNode, reloading)) {
-				this->addAttackSpell(std::move(spell));
+			auto spell = std::make_unique<MonsterSpell>();
+			if (spell->loadFromXMLNode(attackNode, reloading)) {
+				this->addAttackSpell(std::move(*spell));
 			} else {
 				std::cout << "[Warning - MonsterType::loadFromXMLNode] Cant load spell. " << this->mType->name
 				          << std::endl;
@@ -215,9 +216,9 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 		}
 
 		for (auto defenseNode : defensesNode.children()) {
-			MonsterSpell spell;
-			if (spell.loadFromXMLNode(defenseNode, reloading)) {
-				this->addDefenseSpell(std::move(spell));
+			auto spell = std::make_unique<MonsterSpell>();
+			if (spell->loadFromXMLNode(defenseNode, reloading)) {
+				this->addDefenseSpell(std::move(*spell));
 			} else {
 				std::cout << "[Warning - MonsterType::loadFromXMLNode] Cant load spell. " << this->mType->name
 				          << std::endl;

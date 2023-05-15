@@ -10,8 +10,6 @@
 using CreatureHashSet = std::unordered_set<Creature*>;
 using CreatureList = std::list<Creature*>;
 
-uint32_t MONSTER_AUTO_ID = 0x21000000;
-
 // TODO: find a better place for this enum
 enum TargetSearchType_t
 {
@@ -24,7 +22,7 @@ enum TargetSearchType_t
 class Monster final : public Creature
 {
 private:
-	MonsterType* mType;
+	const MonsterType* mType;
 	std::string name;
 	std::string nameDescription;
 
@@ -39,17 +37,19 @@ private:
 	int32_t challengeFocusDuration = 0;
 	int32_t stepDuration = 0;
 
+	bool ignoreFieldDamage = false;
+
 public:
 	Monster() = default;
-	explicit Monster(MonsterType* mType);
-	~Monster();
+	explicit Monster(const MonsterType* mType) : mType(mType){};
 	// non-copyable
 	Monster(const Monster&) = delete;
 	Monster& operator=(const Monster&) = delete;
 
 	static Monster* createMonsterByName(const std::string& name);
-	static int32_t despawnRange;
-	static int32_t despawnRadius;
+	static uint32_t MONSTER_AUTO_ID;
+	static int32_t DESPAWN_RANGE;
+	static int32_t DESPAWN_RADIUS;
 
 	bool isHostile() const { return mType->info.isHostile; }
 
@@ -65,7 +65,7 @@ public:
 	void setNameDescription(const std::string& nameDescription) { this->nameDescription = nameDescription; }
 	std::string getName() { return this->name; }
 	std::string getNameDescription() { return this->nameDescription; }
-	MonsterType* getMonsterType() const { return mType; }
+	const MonsterType* getMonsterType() const { return mType; }
 
 	const Position& getMasterPos() const { return masterPos; }
 	void setMasterPos(Position pos) { masterPos = pos; }
@@ -111,6 +111,11 @@ public:
 	bool canWalkOnFieldType(CombatType_t combatType) const;
 
 	bool isTargetNearby() const { return stepDuration >= 1; }
+
+	bool canPushItems() const;
+	bool canPushCreatures() const { return mType->info.canPushCreatures; }
+
+	bool isIgnoringFieldDamage() const { return ignoreFieldDamage; }
 };
 
 #endif

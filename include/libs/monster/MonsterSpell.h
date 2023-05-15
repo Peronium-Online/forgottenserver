@@ -50,11 +50,10 @@ public:
 	CombatType_t combatType = COMBAT_UNDEFINEDDAMAGE;
 };
 
-class MonsterSpell : virtual public XMLElementBuilder<std::shared_ptr<MonsterSpell>>
+class MonsterSpell : virtual public XMLElementBuilder<MonsterSpell*>
 {
 public:
 	MonsterSpell() = default;
-	~MonsterSpell();
 	MonsterSpell(const MonsterSpell& other) = delete;
 	MonsterSpell& operator=(const MonsterSpell& other) = delete;
 	MonsterSpell(MonsterSpell&& other) :
@@ -83,7 +82,7 @@ public:
 	bool combatSpell = false;
 	bool isMelee = false;
 
-	virtual std::shared_ptr<MonsterSpell> loadFromXMLNode(pugi::xml_node node, bool reloading) override;
+	virtual MonsterSpell* loadFromXMLNode(pugi::xml_node node, bool reloading) override;
 
 	static std::shared_ptr<MonsterSpell> deserializeSpellFromLua(LMonsterSpell* spell);
 
@@ -95,7 +94,7 @@ public:
 	virtual MonsterSpell* setMinCombatValue(int32_t value);
 	virtual MonsterSpell* setMaxCombatValue(int32_t value);
 	virtual MonsterSpell* setBaseSpell(BaseSpell* spell);
-	virtual std::shared_ptr<MonsterSpell> setSpellFromScript(bool needTarget, bool needDirection);
+	virtual MonsterSpell* setSpellFromScript(bool needTarget, bool needDirection);
 	virtual MonsterSpell* setMeleeAttack(int32_t attack, int32_t skill);
 
 	class CombatBuilder
