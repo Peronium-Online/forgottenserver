@@ -29,7 +29,7 @@ bool Monsters::load(pugi::xml_node node, bool reloading)
 		auto mTypeBuilder = new MonsterType::Builder(file);
 		if (mTypeBuilder->loadFromXML(reloading)) {
 			auto mType = mTypeBuilder->build();
-			this->addMonsterType(*mType);
+			this->addMonsterType(name, *mType);
 		} else {
 			std::cout << "[Error - Monsters::load] Failed to load monster: " << file << std::endl;
 		}

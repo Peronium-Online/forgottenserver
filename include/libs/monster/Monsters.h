@@ -14,7 +14,7 @@ private:
 	std::map<std::string, const MonsterType&> monsterTypes;
 	std::unique_ptr<LuaScriptInterface> scriptInterface;
 
-	virtual bool load(pugi::xml_node node, bool reloading) override;
+	bool load(pugi::xml_node node, bool reloading) override;
 
 	void initializeScriptInterface()
 	{
@@ -39,7 +39,13 @@ public:
 	virtual void setMonsterTypeScript(MonsterType& monsterType, std::string script);
 	void addMonsterType(const MonsterType& monsterType)
 	{
-		this->monsterTypes.emplace(monsterType.name.substr(), std::move(monsterType));
+		const auto& name = boost::algorithm::to_lower_copy(monsterType.name);
+		this->monsterTypes.emplace(name, std::move(monsterType));
+	}
+
+	void addMonsterType(const std::string name, const MonsterType& monsterType)
+	{
+		this->monsterTypes.emplace(name, std::move(monsterType));
 	}
 
 	uint32_t monsterTypeCount() const { return this->monsterTypes.size(); }

@@ -3,9 +3,9 @@
 	<health now="350" max="350" />
 	<look type="215" corpse="6058" />
 	<targetchange interval="4000" chance="20" />
-	<targetseeks>
-		<targetseek cid="defense tower" priority="5" />
-	</targetseeks>
+	<seeks>
+		<seek name="defense tower" priority="5" />
+	</seeks>
 	<flags>
 		<flag summonable="0" />
 		<flag attackable="1" />

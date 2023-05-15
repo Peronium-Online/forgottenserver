@@ -3,12 +3,12 @@
 	<health now="30000" max="30000" />
 	<look typeex="7059" corpse="5972" />
 	<targetchange interval="2000" chance="5" />
-    <targetseeks>
-		<targetseek cid="mage minion" priority="5" />
-		<targetseek cid="warrior minion" priority="5" />
-		<targetseek cid="super minion" priority="5" />
-		<targetseek cid="siege minion" priority="5" />
-	</targetseeks>
+    <seeks>
+		<seek name="mage minion" priority="5" />
+		<seek name="warrior minion" priority="5" />
+		<seek name="super minion" priority="5" />
+		<seek name="siege minion" priority="5" />
+	</seeks>
 	<flags>
 		<flag attackable="1" />
 		<flag hostile="1" />

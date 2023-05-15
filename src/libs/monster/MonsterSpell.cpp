@@ -146,8 +146,8 @@ MonsterSpell* MonsterSpell::setMeleeAttack(int32_t attack, int32_t skill)
 	this->setRange(1);
 
 	if (attack > 0 && skill > 0) {
-		this->setMinCombatValue(0);
 		this->setMaxCombatValue(-Weapons::getMaxMeleeDamage(skill, attack));
+		this->setMinCombatValue(0);
 	}
 
 	return this;
@@ -184,12 +184,12 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 		this->setRange(range);
 	}
 
-	if ((attr = node.attribute("min"))) {
-		this->setMinCombatValue(pugi::cast<int32_t>(attr.value()));
-	}
-
 	if ((attr = node.attribute("max"))) {
 		this->setMaxCombatValue(pugi::cast<int32_t>(attr.value()));
+	}
+
+	if ((attr = node.attribute("min"))) {
+		this->setMinCombatValue(pugi::cast<int32_t>(attr.value()));
 	}
 
 	if (auto spell = g_spells->getSpellByName(name)) {
@@ -318,10 +318,10 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 
 		if ((attr = node.attribute("speedchange"))) {
 			minSpeedChange = pugi::cast<int32_t>(attr.value());
-		} else if ((attr = node.attribute("minspeedchange"))) {
+		} else if ((attr = node.attribute("minspeedchange")) || (attr = node.attribute("min"))) {
 			minSpeedChange = pugi::cast<int32_t>(attr.value());
 
-			if ((attr = node.attribute("maxspeedchange"))) {
+			if ((attr = node.attribute("maxspeedchange")) || (attr = node.attribute("max"))) {
 				maxSpeedChange = pugi::cast<int32_t>(attr.value());
 			}
 		} else {
@@ -463,8 +463,8 @@ std::shared_ptr<MonsterSpell> MonsterSpell::deserializeSpellFromLua(LMonsterSpel
 	mSpell->setSpeed(lSpell->interval)
 	    ->setChance(lSpell->chance)
 	    ->setRange(lSpell->range)
-	    ->setMinCombatValue(lSpell->minCombatValue)
-	    ->setMaxCombatValue(lSpell->maxCombatValue);
+	    ->setMaxCombatValue(lSpell->maxCombatValue)
+	    ->setMinCombatValue(lSpell->minCombatValue);
 
 	if (auto spell = g_spells->getSpellByName(mSpell->name)) {
 		mSpell->setBaseSpell(spell);

@@ -84,18 +84,21 @@ class MonsterType
 		MonstersEvent_t eventType = MONSTERS_EVENT_NONE;
 	};
 
+private:
+	bool undefined = true;
+
 public:
 	MonsterType() = default;
 	MonsterType(const MonsterType&) = delete;
 	MonsterType& operator=(const MonsterType&) = delete;
 
-	std::string name = "undefined";
+	std::string name;
 	std::string nameDescription;
 	MonsterInfo info;
 
 	virtual bool loadCallback(LuaScriptInterface* scriptInterface);
 
-	bool isUndefined() const { return name == "undefined"; }
+	bool isUndefined() const { return undefined; }
 
 	static MonsterType UNDEFINED_MONSTER_TYPE;
 
@@ -104,34 +107,37 @@ public:
 	private:
 		MonsterType* mType;
 
-		virtual bool load(pugi::xml_node node, bool reloading) override;
+		bool load(pugi::xml_node node, bool reloading) override;
+		bool loadRootNodeAttributes(pugi::xml_node rootNode, bool reloading) override;
 
 	public:
-		Builder() = default;
-		Builder(std::string filepath)
+		Builder() { mType = new MonsterType(); };
+		Builder(const std::string& filepath)
 		{
 			this->filepath = filepath;
 			this->childNode = "monster";
+			this->mType = new MonsterType();
+			this->mType->undefined = false;
 		};
 
 		virtual MonsterType* build();
 
-		Builder* setName(std::string name)
+		Builder* setName(const std::string& name)
 		{
-			std::string lowerCasedMonsterName = boost::algorithm::to_lower_copy(name);
-
 			this->mType->name = name;
+
+			std::string lowerCasedMonsterName = boost::algorithm::to_lower_copy(name);
 			this->mType->nameDescription = "a " + lowerCasedMonsterName;
 			return this;
 		}
 
-		Builder* setNameDescription(std::string nameDescription)
+		Builder* setNameDescription(const std::string& nameDescription)
 		{
 			this->mType->nameDescription = nameDescription;
 			return this;
 		}
 
-		Builder* setRace(std::string raceName)
+		Builder* setRace(const std::string& raceName)
 		{
 			if (raceName == "venom") {
 				this->mType->info.race = RACE_VENOM;
@@ -190,13 +196,13 @@ public:
 			return this;
 		}
 
-		Builder* setSkull(std::string skull)
+		Builder* setSkull(const std::string& skull)
 		{
 			this->mType->info.skull = getSkullType(boost::algorithm::to_lower_copy<std::string>(skull));
 			return this;
 		}
 
-		Builder* setScript(std::string filename);
+		Builder* setScript(const std::string& filename);
 
 		Builder* setHealthNow(int32_t healthNow)
 		{
@@ -651,12 +657,14 @@ public:
 			return this;
 		}
 
-		Builder* addEvent(std::string script)
+		Builder* addEvent(const std::string& script)
 		{
 			this->mType->info.scripts.emplace_back(std::move(script));
 			return this;
 		}
 	};
+
+	friend Builder;
 };
 
 #endif

@@ -26,7 +26,7 @@
 			<attribute key="areaEffect" value="mortarea" />
 		</attack>
 		<attack name="manadrain" interval="2000" chance="15" range="7" min="-2" max="-170" />
-		<attack name="poisoncondition" interval="2000" chance="15" range="7" min="-200">
+		<attack name="poisoncondition" interval="2000" chance="15" range="7" min="-200" max="-200">
 			<attribute key="shootEffect" value="poison" />
 		</attack>
 	</attacks>

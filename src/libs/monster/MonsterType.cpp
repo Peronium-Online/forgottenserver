@@ -9,8 +9,12 @@ MonsterType* MonsterType::Builder::build()
 {
 	if (this->mType->info.manaCost == 0 && (this->mType->info.isSummonable || this->mType->info.isConvinceable)) {
 		std::cout
-		    << "[Warning - MonsterType::loadFromXMLNode] manaCost missing or zero on monster with summonable and/or convinceable flags: "
-		    << this->mType->name << std::endl;
+		    << "[Warning - MonsterType::build] manaCost missing or zero on monster with summonable and/or convinceable flags: "
+		    << filepath << std::endl;
+	}
+
+	if (this->mType->info.health > this->mType->info.healthMax) {
+		std::cout << "[Warning - MonsterType::build] Health now is greater than health max." << filepath << std::endl;
 	}
 
 	this->mType->info.summons.shrink_to_fit();
@@ -24,28 +28,25 @@ MonsterType* MonsterType::Builder::build()
 	return this->mType;
 }
 
-bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
+bool MonsterType::Builder::loadRootNodeAttributes(pugi::xml_node node, bool reloading)
 {
 	pugi::xml_attribute attr;
 	if (!(attr = node.attribute("name"))) {
-		std::cout << "[Error - MonsterType::loadFromXMLNode] Missing name in: " << node.name() << std::endl;
+		std::cout << "[Error - MonsterType::loadRootNodeAttributes] Missing name in: " << this->filepath << std::endl;
 		return false;
 	}
-	std::string lowerCasedMonsterName = boost::algorithm::to_lower_copy(std::string(attr.as_string()));
+
+	const std::string& monsterName = attr.as_string();
 
 	if (reloading) {
-		const auto& it = g_monsters.findMonsterTypeByName(lowerCasedMonsterName);
+		const auto& it = g_monsters.findMonsterTypeByName(monsterName);
 		if (!it.isUndefined()) {
 			mType = const_cast<MonsterType*>(&it);
 			mType->info = {};
 		}
 	}
 
-	if (!mType) {
-		mType = const_cast<MonsterType*>(&(g_monsters.findMonsterTypeByName(lowerCasedMonsterName)));
-	}
-
-	this->setName(attr.as_string());
+	this->setName(monsterName);
 	if (attr = node.attribute("nameDescription")) {
 		this->setNameDescription(attr.as_string());
 	}
@@ -78,8 +79,34 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 		this->setScript(attr.as_string());
 	}
 
-	if (pugi::xml_node flagsNode = node.child("flags")) {
-		for (auto flagNode : flagsNode.children()) {
+	return true;
+}
+
+bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
+{
+	pugi::xml_attribute attr;
+	std::string name = boost::algorithm::to_lower_copy(std::string(node.name()));
+
+	if (name == "health") {
+		if (attr = node.attribute("now")) {
+			this->setHealthNow(pugi::cast<int32_t>(attr.value()));
+		} else {
+			std::cout << "[Error - MonsterType::load] Missing health now. " << filepath << std::endl;
+			return false;
+		}
+
+		if (attr = node.attribute("max")) {
+			this->setHealthMax(pugi::cast<int32_t>(attr.value()));
+		} else {
+			std::cout << "[Error - MonsterType::load] Missing health max. " << filepath << std::endl;
+			return false;
+		}
+
+		return true;
+	}
+
+	if (name == "flags") {
+		for (auto flagNode : node.children()) {
 			attr = flagNode.first_attribute();
 			const char* attrName = attr.name();
 
@@ -124,89 +151,95 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 			} else if (caseInsensitiveEqual(attrName, "canwalkonpoison")) {
 				this->setCanWalkOnPoison(attr.as_bool());
 			} else {
-				std::cout << "[Warning - MonsterType::loadFromXMLNode] Unknown flag attribute: " << attrName << ". "
-				          << this->mType->name << std::endl;
+				std::cout << "[Warning - MonsterType::load] Unknown flag attribute: " << attrName << ". " << filepath
+				          << " node: " << name << std::endl;
 			}
 		}
+
+		return true;
 	}
 
-	if (pugi::xml_node targetChangeNode = node.child("targetchange")) {
+	if (name == "targetchange") {
 		uint32_t interval = 2000;
-		if ((attr = targetChangeNode.attribute("speed")) || (attr = targetChangeNode.attribute("interval"))) {
+		if ((attr = node.attribute("speed")) || (attr = node.attribute("interval"))) {
 			interval = pugi::cast<uint32_t>(attr.value());
 		} else {
-			std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing targetchange speed. " << this->mType->name
+			std::cout << "[Warning - MonsterType::load] Missing targetchange speed. " << filepath << " node: " << name
 			          << std::endl;
 		}
 
 		int32_t chance = 0;
-		if ((attr = targetChangeNode.attribute("chance"))) {
+		if ((attr = node.attribute("chance"))) {
 			mType->info.changeTargetChance = pugi::cast<int32_t>(attr.value());
 		} else {
-			std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing targetchange chance. " << this->mType->name
+			std::cout << "[Warning - MonsterType::load] Missing targetchange chance. " << filepath << " node: " << name
 			          << std::endl;
 		}
 
 		this->setTargetChange(interval, chance);
+		return true;
 	}
 
-	if (pugi::xml_node lookNode = node.child("look")) {
+	if (name == "look") {
 		Outfit_t outfit = {};
 
-		if ((attr = lookNode.attribute("type"))) {
+		if ((attr = node.attribute("type"))) {
 			outfit.lookType = pugi::cast<uint16_t>(attr.value());
 
-			if ((attr = lookNode.attribute("head"))) {
+			if ((attr = node.attribute("head"))) {
 				outfit.lookHead = pugi::cast<uint16_t>(attr.value());
 			}
 
-			if ((attr = lookNode.attribute("body"))) {
+			if ((attr = node.attribute("body"))) {
 				outfit.lookBody = pugi::cast<uint16_t>(attr.value());
 			}
 
-			if ((attr = lookNode.attribute("legs"))) {
+			if ((attr = node.attribute("legs"))) {
 				outfit.lookLegs = pugi::cast<uint16_t>(attr.value());
 			}
 
-			if ((attr = lookNode.attribute("feet"))) {
+			if ((attr = node.attribute("feet"))) {
 				outfit.lookFeet = pugi::cast<uint16_t>(attr.value());
 			}
 
-			if ((attr = lookNode.attribute("addons"))) {
+			if ((attr = node.attribute("addons"))) {
 				outfit.lookAddons = pugi::cast<uint16_t>(attr.value());
 			}
-		} else if ((attr = lookNode.attribute("typeex"))) {
+		} else if ((attr = node.attribute("typeex"))) {
 			outfit.lookTypeEx = pugi::cast<uint16_t>(attr.value());
 		} else {
-			std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing look type/typeex. " << this->mType->name
+			std::cout << "[Warning - MonsterType::load] Missing look type/typeex. " << filepath << " node: " << name
 			          << std::endl;
 		}
 
-		if ((attr = lookNode.attribute("mount"))) {
+		if ((attr = node.attribute("mount"))) {
 			outfit.lookMount = pugi::cast<uint16_t>(attr.value());
 		}
 
 		uint16_t corpse = 0;
-		if ((attr = lookNode.attribute("corpse"))) {
+		if ((attr = node.attribute("corpse"))) {
 			corpse = pugi::cast<uint16_t>(attr.value());
 		}
 
 		this->setLook(outfit, corpse);
+		return true;
 	}
 
-	if (pugi::xml_node attacksNode = node.child("attacks")) {
-		for (auto attackNode : attacksNode.children()) {
+	if (name == "attacks") {
+		for (auto attackNode : node.children()) {
 			auto spell = std::make_unique<MonsterSpell>();
 			if (spell->loadFromXMLNode(attackNode, reloading)) {
 				this->addAttackSpell(std::move(*spell));
 			} else {
-				std::cout << "[Warning - MonsterType::loadFromXMLNode] Cant load spell. " << this->mType->name
+				std::cout << "[Warning - MonsterType::load] Cant load spell. " << filepath << " node: " << name
 				          << std::endl;
 			}
 		}
+
+		return true;
 	}
 
-	if (pugi::xml_node defensesNode = node.child("defenses")) {
+	if (name == "defenses") {
 		if (attr = node.attribute("defense")) {
 			this->setDefense(pugi::cast<int32_t>(attr.value()));
 		}
@@ -215,19 +248,21 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 			this->setArmor(pugi::cast<int32_t>(attr.value()));
 		}
 
-		for (auto defenseNode : defensesNode.children()) {
+		for (auto defenseNode : node.children()) {
 			auto spell = std::make_unique<MonsterSpell>();
 			if (spell->loadFromXMLNode(defenseNode, reloading)) {
 				this->addDefenseSpell(std::move(*spell));
 			} else {
-				std::cout << "[Warning - MonsterType::loadFromXMLNode] Cant load spell. " << this->mType->name
+				std::cout << "[Warning - MonsterType::load] Cant load spell. " << filepath << " node: " << name
 				          << std::endl;
 			}
 		}
+
+		return true;
 	}
 
-	if (pugi::xml_node immunitiesNode = node.child("immunities")) {
-		for (auto immunityNode : immunitiesNode.children()) {
+	if (name == "immunities") {
+		for (auto immunityNode : node.children()) {
 			if (attr = immunityNode.attribute("name")) {
 				std::string tmpStrValue = boost::algorithm::to_lower_copy<std::string>(attr.as_string());
 				if (tmpStrValue == "physical") {
@@ -261,8 +296,8 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 				} else if (tmpStrValue == "bleed") {
 					this->withImmunityToBleed();
 				} else {
-					std::cout << "[Warning - MonsterType::loadFromXMLNode] Unknown immunity name " << attr.as_string()
-					          << ". " << this->mType->name << std::endl;
+					std::cout << "[Warning - MonsterType::load] Unknown immunity name " << attr.as_string() << ". "
+					          << filepath << " node: " << name << std::endl;
 				}
 			} else if ((attr = immunityNode.attribute("physical"))) {
 				if (attr.as_bool()) {
@@ -326,34 +361,36 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 					this->withImmunityToInvisibility();
 				}
 			} else {
-				std::cout << "[Warning - MonsterType::loadFromXMLNode] Unknown immunity name " << attr.as_string()
-				          << ". " << this->mType->name << std::endl;
+				std::cout << "[Warning - MonsterType::load] Unknown immunity name " << attr.as_string() << ". "
+				          << filepath << " node: " << name << std::endl;
 			}
 		}
+
+		return true;
 	}
 
-	if (pugi::xml_node voicesNode = node.child("voices")) {
+	if (name == "voices") {
 		MonsterVoice voice;
 		if ((attr = node.attribute("speed")) || (attr = node.attribute("interval"))) {
 			voice.setYellSpeedTicks(pugi::cast<uint32_t>(attr.value()));
 		} else {
-			std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing voices speed. " << this->mType->name
+			std::cout << "[Warning - MonsterType::load] Missing voices speed. " << filepath << " node: " << name
 			          << std::endl;
 		}
 
 		if (attr = node.attribute("chance")) {
 			voice.setYellChance(pugi::cast<uint32_t>(attr.value()));
 		} else {
-			std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing voices chance. " << this->mType->name
+			std::cout << "[Warning - MonsterType::load] Missing voices chance. " << filepath << " node: " << name
 			          << std::endl;
 		}
 
-		for (auto voiceNode : voicesNode.children()) {
+		for (auto voiceNode : node.children()) {
 			std::string sentence;
 			if (attr = voiceNode.attribute("sentence")) {
 				sentence = attr.as_string();
 			} else {
-				std::cout << "[Warning - MonsterType::loadFromXMLNode]  Missing voice sentence. " << this->mType->name
+				std::cout << "[Warning - MonsterType::load]  Missing voice sentence. " << filepath << " node: " << name
 				          << std::endl;
 			}
 
@@ -366,22 +403,26 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 		}
 
 		this->setVoice(voice);
+
+		return true;
 	}
 
-	if (pugi::xml_node lootsNode = node.child("loot")) {
-		for (auto lootNode : lootsNode.children()) {
+	if (name == "loot") {
+		for (auto lootNode : node.children()) {
 			MonsterLoot monsterLoot;
 			if (monsterLoot.loadFromXMLNode(lootNode, reloading)) {
 				this->addLoot(std::move(monsterLoot));
 			} else {
-				std::cout << "[Warning - MonsterType::loadFromXMLNode] Cant load loot. " << this->mType->name
+				std::cout << "[Warning - MonsterType::load] Cant load loot. " << filepath << " node: " << name
 				          << std::endl;
 			}
 		}
+
+		return true;
 	}
 
-	if (pugi::xml_node elementsNode = node.child("elements")) {
-		for (auto elementNode : elementsNode.children()) {
+	if (name == "elements") {
+		for (auto elementNode : node.children()) {
 			if (attr = elementNode.attribute("physicalPercent")) {
 				this->withImmunityToPhysical(pugi::cast<uint32_t>(attr.value()));
 			} else if (attr = elementNode.attribute("energyPercent")) {
@@ -404,21 +445,23 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 			} else if (attr = elementNode.attribute("manadrainPercent")) {
 				this->withImmunityToManaDrain(pugi::cast<uint32_t>(attr.value()));
 			} else {
-				std::cout << "[Warning - MonsterType::loadFromXMLNode] Unknown element percent. " << this->mType->name
+				std::cout << "[Warning - MonsterType::load] Unknown element percent. " << filepath << " node: " << name
 				          << std::endl;
 			}
 		}
+
+		return true;
 	}
 
-	if (pugi::xml_node summonsNode = node.child("summons")) {
-		if (attr = summonsNode.attribute("maxSummons")) {
+	if (name == "summons") {
+		if (attr = node.attribute("maxSummons")) {
 			this->setMaxSummons(pugi::cast<uint32_t>(attr.value()));
 		} else {
-			std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing summons maxSummons. " << this->mType->name
+			std::cout << "[Warning - MonsterType::load] Missing summons maxSummons. " << filepath << " node: " << name
 			          << std::endl;
 		}
 
-		for (auto summonNode : summonsNode.children()) {
+		for (auto summonNode : node.children()) {
 			if (attr = summonNode.attribute("name")) {
 				MonsterSummon* summon = new MonsterSummon(attr.as_string());
 
@@ -440,14 +483,16 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 
 				this->addSummon(*summon);
 			} else {
-				std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing summon name. " << this->mType->name
+				std::cout << "[Warning - MonsterType::load] Missing summon name. " << filepath << " node: " << name
 				          << std::endl;
 			}
 		}
+
+		return true;
 	}
 
-	if (pugi::xml_node seeksNode = node.child("seeks")) {
-		for (auto seekNode : seeksNode.children()) {
+	if (name == "seeks") {
+		for (auto seekNode : node.children()) {
 			if (attr = seekNode.attribute("name")) {
 				MonsterSeek* seek = new MonsterSeek(attr.as_string());
 
@@ -457,27 +502,32 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 
 				this->addSeek(*seek);
 			} else {
-				std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing target to seek name. "
-				          << this->mType->name << std::endl;
+				std::cout << "[Warning - MonsterType::load] Missing target to seek name. " << filepath
+				          << " node: " << name << std::endl;
 			}
 		}
+
+		return true;
 	}
 
-	if (pugi::xml_node scriptNode = node.child("script")) {
-		for (auto scriptNode : scriptNode.children()) {
+	if (name == "script") {
+		for (auto scriptNode : node.children()) {
 			if (attr = scriptNode.attribute("name")) {
 				this->addEvent(attr.as_string());
 			} else {
-				std::cout << "[Warning - MonsterType::loadFromXMLNode] Missing name for script event. "
-				          << this->mType->name << std::endl;
+				std::cout << "[Warning - MonsterType::load] Missing name for script event. " << filepath
+				          << " node: " << name << std::endl;
 			}
 		}
+
+		return true;
 	}
 
-	return true;
+	std::cout << "[Error - MonsterType::load] Unexpected node name at " << filepath << " node: " << name << std::endl;
+	return false;
 }
 
-MonsterType::Builder* MonsterType::Builder::setScript(std::string filename)
+MonsterType::Builder* MonsterType::Builder::setScript(const std::string& filename)
 {
 	g_monsters.setMonsterTypeScript(*(this->mType), filename);
 
