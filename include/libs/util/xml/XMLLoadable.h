@@ -17,7 +17,7 @@ public:
 		loaded = false;
 
 		pugi::xml_document doc;
-		std::cout << "Loading XML file: " << this->filepath << std::endl;
+		// std::cout << "Loading XML file: " << this->filepath << std::endl;
 		pugi::xml_parse_result result = doc.load_file(this->filepath.c_str());
 		if (!result) {
 			printXMLError("Error - XMLLoadable::loadFromXML>", this->filepath, result);
