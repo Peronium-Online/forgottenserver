@@ -37,6 +37,7 @@ public:
 	uint32_t getMax() const { return max; }
 	void setMax(uint32_t max) { this->max = std::min(max, MAX_SUMMONS); }
 
+	bool isForce() const { return force; }
 	void setForce(bool force) { this->force = force; }
 };
 

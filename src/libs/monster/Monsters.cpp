@@ -8,14 +8,14 @@
 extern ConfigManager g_config;
 Monsters g_monsters;
 
-const MonsterType& Monsters::findMonsterTypeByName(std::string name)
+MonsterType* Monsters::findMonsterTypeByName(std::string name)
 {
 	auto it = this->monsterTypes.find(boost::algorithm::to_lower_copy(name));
 	if (it != this->monsterTypes.end()) {
 		return it->second;
 	}
 
-	return MonsterType::UNDEFINED_MONSTER_TYPE;
+	return &MonsterType::UNDEFINED_MONSTER_TYPE;
 }
 
 bool Monsters::load(pugi::xml_node node, bool reloading)
@@ -29,7 +29,7 @@ bool Monsters::load(pugi::xml_node node, bool reloading)
 		auto mTypeBuilder = new MonsterType::Builder(file);
 		if (mTypeBuilder->loadFromXML(reloading)) {
 			auto mType = mTypeBuilder->build();
-			this->addMonsterType(name, *mType);
+			this->addMonsterType(name, mType);
 		} else {
 			std::cout << "[Error - Monsters::load] Failed to load monster: " << file << std::endl;
 		}

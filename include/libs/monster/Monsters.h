@@ -11,7 +11,7 @@
 class Monsters final : virtual public XMLLoadable
 {
 private:
-	std::map<std::string, const MonsterType&> monsterTypes;
+	std::map<std::string, MonsterType*> monsterTypes;
 	std::unique_ptr<LuaScriptInterface> scriptInterface;
 
 	bool load(pugi::xml_node node, bool reloading) override;
@@ -32,27 +32,27 @@ public:
 
 	Monsters& operator=(const Monsters&) = delete;
 
-	virtual const MonsterType& findMonsterTypeByName(std::string name);
+	virtual MonsterType* findMonsterTypeByName(std::string name);
 
 	virtual bool reload();
 
 	virtual void setMonsterTypeScript(MonsterType& monsterType, std::string script);
-	void addMonsterType(const MonsterType& monsterType)
+	void addMonsterType(MonsterType* monsterType)
 	{
-		const auto& name = boost::algorithm::to_lower_copy(monsterType.name);
+		const auto& name = boost::algorithm::to_lower_copy(monsterType->name);
 		this->monsterTypes.emplace(name, std::move(monsterType));
 	}
 
-	void addMonsterType(const std::string name, const MonsterType& monsterType)
+	void addMonsterType(const std::string name, MonsterType* monsterType)
 	{
 		this->monsterTypes.emplace(name, std::move(monsterType));
 	}
 
 	uint32_t monsterTypeCount() const { return this->monsterTypes.size(); }
 
-	void forEachMonsterType(const std::function<void(const MonsterType&)>& callback)
+	void forEachMonsterType(const std::function<void(MonsterType*)>& callback)
 	{
-		for (const auto& monsterType : this->monsterTypes) {
+		for (auto monsterType : this->monsterTypes) {
 			callback(monsterType.second);
 		}
 	}

@@ -48,6 +48,8 @@ public:
 			callback(voiceBlock.text, voiceBlock.yellText);
 		}
 	}
+
+	const voiceBlock_t* getRandomYell();
 };
 
 #endif

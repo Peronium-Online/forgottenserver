@@ -340,8 +340,8 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 
 		if ((attr = node.attribute("monster"))) {
 			const auto& mType = g_monsters.findMonsterTypeByName(attr.as_string());
-			if (!mType.isUndefined()) {
-				combatBuilder->withOutfitChange(mType.info.outfit, duration);
+			if (!mType->isUndefined()) {
+				combatBuilder->withOutfitChange(mType->info.outfit, duration);
 			}
 		} else if ((attr = node.attribute("item"))) {
 			auto lookTypeEx = pugi::cast<uint16_t>(attr.value());

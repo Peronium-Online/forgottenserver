@@ -39,9 +39,9 @@ bool MonsterType::Builder::loadRootNodeAttributes(pugi::xml_node node, bool relo
 	const std::string& monsterName = attr.as_string();
 
 	if (reloading) {
-		const auto& it = g_monsters.findMonsterTypeByName(monsterName);
-		if (!it.isUndefined()) {
-			mType = const_cast<MonsterType*>(&it);
+		auto it = g_monsters.findMonsterTypeByName(monsterName);
+		if (!it->isUndefined()) {
+			mType = it;
 			mType->info = {};
 		}
 	}
