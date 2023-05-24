@@ -14341,7 +14341,7 @@ int LuaScriptInterface::luaMonsterTypeAddAttack(lua_State* L)
 	if (monsterType) {
 		LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 2);
 		if (spell) {
-			auto mSpell = MonsterSpell::deserializeSpellFromLua(spell);
+			auto mSpell = MonsterSpell::Factory::deserializeSpellFromLua(spell);
 			if (mSpell) {
 				monsterType->info.attackSpells.push_back(std::move(*mSpell));
 			} else {
@@ -14418,7 +14418,7 @@ int LuaScriptInterface::luaMonsterTypeAddDefense(lua_State* L)
 	if (monsterType) {
 		LMonsterSpell* spell = getUserdata<LMonsterSpell>(L, 2);
 		if (spell) {
-			auto mSpell = MonsterSpell::deserializeSpellFromLua(spell);
+			auto mSpell = MonsterSpell::Factory::deserializeSpellFromLua(spell);
 			if (mSpell) {
 				monsterType->info.defenseSpells.push_back(std::move(*mSpell));
 			} else {

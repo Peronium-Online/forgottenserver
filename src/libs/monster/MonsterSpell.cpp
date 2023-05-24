@@ -16,7 +16,7 @@ struct damage_condition_params
 	int32_t minDamage;
 	int32_t maxDamage;
 };
-damage_condition_params getDamageConditionParamsFromXML(const pugi::xml_node node, const MonsterSpell* spell)
+damage_condition_params getDamageConditionParamsFromXML(const pugi::xml_node node, MonsterSpell* spell)
 {
 	int32_t tickInterval = -1;
 	if (pugi::xml_attribute attr = node.attribute("tick")) {
@@ -40,6 +40,14 @@ damage_condition_params getDamageConditionParamsFromXML(const pugi::xml_node nod
 		minDamage : std::abs(spell->minCombatValue),
 		maxDamage : std::abs(spell->maxCombatValue),
 	};
+}
+
+MonsterSpell::MonsterSpell(const std::string& name, const std::string& scriptName) : name(name), scriptName(scriptName)
+{
+	if (!scriptName.empty()) {
+		isScripted = true;
+	}
+	isScripted = false;
 }
 
 std::string MonsterSpell::getName()
@@ -153,51 +161,46 @@ MonsterSpell* MonsterSpell::setMeleeAttack(int32_t attack, int32_t skill)
 	return this;
 }
 
-MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
+MonsterSpell* MonsterSpell::Factory::loadFromXMLNode(pugi::xml_node node, bool reloading)
 {
-	bool isScripted;
-
 	pugi::xml_attribute attr;
-	if ((attr = node.attribute("script"))) {
-		this->scriptName = attr.as_string();
-		isScripted = true;
-	} else if ((attr = node.attribute("name"))) {
-		this->name = attr.as_string();
-		isScripted = false;
-	} else {
+	auto mSpell = new MonsterSpell(node.attribute("name").as_string(), node.attribute("script").as_string());
+	if (mSpell->scriptName.empty() && mSpell->name.empty()) {
+		std::cout << "[Warning - MonstersSpell::loadFromXMLNode] missing name or script name for spell" << std::endl;
+
 		return nullptr;
 	}
 
 	if ((attr = node.attribute("speed")) || (attr = node.attribute("interval"))) {
-		this->setSpeed(pugi::cast<int32_t>(attr.value()));
+		mSpell->setSpeed(pugi::cast<int32_t>(attr.value()));
 	}
 
 	if ((attr = node.attribute("chance"))) {
-		this->setChance(pugi::cast<uint32_t>(attr.value()));
-	} else if (boost::algorithm::to_lower_copy(name) != "melee") {
-		std::cout << "[Warning - MonstersSpell::loadFromXMLNode] Missing chance value on non-melee spell: " << getName()
-		          << std::endl;
+		mSpell->setChance(pugi::cast<uint32_t>(attr.value()));
+	} else if (boost::algorithm::to_lower_copy(mSpell->getName()) != "melee") {
+		std::cout << "[Warning - MonstersSpell::loadFromXMLNode] Missing chance value on non-melee spell: "
+		          << mSpell->getName() << std::endl;
 	}
 
 	if ((attr = node.attribute("range"))) {
 		uint32_t range = pugi::cast<uint32_t>(attr.value());
-		this->setRange(range);
+		mSpell->setRange(range);
 	}
 
 	if ((attr = node.attribute("max"))) {
-		this->setMaxCombatValue(pugi::cast<int32_t>(attr.value()));
+		mSpell->setMaxCombatValue(pugi::cast<int32_t>(attr.value()));
 	}
 
 	if ((attr = node.attribute("min"))) {
-		this->setMinCombatValue(pugi::cast<int32_t>(attr.value()));
+		mSpell->setMinCombatValue(pugi::cast<int32_t>(attr.value()));
 	}
 
-	if (auto spell = g_spells->getSpellByName(name)) {
-		this->setBaseSpell(spell);
-		return this;
+	if (auto spell = g_spells->getSpellByName(mSpell->getName())) {
+		mSpell->setBaseSpell(spell);
+		return mSpell;
 	}
 
-	if (isScripted) {
+	if (mSpell->isScripted) {
 		bool needTarget = false;
 		bool needDirection = false;
 
@@ -209,7 +212,7 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 			needTarget = attr.as_bool();
 		}
 
-		return this->setSpellFromScript(needTarget, needDirection);
+		return mSpell->setSpellFromScript(needTarget, needDirection);
 	}
 
 	auto combatBuilder = std::make_unique<MonsterSpell::CombatBuilder>();
@@ -248,12 +251,14 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 		combatBuilder->withRing(ring, needTarget);
 	}
 
-	std::string tmpName = boost::algorithm::to_lower_copy(name);
+	std::string tmpName = boost::algorithm::to_lower_copy(mSpell->getName());
 	if (tmpName == "melee") {
 		pugi::xml_attribute attackAttribute, skillAttribute;
 		if ((attackAttribute = node.attribute("attack")) && (skillAttribute = node.attribute("skill"))) {
-			this->setMeleeAttack(pugi::cast<int32_t>(skillAttribute.value()),
-			                     pugi::cast<int32_t>(attackAttribute.value()));
+			mSpell->setMeleeAttack(pugi::cast<int32_t>(skillAttribute.value()),
+			                       pugi::cast<int32_t>(attackAttribute.value()));
+		} else {
+			mSpell->setMeleeAttack(0, 0);
 		}
 
 		uint32_t tickInterval = 0;
@@ -325,7 +330,7 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 				maxSpeedChange = pugi::cast<int32_t>(attr.value());
 			}
 		} else {
-			std::cout << "[Error - MonsterSpell::loadFromXMLNode] - " << getName()
+			std::cout << "[Error - MonsterSpell::loadFromXMLNode] - " << mSpell->getName()
 			          << " - missing speedchange/minspeedchange value" << std::endl;
 			return nullptr;
 		}
@@ -375,35 +380,35 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 	} else if (tmpName == "energyfield") {
 		combatBuilder->withEnergyField();
 	} else if (tmpName == "firecondition") {
-		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		auto conditionParams = getDamageConditionParamsFromXML(node, mSpell);
 		combatBuilder->withConditionFire(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
 		                                 conditionParams.startDamage);
 	} else if (tmpName == "poisoncondition" || tmpName == "earthcondition") {
-		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		auto conditionParams = getDamageConditionParamsFromXML(node, mSpell);
 		combatBuilder->withConditionPoison(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
 		                                   conditionParams.startDamage);
 	} else if (tmpName == "energycondition") {
-		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		auto conditionParams = getDamageConditionParamsFromXML(node, mSpell);
 		combatBuilder->withConditionEnergy(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
 		                                   conditionParams.startDamage);
 	} else if (tmpName == "drowncondition") {
-		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		auto conditionParams = getDamageConditionParamsFromXML(node, mSpell);
 		combatBuilder->withConditionDrown(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
 		                                  conditionParams.startDamage);
 	} else if (tmpName == "freezecondition" || tmpName == "icecondition") {
-		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		auto conditionParams = getDamageConditionParamsFromXML(node, mSpell);
 		combatBuilder->withConditionFreeze(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
 		                                   conditionParams.startDamage);
 	} else if (tmpName == "cursecondition" || tmpName == "deathcondition") {
-		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		auto conditionParams = getDamageConditionParamsFromXML(node, mSpell);
 		combatBuilder->withConditionCurse(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
 		                                  conditionParams.startDamage);
 	} else if (tmpName == "dazzlecondition" || tmpName == "holycondition") {
-		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		auto conditionParams = getDamageConditionParamsFromXML(node, mSpell);
 		combatBuilder->withConditionDazzle(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
 		                                   conditionParams.startDamage);
 	} else if (tmpName == "physicalcondition" || tmpName == "bleedcondition") {
-		auto conditionParams = getDamageConditionParamsFromXML(node, this);
+		auto conditionParams = getDamageConditionParamsFromXML(node, mSpell);
 		combatBuilder->withConditionBleed(conditionParams.minDamage, conditionParams.maxDamage, conditionParams.tick,
 		                                  conditionParams.startDamage);
 	} else if (tmpName == "strength") {
@@ -411,8 +416,8 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 	} else if (tmpName == "effect") {
 		//
 	} else {
-		std::cout << "[Error - MonsterSpell::loadFromXMLNode] - " << getName() << " - Unknown spell name: " << name
-		          << std::endl;
+		std::cout << "[Error - MonsterSpell::loadFromXMLNode] - " << mSpell->getName()
+		          << " - Unknown spell name: " << tmpName << std::endl;
 		return nullptr;
 	}
 
@@ -431,32 +436,31 @@ MonsterSpell* MonsterSpell::loadFromXMLNode(pugi::xml_node node, bool reloading)
 					combatBuilder->withMagicEffect(effect);
 				}
 			} else {
-				std::cout << "[Warning - MonsterSpell::loadFromXMLNode] - " << getName() << " - Effect type: \""
+				std::cout << "[Warning - MonsterSpell::loadFromXMLNode] - " << mSpell->getName() << " - Effect type: \""
 				          << attr.as_string() << "\" does not exist." << std::endl;
 			}
 		}
 	}
 
 	auto combatPtr = combatBuilder->build();
-	combatPtr->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, this->minCombatValue, 0, this->maxCombatValue, 0);
+	combatPtr->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, mSpell->minCombatValue, 0, mSpell->maxCombatValue, 0);
 
 	auto combatSpell = new CombatSpell(combatPtr, combatBuilder->isTargetNeeded(), combatBuilder->isDirectionNeeded());
-	this->setBaseSpell(combatSpell);
+	mSpell->setBaseSpell(combatSpell);
 	if (combatSpell) {
-		this->combatSpell = true;
+		mSpell->combatSpell = true;
 	}
 
-	return this;
+	return mSpell;
 }
 
-std::shared_ptr<MonsterSpell> MonsterSpell::deserializeSpellFromLua(LMonsterSpell* lSpell)
+std::shared_ptr<MonsterSpell> MonsterSpell::Factory::deserializeSpellFromLua(LMonsterSpell* lSpell)
 {
-	auto mSpell = std::make_shared<MonsterSpell>();
-	if (!lSpell->scriptName.empty()) {
-		lSpell->isScripted = true;
-	} else if (!lSpell->name.empty()) {
-		lSpell->isScripted = false;
-	} else {
+	auto mSpell = std::make_shared<MonsterSpell>(lSpell->name, lSpell->scriptName);
+	if (mSpell->scriptName.empty() && mSpell->name.empty()) {
+		std::cout << "[Warning - MonstersSpell::deserializeSpellFromLua] missing name or script name for spell"
+		          << std::endl;
+
 		return nullptr;
 	}
 
@@ -471,7 +475,7 @@ std::shared_ptr<MonsterSpell> MonsterSpell::deserializeSpellFromLua(LMonsterSpel
 		return mSpell;
 	}
 
-	if (lSpell->isScripted) {
+	if (mSpell->isScripted) {
 		mSpell->setSpellFromScript(lSpell->needTarget, lSpell->needDirection);
 		return mSpell;
 	}

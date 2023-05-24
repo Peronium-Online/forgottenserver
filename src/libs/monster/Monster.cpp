@@ -1184,6 +1184,17 @@ void Monster::updateTargetList()
 	for (Creature* spectator : spectators) {
 		onCreatureFound(spectator);
 	}
+
+	if (mType->info.seeks.size() > 0) {
+		std::list<Creature*> seeks;
+
+		for (auto target : mType->info.seeks) {
+			auto creature = g_game.getCreatureByName(target.getName());
+			if (creature && !creature->isDead()) {
+				onCreatureFound(creature, true);
+			}
+		}
+	}
 }
 
 void Monster::onAttackedCreatureDisappear(bool) { attackTicks = 0; }
@@ -1431,7 +1442,7 @@ void Monster::onCreatureFound(Creature* creature, bool pushFront /* = false*/)
 		return;
 	}
 
-	if (!canSee(creature->getPosition())) {
+	if (!canSee(creature->getPosition()) && !isSeekTarget(creature)) {
 		return;
 	}
 

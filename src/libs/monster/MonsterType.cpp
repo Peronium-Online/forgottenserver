@@ -227,8 +227,8 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 
 	if (name == "attacks") {
 		for (auto attackNode : node.children()) {
-			auto spell = std::make_unique<MonsterSpell>();
-			if (spell->loadFromXMLNode(attackNode, reloading)) {
+			auto spell = MonsterSpell::Factory().loadFromXMLNode(attackNode, reloading);
+			if (spell) {
 				this->addAttackSpell(std::move(*spell));
 			} else {
 				std::cout << "[Warning - MonsterType::load] Cant load spell. " << filepath << " node: " << name
@@ -249,8 +249,8 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 		}
 
 		for (auto defenseNode : node.children()) {
-			auto spell = std::make_unique<MonsterSpell>();
-			if (spell->loadFromXMLNode(defenseNode, reloading)) {
+			auto spell = MonsterSpell::Factory().loadFromXMLNode(defenseNode, reloading);
+			if (spell) {
 				this->addDefenseSpell(std::move(*spell));
 			} else {
 				std::cout << "[Warning - MonsterType::load] Cant load spell. " << filepath << " node: " << name
