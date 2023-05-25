@@ -343,14 +343,24 @@ MonsterSpell* MonsterSpell::Factory::loadFromXMLNode(pugi::xml_node node, bool r
 			duration = pugi::cast<int32_t>(attr.value());
 		}
 
-		if ((attr = node.attribute("monster"))) {
+		if (attr = node.attribute("monster")) {
 			const auto& mType = g_monsters.findMonsterTypeByName(attr.as_string());
 			if (!mType->isUndefined()) {
 				combatBuilder->withOutfitChange(mType->info.outfit, duration);
+			} else {
+				std::cout
+				    << "[Warning - MonstersSpell::loadFromXMLNode] monster " << attr.as_string()
+				    << " not found for outfit change spell.\n"
+				    << " The desired monster may be not initialized yet, try to use the looktype attribute instead."
+				    << std::endl;
 			}
 		} else if ((attr = node.attribute("item"))) {
 			auto lookTypeEx = pugi::cast<uint16_t>(attr.value());
 			combatBuilder->withOutfitChange(lookTypeEx, duration);
+		} else if (attr = node.attribute("looktype")) {
+			Outfit_t outfit = {};
+			outfit.lookType = pugi::cast<uint16_t>(attr.value());
+			combatBuilder->withOutfitChange(outfit, duration);
 		}
 	} else if (tmpName == "invisible") {
 		int32_t duration = 10000;

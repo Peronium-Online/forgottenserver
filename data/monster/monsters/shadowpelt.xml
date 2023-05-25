@@ -19,7 +19,7 @@
 		<attack name="physical" interval="100" chance="22" radius="3" min="-200" max="-310">
 			<attribute key="areaEffect" value="explosionarea" />
 		</attack>
-		<attack name="outfit" interval="1000" chance="1" target="1" radius="1" monster="Werebear" duration="2000" />
+		<attack name="outfit" interval="1000" chance="1" target="1" radius="1" looktype="720" duration="2000" />
 		<attack name="lifedrain" interval="100" chance="15" radius="3" target="0" min="-100" max="-200">
 			<attribute key="areaEffect" value="whitenote" />
 		</attack>

@@ -22,7 +22,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" min="0" max="-120" />
-		<attack name="outfit" interval="2000" chance="10" range="5" monster="Ugly Monster" duration="10000">
+		<attack name="outfit" interval="2000" chance="10" range="5" looktype="1218" duration="10000">
 			<attribute key="shootEffect" value="earth" />
 		</attack>
 		<attack name="drunk" interval="2000" chance="10" range="5" duration="5000" poison="80">

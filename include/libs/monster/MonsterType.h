@@ -379,8 +379,8 @@ public:
 
 		Builder* setLook(Outfit_t outfit, uint16_t corpse)
 		{
-			this->mType->info.outfit = outfit;
-			this->mType->info.lookcorpse = corpse;
+			this->mType->info.outfit = std::move(outfit);
+			this->mType->info.lookcorpse = std::move(corpse);
 
 			return this;
 		}

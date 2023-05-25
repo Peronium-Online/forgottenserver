@@ -21,9 +21,9 @@
 		<attack name="fire" interval="2000" chance="5" range="7" radius="1" target="1" min="-200" max="-250">
 			<attribute key="shootEffect" value="fire" />
 		</attack>
-		<attack name="outfit" interval="4000" chance="15" target="1" monster="orc warlord" duration="30000" />
-		<attack name="outfit" interval="4000" chance="10" target="1" monster="orc shaman" duration="30000" />
-		<attack name="outfit" interval="4000" chance="20" target="1" monster="orc" duration="30000" />
+		<attack name="outfit" interval="4000" chance="15" target="1" looktype="2" duration="30000" />
+		<attack name="outfit" interval="4000" chance="10" target="1" looktype="6" duration="30000" />
+		<attack name="outfit" interval="4000" chance="20" target="1" looktype="5" duration="30000" />
 	</attacks>
 	<defenses armor="27" defense="27">
 		<defense name="heal monster" interval="2000" chance="20">

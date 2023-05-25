@@ -36,7 +36,7 @@
 		<defense name="speed" interval="2000" chance="12" speedchange="450" duration="10000">
 			<attribute key="areaEffect" value="redshimmer" />
 		</defense>
-		<defense name="outfit" interval="2000" chance="20" monster="werewolf" duration="5000">
+		<defense name="outfit" interval="2000" chance="20" looktype="308" duration="5000">
 			<attribute key="areaEffect" value="blueshimmer" />
 		</defense>
 	</defenses>

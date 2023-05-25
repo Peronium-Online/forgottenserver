@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Defense Tower" nameDescription="a defense tower" race="undead" experience="10000" speed="0" >
 	<health now="30000" max="30000" />
-	<look typeex="7059" corpse="5972" />
+	<look typeex="23265" corpse="24309" />
 	<targetchange interval="2000" chance="5" />
     <seeks>
 		<seek name="mage minion" priority="5" />

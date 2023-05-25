@@ -77,6 +77,7 @@ public:
 		this->healthMax = mType->info.healthMax;
 		this->setBaseSpeed(mType->info.baseSpeed);
 		this->setCurrentOutfit(mType->info.outfit);
+		this->defaultOutfit = mType->info.outfit;
 	};
 	// non-copyable
 	Monster(const Monster&) = delete;

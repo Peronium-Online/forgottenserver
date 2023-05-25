@@ -323,12 +323,17 @@ function Player.updateKillTracker(self, monster, corpse)
 	msg:addString(monster:getName())
 
 	local monsterOutfit = monsterType:getOutfit()
+
 	msg:addU16(monsterOutfit.lookType or 19)
-	msg:addByte(monsterOutfit.lookHead)
-	msg:addByte(monsterOutfit.lookBody)
-	msg:addByte(monsterOutfit.lookLegs)
-	msg:addByte(monsterOutfit.lookFeet)
-	msg:addByte(monsterOutfit.lookAddons)
+	if monsterOutfit.lookTypeEx ~= 0 then
+		msg:addU16(monsterOutfit.lookTypeEx)
+	else
+		msg:addByte(monsterOutfit.lookHead)
+		msg:addByte(monsterOutfit.lookBody)
+		msg:addByte(monsterOutfit.lookLegs)
+		msg:addByte(monsterOutfit.lookFeet)
+		msg:addByte(monsterOutfit.lookAddons)
+	end
 
 	local corpseSize = corpse:getSize()
 	msg:addByte(corpseSize)

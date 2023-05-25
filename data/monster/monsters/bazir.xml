@@ -42,7 +42,7 @@
 		<attack name="effect" interval="1000" chance="8" radius="5" target="0">
 			<attribute key="areaEffect" value="blackspark" />
 		</attack>
-		<attack name="outfit" interval="1000" chance="2" radius="8" target="0" monster="demon" duration="5000">
+		<attack name="outfit" interval="1000" chance="2" radius="8" target="0" looktype="35" duration="5000">
 			<attribute key="areaEffect" value="bluebubble" />
 		</attack>
 		<attack name="outfit" interval="1000" chance="2" radius="8" target="0" item="3058" duration="5000">

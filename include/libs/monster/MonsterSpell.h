@@ -461,7 +461,7 @@ public:
 
 		CombatBuilder* withOutfitChange(uint16_t lookTypeEx, int32_t duration = 10000)
 		{
-			Outfit_t outfit;
+			Outfit_t outfit = {};
 			outfit.lookTypeEx = lookTypeEx;
 
 			return this->withOutfitChange(outfit, duration);

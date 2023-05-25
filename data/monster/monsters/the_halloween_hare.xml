@@ -17,16 +17,16 @@
 		<flag runonhealth="0" />
 	</flags>
 	<attacks>
-		<attack name="outfit" interval="2000" radius="3" chance="16" monster="vampire" duration="60000">
+		<attack name="outfit" interval="2000" radius="3" chance="16" looktype="68" duration="60000">
 			<attribute key="areaEffect" value="poff" />
 		</attack>
 		<attack name="outfit" interval="2000" radius="3" chance="16" monster="ghost" duration="60000">
 			<attribute key="areaEffect" value="poff" />
 		</attack>
-		<attack name="outfit" interval="2000" radius="3" chance="16" monster="witch" duration="60000">
+		<attack name="outfit" interval="2000" radius="3" chance="16" looktype="54" duration="60000">
 			<attribute key="areaEffect" value="poff" />
 		</attack>
-		<attack name="outfit" interval="2000" radius="3" chance="16" monster="skeleton" duration="60000">
+		<attack name="outfit" interval="2000" radius="3" chance="16" looktype="33" duration="60000">
 			<attribute key="areaEffect" value="poff" />
 		</attack>
 		<attack name="outfit" interval="2000" radius="3" chance="16" monster="mummy" duration="60000">

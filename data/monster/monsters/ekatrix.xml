@@ -29,7 +29,7 @@
 		<attack name="firefield" interval="2000" chance="10" range="7" radius="1" target="1">
 			<attribute key="shootEffect" value="fire" />
 		</attack>
-		<attack name="outfit" interval="2000" chance="1" target="1" range="5" monster="green frog" duration="2000" />
+		<attack name="outfit" interval="2000" chance="1" target="1" range="5" looktype="224" duration="2000" />
 	</attacks>
 	<defenses armor="10" defense="10" />
 	<immunities>

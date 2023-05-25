@@ -35,11 +35,11 @@
 		<defense name="invisible" interval="2000" chance="10" duration="4000">
 			<attribute key="areaEffect" value="yellowbubble" />
 		</defense>
-		<defense name="outfit" interval="5000" chance="10" monster="nightstalker" duration="4000" />
-		<defense name="outfit" interval="5000" chance="10" monster="werewolf" duration="4000" />
-		<defense name="outfit" interval="5000" chance="10" monster="the count" duration="4000" />
+		<defense name="outfit" interval="5000" chance="10" looktype="320" duration="4000" />
+		<defense name="outfit" interval="5000" chance="10" looktype="308" duration="4000" />
+		<defense name="outfit" interval="5000" chance="10" looktype="287" duration="4000" />
 		<defense name="outfit" interval="5000" chance="10" monster="grim reaper" duration="4000" />
-		<defense name="outfit" interval="5000" chance="10" monster="tarantula" duration="4000" />
+		<defense name="outfit" interval="5000" chance="10" looktype="219" duration="4000" />
 		<defense name="outfit" interval="5000" chance="1" monster="ferumbras" duration="4000" />
 	</defenses>
 	<elements>

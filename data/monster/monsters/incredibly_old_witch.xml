@@ -17,7 +17,7 @@
 		<flag runonhealth="0" />
 	</flags>
 	<attacks>
-		<attack name="outfit" interval="2000" chance="12" range="7" radius="4" target="1" monster="rat" duration="60000">
+		<attack name="outfit" interval="2000" chance="12" range="7" radius="4" target="1" looktype="21" duration="60000">
 			<attribute key="areaEffect" value="teleport" />
 			<attribute key="shootEffect" value="suddendeath" />
 		</attack>
@@ -25,7 +25,7 @@
 			<attribute key="areaEffect" value="teleport" />
 			<attribute key="shootEffect" value="suddendeath" />
 		</attack>
-		<attack name="outfit" interval="2000" chance="12" range="7" radius="4" target="1" monster="green frog" duration="60000">
+		<attack name="outfit" interval="2000" chance="12" range="7" radius="4" target="1" looktype="224" duration="60000">
 			<attribute key="areaEffect" value="teleport" />
 			<attribute key="shootEffect" value="suddendeath" />
 		</attack>
@@ -33,11 +33,11 @@
 			<attribute key="areaEffect" value="teleport" />
 			<attribute key="shootEffect" value="suddendeath" />
 		</attack>
-		<attack name="outfit" interval="2000" chance="12" range="7" radius="4" target="1" monster="pig" duration="60000">
+		<attack name="outfit" interval="2000" chance="12" range="7" radius="4" target="1" looktype="60" duration="60000">
 			<attribute key="areaEffect" value="teleport" />
 			<attribute key="shootEffect" value="suddendeath" />
 		</attack>
-		<attack name="outfit" interval="2000" chance="12" range="7" radius="4" target="1" monster="kongra" duration="60000">
+		<attack name="outfit" interval="2000" chance="12" range="7" radius="4" target="1" looktype="116" duration="60000">
 			<attribute key="areaEffect" value="teleport" />
 			<attribute key="shootEffect" value="suddendeath" />
 		</attack>
@@ -45,7 +45,7 @@
 			<attribute key="areaEffect" value="teleport" />
 			<attribute key="shootEffect" value="suddendeath" />
 		</attack>
-		<attack name="outfit" interval="2000" chance="12" range="7" radius="4" target="1" monster="skunk" duration="60000">
+		<attack name="outfit" interval="2000" chance="12" range="7" radius="4" target="1" looktype="106" duration="60000">
 			<attribute key="areaEffect" value="teleport" />
 			<attribute key="shootEffect" value="suddendeath" />
 		</attack>

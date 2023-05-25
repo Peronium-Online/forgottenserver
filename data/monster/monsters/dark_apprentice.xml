@@ -41,7 +41,7 @@
 		<defense name="healing" interval="2000" chance="15" min="30" max="40">
 			<attribute key="areaEffect" value="greenshimmer" />
 		</defense>
-		<defense name="outfit" interval="2000" chance="5" target="1" monster="green frog" duration="3000" />
+		<defense name="outfit" interval="2000" chance="5" target="1" looktype="224" duration="3000" />
 	</defenses>
 	<elements>
 		<element deathPercent="-5" />

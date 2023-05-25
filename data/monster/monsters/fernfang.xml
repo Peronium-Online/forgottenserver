@@ -37,7 +37,7 @@
 		<defense name="effect" interval="1000" chance="5">
 			<attribute key="areaEffect" value="redshimmer" />
 		</defense>
-		<defense name="outfit" interval="1000" chance="5" monster="war wolf" duration="14000">
+		<defense name="outfit" interval="1000" chance="5" looktype="3" duration="14000">
 			<attribute key="areaEffect" value="blueshimmer" />
 		</defense>
 	</defenses>

@@ -23,7 +23,7 @@
 		<defense name="speed" interval="1000" chance="15" speedchange="290" duration="6000">
 			<attribute key="areaEffect" value="redshimmer" />
 		</defense>
-		<defense name="outfit" interval="10000" chance="15" monster="pig" duration="500">
+		<defense name="outfit" interval="10000" chance="15" looktype="60" duration="500">
 			<attribute key="areaEffect" value="redshimmer" />
 		</defense>
 	</defenses>
