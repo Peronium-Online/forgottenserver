@@ -16,10 +16,10 @@
 #include "inbox.h"
 #include "iologindata.h"
 #include "libs/monster/Monster.h"
+#include "libs/outfit/Outfits.h"
 #include "libs/util/tools/random.h"
 #include "movement.h"
 #include "npc.h"
-#include "outfit.h"
 #include "party.h"
 #include "scheduler.h"
 #include "spectators.h"
@@ -1187,13 +1187,13 @@ void Player::onCreatureAppear(Creature* creature, bool isLogin)
 		}
 
 		// load mount speed bonus
-		uint16_t currentMountId = currentOutfit.lookMount;
+		uint16_t currentMountId = currentOutfit.mount;
 		if (currentMountId != 0) {
 			Mount* currentMount = g_game.mounts.getMountByClientID(currentMountId);
 			if (currentMount && hasMount(currentMount)) {
 				g_game.changeSpeed(this, currentMount->speed);
 			} else {
-				defaultOutfit.lookMount = 0;
+				defaultOutfit.mount = 0;
 				g_game.internalCreatureChangeOutfit(this, defaultOutfit);
 			}
 		}
@@ -4390,7 +4390,7 @@ bool Player::toggleMount(bool mount)
 			return false;
 		}
 
-		const Outfit* playerOutfit = Outfits::getInstance().getOutfitByLookType(getSex(), defaultOutfit.lookType);
+		const Outfit* playerOutfit = Outfits::getInstance().getOutfitByLookType(getSex(), defaultOutfit.type);
 		if (!playerOutfit) {
 			return false;
 		}
@@ -4426,7 +4426,7 @@ bool Player::toggleMount(bool mount)
 			return false;
 		}
 
-		defaultOutfit.lookMount = currentMount->clientId;
+		defaultOutfit.mount = currentMount->clientId;
 
 		if (currentMount->speed != 0) {
 			g_game.changeSpeed(this, currentMount->speed);
@@ -4530,7 +4530,7 @@ void Player::dismount()
 		g_game.changeSpeed(this, -mount->speed);
 	}
 
-	defaultOutfit.lookMount = 0;
+	defaultOutfit.mount = 0;
 }
 
 bool Player::addOfflineTrainingTries(skills_t skill, uint64_t tries)

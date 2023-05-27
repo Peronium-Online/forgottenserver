@@ -358,8 +358,8 @@ MonsterSpell* MonsterSpell::Factory::loadFromXMLNode(pugi::xml_node node, bool r
 			auto lookTypeEx = pugi::cast<uint16_t>(attr.value());
 			combatBuilder->withOutfitChange(lookTypeEx, duration);
 		} else if (attr = node.attribute("looktype")) {
-			Outfit_t outfit = {};
-			outfit.lookType = pugi::cast<uint16_t>(attr.value());
+			Look outfit = {};
+			outfit.type = pugi::cast<uint16_t>(attr.value());
 			combatBuilder->withOutfitChange(outfit, duration);
 		}
 	} else if (tmpName == "invisible") {

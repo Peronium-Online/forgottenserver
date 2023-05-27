@@ -8,6 +8,7 @@
 #include "libs/monster/Monsters.h"
 #include "libs/util/tools/direction.h"
 #include "libs/util/tools/random.h"
+
 #if __has_include("luajit/lua.hpp")
 #include <luajit/lua.hpp>
 #else

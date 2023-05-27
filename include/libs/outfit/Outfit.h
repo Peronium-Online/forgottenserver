@@ -1,10 +1,8 @@
-// Copyright 2022 The Forgotten Server Authors. All rights reserved.
-// Use of this source code is governed by the GPL-2.0 License that can be found in the LICENSE file.
+#ifndef PR_OUTFIT_H
+#define PR_OUTFIT_H
 
-#ifndef FS_OUTFIT_H
-#define FS_OUTFIT_H
-
-#include "constants/enums.h"
+#include <cinttypes>
+#include <string>
 
 struct Outfit
 {
@@ -35,23 +33,20 @@ struct ProtocolOutfit
 	uint8_t addons;
 };
 
-class Outfits
+struct Look
 {
-public:
-	static Outfits& getInstance()
-	{
-		static Outfits instance;
-		return instance;
-	}
-
-	bool loadFromXml();
-
-	const Outfit* getOutfitByLookType(PlayerSex_t sex, uint16_t lookType) const;
-	const Outfit* getOutfitByLookType(uint16_t lookType) const;
-	const std::vector<Outfit>& getOutfits(PlayerSex_t sex) const { return outfits[sex]; }
-
-private:
-	std::vector<Outfit> outfits[PLAYERSEX_LAST + 1];
+	uint16_t type = 0;
+	uint16_t typeEx = 0;
+	uint8_t head = 0;
+	uint8_t body = 0;
+	uint8_t legs = 0;
+	uint8_t feet = 0;
+	uint8_t addons = 0;
+	uint16_t mount = 0;
+	uint8_t mountHead = 0;
+	uint8_t mountBody = 0;
+	uint8_t mountLegs = 0;
+	uint8_t mountFeet = 0;
 };
 
-#endif // FS_OUTFIT_H
+#endif

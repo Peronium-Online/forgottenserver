@@ -21,6 +21,8 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterSummon.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterType.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterVoice.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/outfit/Outfit.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/outfit/Outfits.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocation.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocations.h
 )

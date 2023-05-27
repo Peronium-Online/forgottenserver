@@ -41,7 +41,6 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/networkmessage.cpp
 	${CMAKE_CURRENT_LIST_DIR}/npc.cpp
 	${CMAKE_CURRENT_LIST_DIR}/otserv.cpp
-	${CMAKE_CURRENT_LIST_DIR}/outfit.cpp
 	${CMAKE_CURRENT_LIST_DIR}/outputmessage.cpp
 	${CMAKE_CURRENT_LIST_DIR}/party.cpp
 	${CMAKE_CURRENT_LIST_DIR}/player.cpp
@@ -85,6 +84,7 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterSpell.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterVoice.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterType.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/outfit/Outfits.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocation.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocations.cpp
 	PARENT_SCOPE)
@@ -137,7 +137,6 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/movement.h
 	${CMAKE_CURRENT_LIST_DIR}/networkmessage.h
 	${CMAKE_CURRENT_LIST_DIR}/npc.h
-	${CMAKE_CURRENT_LIST_DIR}/outfit.h
 	${CMAKE_CURRENT_LIST_DIR}/outputmessage.h
 	${CMAKE_CURRENT_LIST_DIR}/party.h
 	${CMAKE_CURRENT_LIST_DIR}/player.h

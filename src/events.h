@@ -6,6 +6,7 @@
 
 #include "constants/const.h"
 #include "creature.h"
+#include "libs/outfit/Outfit.h"
 #include "luascript.h"
 
 class ItemType;
@@ -68,7 +69,7 @@ public:
 	bool load();
 
 	// Creature
-	bool eventCreatureOnChangeOutfit(Creature* creature, const Outfit_t& outfit);
+	bool eventCreatureOnChangeOutfit(Creature* creature, const Look& outfit);
 	ReturnValue eventCreatureOnAreaCombat(Creature* creature, Tile* tile, bool aggressive);
 	ReturnValue eventCreatureOnTargetCombat(Creature* creature, Creature* target);
 	void eventCreatureOnHear(Creature* creature, Creature* speaker, const std::string& words, SpeakClasses type);
@@ -102,7 +103,7 @@ public:
 	bool eventPlayerOnTradeAccept(Player* player, Player* target, Item* item, Item* targetItem);
 	void eventPlayerOnTradeCompleted(Player* player, Player* target, Item* item, Item* targetItem, bool isSuccess);
 	void eventPlayerOnPodiumRequest(Player* player, Item* item);
-	void eventPlayerOnPodiumEdit(Player* player, Item* item, const Outfit_t& outfit, bool podiumVisible,
+	void eventPlayerOnPodiumEdit(Player* player, Item* item, const Look& outfit, bool podiumVisible,
 	                             Direction direction);
 	void eventPlayerOnGainExperience(Player* player, Creature* source, uint64_t& exp, uint64_t rawExp);
 	void eventPlayerOnLoseExperience(Player* player, uint64_t& exp);

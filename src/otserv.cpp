@@ -9,8 +9,8 @@
 #include "game.h"
 #include "iomarket.h"
 #include "libs/monster/Monsters.h"
+#include "libs/outfit/Outfits.h"
 #include "libs/vocation/Vocations.h"
-#include "outfit.h"
 #include "protocollogin.h"
 #include "protocolold.h"
 #include "protocolstatus.h"
@@ -301,7 +301,7 @@ void mainLoader(int, char*[], ServiceManager* services)
 	}
 
 	std::cout << ">> Loading outfits" << std::endl;
-	if (!Outfits::getInstance().loadFromXml()) {
+	if (!Outfits::getInstance().loadFromXML()) {
 		startupErrorMessage("Unable to load outfits!");
 		return;
 	}

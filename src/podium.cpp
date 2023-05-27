@@ -25,18 +25,18 @@ Attr_ReadValue Podium::readAttr(AttrTypes_t attr, PropStream& propStream)
 			propStream.read<uint8_t>(newDirection);
 			setDirection(static_cast<Direction>(newDirection));
 
-			Outfit_t newOutfit;
-			propStream.read<uint16_t>(newOutfit.lookType);
-			propStream.read<uint8_t>(newOutfit.lookHead);
-			propStream.read<uint8_t>(newOutfit.lookBody);
-			propStream.read<uint8_t>(newOutfit.lookLegs);
-			propStream.read<uint8_t>(newOutfit.lookFeet);
-			propStream.read<uint8_t>(newOutfit.lookAddons);
-			propStream.read<uint16_t>(newOutfit.lookMount);
-			propStream.read<uint8_t>(newOutfit.lookMountHead);
-			propStream.read<uint8_t>(newOutfit.lookMountBody);
-			propStream.read<uint8_t>(newOutfit.lookMountLegs);
-			propStream.read<uint8_t>(newOutfit.lookMountFeet);
+			Look newOutfit;
+			propStream.read<uint16_t>(newOutfit.type);
+			propStream.read<uint8_t>(newOutfit.head);
+			propStream.read<uint8_t>(newOutfit.body);
+			propStream.read<uint8_t>(newOutfit.legs);
+			propStream.read<uint8_t>(newOutfit.feet);
+			propStream.read<uint8_t>(newOutfit.addons);
+			propStream.read<uint16_t>(newOutfit.mount);
+			propStream.read<uint8_t>(newOutfit.mountHead);
+			propStream.read<uint8_t>(newOutfit.mountBody);
+			propStream.read<uint8_t>(newOutfit.mountLegs);
+			propStream.read<uint8_t>(newOutfit.mountFeet);
 			setOutfit(newOutfit);
 
 			g_game.updatePodium(this);
@@ -55,16 +55,16 @@ void Podium::serializeAttr(PropWriteStream& propWriteStream) const
 		propWriteStream.write<uint8_t>(ATTR_PODIUMOUTFIT);
 		propWriteStream.write<uint8_t>(static_cast<uint8_t>(flags.to_ulong()));
 		propWriteStream.write<uint8_t>(direction);
-		propWriteStream.write<uint16_t>(outfit.lookType);
-		propWriteStream.write<uint8_t>(outfit.lookHead);
-		propWriteStream.write<uint8_t>(outfit.lookBody);
-		propWriteStream.write<uint8_t>(outfit.lookLegs);
-		propWriteStream.write<uint8_t>(outfit.lookFeet);
-		propWriteStream.write<uint8_t>(outfit.lookAddons);
-		propWriteStream.write<uint16_t>(outfit.lookMount);
-		propWriteStream.write<uint8_t>(outfit.lookMountHead);
-		propWriteStream.write<uint8_t>(outfit.lookMountBody);
-		propWriteStream.write<uint8_t>(outfit.lookMountLegs);
-		propWriteStream.write<uint8_t>(outfit.lookMountFeet);
+		propWriteStream.write<uint16_t>(outfit.type);
+		propWriteStream.write<uint8_t>(outfit.head);
+		propWriteStream.write<uint8_t>(outfit.body);
+		propWriteStream.write<uint8_t>(outfit.legs);
+		propWriteStream.write<uint8_t>(outfit.feet);
+		propWriteStream.write<uint8_t>(outfit.addons);
+		propWriteStream.write<uint16_t>(outfit.mount);
+		propWriteStream.write<uint8_t>(outfit.mountHead);
+		propWriteStream.write<uint8_t>(outfit.mountBody);
+		propWriteStream.write<uint8_t>(outfit.mountLegs);
+		propWriteStream.write<uint8_t>(outfit.mountFeet);
 	}
 }

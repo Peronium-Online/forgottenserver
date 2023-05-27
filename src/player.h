@@ -124,7 +124,7 @@ public:
 	uint8_t getRandomMount() const;
 	uint8_t getCurrentMount() const;
 	void setCurrentMount(uint8_t mountId);
-	bool isMounted() const { return defaultOutfit.lookMount != 0; }
+	bool isMounted() const { return defaultOutfit.mount != 0; }
 	bool toggleMount(bool mount);
 	bool tameMount(uint8_t mountId);
 	bool untameMount(uint8_t mountId);
@@ -643,7 +643,7 @@ public:
 			client->sendCreatureSquare(creature, color);
 		}
 	}
-	void sendCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
+	void sendCreatureChangeOutfit(const Creature* creature, const Look& outfit)
 	{
 		if (client) {
 			client->sendCreatureOutfit(creature, outfit);
@@ -659,7 +659,7 @@ public:
 			if (visible) {
 				client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
 			} else {
-				static Outfit_t outfit;
+				static Look outfit;
 				client->sendCreatureOutfit(creature, outfit);
 			}
 		} else if (canSeeInvisibility()) {

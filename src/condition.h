@@ -5,6 +5,7 @@
 #define FS_CONDITION_H
 
 #include "constants/enums.h"
+#include "libs/outfit/Outfit.h"
 
 class Creature;
 class Player;
@@ -348,14 +349,14 @@ public:
 
 	ConditionOutfit* clone() const override { return new ConditionOutfit(*this); }
 
-	void setOutfit(const Outfit_t& outfit);
+	void setOutfit(const Look& outfit);
 
 	// serialization
 	void serialize(PropWriteStream& propWriteStream) override;
 	bool unserializeProp(ConditionAttr_t attr, PropStream& propStream) override;
 
 private:
-	Outfit_t outfit;
+	Look outfit;
 };
 
 class ConditionLight final : public Condition

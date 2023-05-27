@@ -181,39 +181,39 @@ bool MonsterType::Builder::load(pugi::xml_node node, bool reloading)
 	}
 
 	if (name == "look") {
-		Outfit_t outfit = {};
+		Look outfit = {};
 
 		if ((attr = node.attribute("type"))) {
-			outfit.lookType = pugi::cast<uint16_t>(attr.value());
+			outfit.type = pugi::cast<uint16_t>(attr.value());
 
 			if ((attr = node.attribute("head"))) {
-				outfit.lookHead = pugi::cast<uint16_t>(attr.value());
+				outfit.head = pugi::cast<uint16_t>(attr.value());
 			}
 
 			if ((attr = node.attribute("body"))) {
-				outfit.lookBody = pugi::cast<uint16_t>(attr.value());
+				outfit.body = pugi::cast<uint16_t>(attr.value());
 			}
 
 			if ((attr = node.attribute("legs"))) {
-				outfit.lookLegs = pugi::cast<uint16_t>(attr.value());
+				outfit.legs = pugi::cast<uint16_t>(attr.value());
 			}
 
 			if ((attr = node.attribute("feet"))) {
-				outfit.lookFeet = pugi::cast<uint16_t>(attr.value());
+				outfit.feet = pugi::cast<uint16_t>(attr.value());
 			}
 
 			if ((attr = node.attribute("addons"))) {
-				outfit.lookAddons = pugi::cast<uint16_t>(attr.value());
+				outfit.addons = pugi::cast<uint16_t>(attr.value());
 			}
 		} else if ((attr = node.attribute("typeex"))) {
-			outfit.lookTypeEx = pugi::cast<uint16_t>(attr.value());
+			outfit.typeEx = pugi::cast<uint16_t>(attr.value());
 		} else {
 			std::cout << "[Warning - MonsterType::load] Missing look type/typeex. " << filepath << " node: " << name
 			          << std::endl;
 		}
 
 		if ((attr = node.attribute("mount"))) {
-			outfit.lookMount = pugi::cast<uint16_t>(attr.value());
+			outfit.mount = pugi::cast<uint16_t>(attr.value());
 		}
 
 		uint16_t corpse = 0;

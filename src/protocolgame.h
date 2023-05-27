@@ -194,7 +194,7 @@ private:
 	void sendCancelWalk();
 	void sendChangeSpeed(const Creature* creature, uint32_t speed);
 	void sendCancelTarget();
-	void sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit);
+	void sendCreatureOutfit(const Creature* creature, const Look& outfit);
 	void sendStats();
 	void sendExperienceTracker(int64_t rawExp, int64_t finalExp);
 	void sendClientFeatures();
@@ -304,7 +304,7 @@ private:
 
 	void AddCreature(NetworkMessage& msg, const Creature* creature, bool known, uint32_t remove);
 	void AddPlayerStats(NetworkMessage& msg);
-	void AddOutfit(NetworkMessage& msg, const Outfit_t& outfit);
+	void AddOutfit(NetworkMessage& msg, const Look& outfit);
 	void AddPlayerSkills(NetworkMessage& msg);
 	void AddWorldLight(NetworkMessage& msg, LightInfo lightInfo);
 	void AddCreatureLight(NetworkMessage& msg, const Creature* creature);

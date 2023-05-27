@@ -8,6 +8,7 @@
 #include "libs/monster/MonsterSpell.h"
 #include "libs/monster/MonsterSummon.h"
 #include "libs/monster/MonsterVoice.h"
+#include "libs/outfit/Outfit.h"
 #include "libs/util/tools/gamehelpers.h"
 #include "libs/util/xml/XMLElementBuilder.h"
 
@@ -34,7 +35,7 @@ class MonsterType
 		std::vector<MonsterSeek> seeks;
 
 		Skulls_t skull = SKULL_NONE;
-		Outfit_t outfit = {};
+		Look outfit = {};
 		RaceType_t race = RACE_BLOOD;
 
 		LightInfo light = {};
@@ -377,7 +378,7 @@ public:
 			return this;
 		}
 
-		Builder* setLook(Outfit_t outfit, uint16_t corpse)
+		Builder* setLook(Look outfit, uint16_t corpse)
 		{
 			this->mType->info.outfit = std::move(outfit);
 			this->mType->info.lookcorpse = std::move(corpse);

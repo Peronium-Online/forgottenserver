@@ -7,6 +7,7 @@
 #include "constants/const.h"
 #include "constants/enums.h"
 #include "creatureevent.h"
+#include "libs/outfit/Outfit.h"
 #include "map.h"
 #include "position.h"
 #include "tile.h"
@@ -165,9 +166,9 @@ public:
 	void setTeam(uint8_t newTeam) { team = newTeam; }
 	uint8_t getTeam() { return team; }
 
-	const Outfit_t getCurrentOutfit() const { return currentOutfit; }
-	void setCurrentOutfit(Outfit_t outfit) { currentOutfit = outfit; }
-	const Outfit_t getDefaultOutfit() const { return defaultOutfit; }
+	const Look getCurrentOutfit() const { return currentOutfit; }
+	void setCurrentOutfit(Look outfit) { currentOutfit = outfit; }
+	const Look getDefaultOutfit() const { return defaultOutfit; }
 	bool isInvisible() const;
 	ZoneType_t getZone() const { return getTile()->getZone(); }
 
@@ -394,8 +395,8 @@ protected:
 	uint8_t drunkenness = 0;
 	uint8_t team = 0;
 
-	Outfit_t currentOutfit;
-	Outfit_t defaultOutfit;
+	Look currentOutfit;
+	Look defaultOutfit;
 
 	Position lastPosition;
 	LightInfo internalLight;

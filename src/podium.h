@@ -17,8 +17,8 @@ public:
 	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream) override;
 	void serializeAttr(PropWriteStream& propWriteStream) const override;
 
-	void setOutfit(const Outfit_t& newOutfit) { outfit = newOutfit; }
-	const Outfit_t getOutfit() const { return outfit; }
+	void setOutfit(const Look& newOutfit) { outfit = newOutfit; }
+	const Look getOutfit() const { return outfit; }
 
 	bool hasFlag(PodiumFlags flag) const { return flags.test(flag); }
 	void setFlagValue(PodiumFlags flag, bool value)
@@ -35,7 +35,7 @@ public:
 	void setDirection(Direction newDirection) { direction = newDirection; }
 
 protected:
-	Outfit_t outfit;
+	Look outfit;
 
 private:
 	std::bitset<3> flags = {true}; // show platform only

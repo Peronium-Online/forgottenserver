@@ -21,11 +21,11 @@
 #include "items.h"
 #include "libs/monster/Monster.h"
 #include "libs/monster/Monsters.h"
+#include "libs/outfit/Outfits.h"
 #include "libs/util/tools/direction.h"
 #include "libs/util/tools/random.h"
 #include "movement.h"
 #include "npc.h"
-#include "outfit.h"
 #include "party.h"
 #include "podium.h"
 #include "scheduler.h"
@@ -3438,7 +3438,7 @@ void Game::playerRequestEditPodium(uint32_t playerId, const Position& position, 
 	g_events->eventPlayerOnPodiumRequest(player, item);
 }
 
-void Game::playerEditPodium(uint32_t playerId, Outfit_t outfit, const Position& position, uint8_t stackPos,
+void Game::playerEditPodium(uint32_t playerId, Look outfit, const Position& position, uint8_t stackPos,
                             const uint16_t spriteId, bool podiumVisible, Direction direction)
 {
 	Player* player = getPlayerByID(playerId);
@@ -3474,7 +3474,7 @@ void Game::playerToggleMount(uint32_t playerId, bool mount)
 	player->toggleMount(mount);
 }
 
-void Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit, bool randomizeMount /* = false*/)
+void Game::playerChangeOutfit(uint32_t playerId, Look outfit, bool randomizeMount /* = false*/)
 {
 	if (!g_config.getBoolean(ConfigManager::ALLOW_CHANGEOUTFIT)) {
 		return;
@@ -3487,13 +3487,13 @@ void Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit, bool randomize
 
 	player->randomizeMount = randomizeMount;
 
-	const Outfit* playerOutfit = Outfits::getInstance().getOutfitByLookType(player->getSex(), outfit.lookType);
+	const Outfit* playerOutfit = Outfits::getInstance().getOutfitByLookType(player->getSex(), outfit.type);
 	if (!playerOutfit) {
-		outfit.lookMount = 0;
+		outfit.mount = 0;
 	}
 
-	if (outfit.lookMount != 0) {
-		Mount* mount = mounts.getMountByClientID(outfit.lookMount);
+	if (outfit.mount != 0) {
+		Mount* mount = mounts.getMountByClientID(outfit.mount);
 		if (!mount) {
 			return;
 		}
@@ -3516,7 +3516,7 @@ void Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit, bool randomize
 		player->dismount();
 	}
 
-	if (player->canWear(outfit.lookType, outfit.lookAddons)) {
+	if (player->canWear(outfit.type, outfit.addons)) {
 		player->defaultOutfit = outfit;
 
 		if (player->hasCondition(CONDITION_OUTFIT)) {
@@ -3525,7 +3525,7 @@ void Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit, bool randomize
 
 		if (player->randomizeMount && player->hasMounts()) {
 			const Mount* mount = mounts.getMountByID(player->getRandomMount());
-			outfit.lookMount = mount->clientId;
+			outfit.mount = mount->clientId;
 		}
 
 		internalCreatureChangeOutfit(player, outfit);
@@ -3939,7 +3939,7 @@ void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 	}
 }
 
-void Game::internalCreatureChangeOutfit(Creature* creature, const Outfit_t& outfit)
+void Game::internalCreatureChangeOutfit(Creature* creature, const Look& outfit)
 {
 	if (!g_events->eventCreatureOnChangeOutfit(creature, outfit)) {
 		return;

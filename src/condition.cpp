@@ -1684,12 +1684,12 @@ void ConditionInvisible::endCondition(Creature* creature)
 	}
 }
 
-void ConditionOutfit::setOutfit(const Outfit_t& outfit) { this->outfit = outfit; }
+void ConditionOutfit::setOutfit(const Look& outfit) { this->outfit = outfit; }
 
 bool ConditionOutfit::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 {
 	if (attr == CONDITIONATTR_OUTFIT) {
-		return propStream.read<Outfit_t>(outfit);
+		return propStream.read<Look>(outfit);
 	}
 	return Condition::unserializeProp(attr, propStream);
 }
@@ -1699,7 +1699,7 @@ void ConditionOutfit::serialize(PropWriteStream& propWriteStream)
 	Condition::serialize(propWriteStream);
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_OUTFIT);
-	propWriteStream.write<Outfit_t>(outfit);
+	propWriteStream.write<Look>(outfit);
 }
 
 bool ConditionOutfit::startCondition(Creature* creature)

@@ -134,17 +134,17 @@ void NetworkMessage::addItem(const Item* item)
 	// display outfit on the podium
 	if (it.isPodium()) {
 		const Podium* podium = item->getPodium();
-		const Outfit_t& outfit = podium->getOutfit();
+		const Look& outfit = podium->getOutfit();
 
 		// add outfit
 		if (podium->hasFlag(PODIUM_SHOW_OUTFIT)) {
-			add<uint16_t>(outfit.lookType);
-			if (outfit.lookType != 0) {
-				addByte(outfit.lookHead);
-				addByte(outfit.lookBody);
-				addByte(outfit.lookLegs);
-				addByte(outfit.lookFeet);
-				addByte(outfit.lookAddons);
+			add<uint16_t>(outfit.type);
+			if (outfit.type != 0) {
+				addByte(outfit.head);
+				addByte(outfit.body);
+				addByte(outfit.legs);
+				addByte(outfit.feet);
+				addByte(outfit.addons);
 			}
 		} else {
 			add<uint16_t>(0);
@@ -152,12 +152,12 @@ void NetworkMessage::addItem(const Item* item)
 
 		// add mount
 		if (podium->hasFlag(PODIUM_SHOW_MOUNT)) {
-			add<uint16_t>(outfit.lookMount);
-			if (outfit.lookMount != 0) {
-				addByte(outfit.lookMountHead);
-				addByte(outfit.lookMountBody);
-				addByte(outfit.lookMountLegs);
-				addByte(outfit.lookMountFeet);
+			add<uint16_t>(outfit.mount);
+			if (outfit.mount != 0) {
+				addByte(outfit.mountHead);
+				addByte(outfit.mountBody);
+				addByte(outfit.mountLegs);
+				addByte(outfit.mountFeet);
 			}
 		} else {
 			add<uint16_t>(0);

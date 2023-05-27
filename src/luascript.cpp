@@ -23,11 +23,11 @@
 #include "libs/monster/MonsterSeek.h"
 #include "libs/monster/MonsterSummon.h"
 #include "libs/monster/Monsters.h"
+#include "libs/outfit/Outfits.h"
 #include "libs/util/tools/random.h"
 #include "luavariant.h"
 #include "movement.h"
 #include "npc.h"
-#include "outfit.h"
 #include "party.h"
 #include "player.h"
 #include "podium.h"
@@ -758,24 +758,24 @@ Position LuaScriptInterface::getPosition(lua_State* L, int32_t arg)
 	return position;
 }
 
-Outfit_t LuaScriptInterface::getOutfit(lua_State* L, int32_t arg)
+Look LuaScriptInterface::getOutfit(lua_State* L, int32_t arg)
 {
-	Outfit_t outfit;
+	Look outfit;
 
-	outfit.lookType = getField<uint16_t>(L, arg, "lookType");
-	outfit.lookTypeEx = getField<uint16_t>(L, arg, "lookTypeEx");
+	outfit.type = getField<uint16_t>(L, arg, "lookType");
+	outfit.typeEx = getField<uint16_t>(L, arg, "lookTypeEx");
 
-	outfit.lookHead = getField<uint8_t>(L, arg, "lookHead");
-	outfit.lookBody = getField<uint8_t>(L, arg, "lookBody");
-	outfit.lookLegs = getField<uint8_t>(L, arg, "lookLegs");
-	outfit.lookFeet = getField<uint8_t>(L, arg, "lookFeet");
-	outfit.lookAddons = getField<uint8_t>(L, arg, "lookAddons");
+	outfit.head = getField<uint8_t>(L, arg, "lookHead");
+	outfit.body = getField<uint8_t>(L, arg, "lookBody");
+	outfit.legs = getField<uint8_t>(L, arg, "lookLegs");
+	outfit.feet = getField<uint8_t>(L, arg, "lookFeet");
+	outfit.addons = getField<uint8_t>(L, arg, "lookAddons");
 
-	outfit.lookMount = getField<uint16_t>(L, arg, "lookMount");
-	outfit.lookMountHead = getField<uint8_t>(L, arg, "lookMountHead");
-	outfit.lookMountBody = getField<uint8_t>(L, arg, "lookMountBody");
-	outfit.lookMountLegs = getField<uint8_t>(L, arg, "lookMountLegs");
-	outfit.lookMountFeet = getField<uint8_t>(L, arg, "lookMountFeet");
+	outfit.mount = getField<uint16_t>(L, arg, "lookMount");
+	outfit.mountHead = getField<uint8_t>(L, arg, "lookMountHead");
+	outfit.mountBody = getField<uint8_t>(L, arg, "lookMountBody");
+	outfit.mountLegs = getField<uint8_t>(L, arg, "lookMountLegs");
+	outfit.mountFeet = getField<uint8_t>(L, arg, "lookMountFeet");
 
 	lua_pop(L, 12);
 	return outfit;
@@ -956,21 +956,21 @@ void LuaScriptInterface::pushPosition(lua_State* L, const Position& position, in
 	setMetatable(L, -1, "Position");
 }
 
-void LuaScriptInterface::pushOutfit(lua_State* L, const Outfit_t& outfit)
+void LuaScriptInterface::pushOutfit(lua_State* L, const Look& outfit)
 {
 	lua_createtable(L, 0, 12);
-	setField(L, "lookType", outfit.lookType);
-	setField(L, "lookTypeEx", outfit.lookTypeEx);
-	setField(L, "lookHead", outfit.lookHead);
-	setField(L, "lookBody", outfit.lookBody);
-	setField(L, "lookLegs", outfit.lookLegs);
-	setField(L, "lookFeet", outfit.lookFeet);
-	setField(L, "lookAddons", outfit.lookAddons);
-	setField(L, "lookMount", outfit.lookMount);
-	setField(L, "lookMountHead", outfit.lookMountHead);
-	setField(L, "lookMountBody", outfit.lookMountBody);
-	setField(L, "lookMountLegs", outfit.lookMountLegs);
-	setField(L, "lookMountFeet", outfit.lookMountFeet);
+	setField(L, "lookType", outfit.type);
+	setField(L, "lookTypeEx", outfit.typeEx);
+	setField(L, "lookHead", outfit.head);
+	setField(L, "lookBody", outfit.body);
+	setField(L, "lookLegs", outfit.legs);
+	setField(L, "lookFeet", outfit.feet);
+	setField(L, "lookAddons", outfit.addons);
+	setField(L, "lookMount", outfit.mount);
+	setField(L, "lookMountHead", outfit.mountHead);
+	setField(L, "lookMountBody", outfit.mountBody);
+	setField(L, "lookMountLegs", outfit.mountLegs);
+	setField(L, "lookMountFeet", outfit.mountFeet);
 }
 
 void LuaScriptInterface::pushOutfit(lua_State* L, const Outfit* outfit)
@@ -13740,18 +13740,18 @@ int LuaScriptInterface::luaConditionSetOutfit(lua_State* L)
 {
 	// condition:setOutfit(outfit)
 	// condition:setOutfit(lookTypeEx, lookType, lookHead, lookBody, lookLegs, lookFeet[, lookAddons[, lookMount]])
-	Outfit_t outfit;
+	Look outfit;
 	if (isTable(L, 2)) {
 		outfit = getOutfit(L, 2);
 	} else {
-		outfit.lookMount = getNumber<uint16_t>(L, 9, outfit.lookMount);
-		outfit.lookAddons = getNumber<uint8_t>(L, 8, outfit.lookAddons);
-		outfit.lookFeet = getNumber<uint8_t>(L, 7);
-		outfit.lookLegs = getNumber<uint8_t>(L, 6);
-		outfit.lookBody = getNumber<uint8_t>(L, 5);
-		outfit.lookHead = getNumber<uint8_t>(L, 4);
-		outfit.lookType = getNumber<uint16_t>(L, 3);
-		outfit.lookTypeEx = getNumber<uint16_t>(L, 2);
+		outfit.mount = getNumber<uint16_t>(L, 9, outfit.mount);
+		outfit.addons = getNumber<uint8_t>(L, 8, outfit.addons);
+		outfit.feet = getNumber<uint8_t>(L, 7);
+		outfit.legs = getNumber<uint8_t>(L, 6);
+		outfit.body = getNumber<uint8_t>(L, 5);
+		outfit.head = getNumber<uint8_t>(L, 4);
+		outfit.type = getNumber<uint16_t>(L, 3);
+		outfit.typeEx = getNumber<uint16_t>(L, 2);
 	}
 
 	ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(getUserdata<Condition>(L, 1));
@@ -15372,7 +15372,7 @@ int LuaScriptInterface::luaMonsterSpellSetOutfit(lua_State* L)
 		if (isTable(L, 2)) {
 			spell->outfit = getOutfit(L, 2);
 		} else if (isNumber(L, 2)) {
-			spell->outfit.lookTypeEx = getNumber<uint16_t>(L, 2);
+			spell->outfit.typeEx = getNumber<uint16_t>(L, 2);
 		} else if (isString(L, 2)) {
 			auto mType = g_monsters.findMonsterTypeByName(getString(L, 2));
 			if (!mType->isUndefined()) {

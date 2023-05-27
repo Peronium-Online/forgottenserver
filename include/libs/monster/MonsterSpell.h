@@ -43,7 +43,7 @@ public:
 	bool combatSpell = false;
 	bool isMelee = false;
 
-	Outfit_t outfit = {};
+	Look outfit = {};
 	ShootType_t shoot = CONST_ANI_NONE;
 	MagicEffectClasses effect = CONST_ME_NONE;
 	ConditionType_t conditionType = CONDITION_NONE;
@@ -444,7 +444,7 @@ public:
 			return this;
 		}
 
-		CombatBuilder* withOutfitChange(Outfit_t outfit, int32_t duration = 10000)
+		CombatBuilder* withOutfitChange(Look outfit, int32_t duration = 10000)
 		{
 			if (duration <= 0) {
 				duration = 10000;
@@ -461,8 +461,8 @@ public:
 
 		CombatBuilder* withOutfitChange(uint16_t lookTypeEx, int32_t duration = 10000)
 		{
-			Outfit_t outfit = {};
-			outfit.lookTypeEx = lookTypeEx;
+			Look outfit = {};
+			outfit.typeEx = lookTypeEx;
 
 			return this->withOutfitChange(outfit, duration);
 		}

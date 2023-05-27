@@ -7,6 +7,7 @@
 #include "constants/enums.h"
 #include "database.h"
 #include "libs/monster/MonsterLoot.h"
+#include "libs/outfit/Outfit.h"
 #include "position.h"
 
 #if LUA_VERSION_NUM >= 502
@@ -316,7 +317,7 @@ public:
 	static std::string getString(lua_State* L, int32_t arg);
 	static Position getPosition(lua_State* L, int32_t arg, int32_t& stackpos);
 	static Position getPosition(lua_State* L, int32_t arg);
-	static Outfit_t getOutfit(lua_State* L, int32_t arg);
+	static Look getOutfit(lua_State* L, int32_t arg);
 	static Outfit getOutfitClass(lua_State* L, int32_t arg);
 	static InstantSpell* getInstantSpell(lua_State* L, int32_t arg);
 	static Reflect getReflect(lua_State* L, int32_t arg);
@@ -349,7 +350,7 @@ public:
 	static void pushCombatDamage(lua_State* L, const CombatDamage& damage);
 	static void pushInstantSpell(lua_State* L, const InstantSpell& spell);
 	static void pushPosition(lua_State* L, const Position& position, int32_t stackpos = 0);
-	static void pushOutfit(lua_State* L, const Outfit_t& outfit);
+	static void pushOutfit(lua_State* L, const Look& outfit);
 	static void pushOutfit(lua_State* L, const Outfit* outfit);
 	static void pushMount(lua_State* L, const Mount* mount);
 	static void pushLoot(lua_State* L, const std::vector<MonsterLoot>& lootList);

@@ -156,7 +156,7 @@ bool Events::eventMonsterOnSpawn(Monster* monster, const Position& position, boo
 }
 
 // Creature
-bool Events::eventCreatureOnChangeOutfit(Creature* creature, const Outfit_t& outfit)
+bool Events::eventCreatureOnChangeOutfit(Creature* creature, const Look& outfit)
 {
 	// Creature:onChangeOutfit(outfit) or Creature.onChangeOutfit(self, outfit)
 	if (info.creatureOnChangeOutfit == -1) {
@@ -919,7 +919,7 @@ void Events::eventPlayerOnPodiumRequest(Player* player, Item* item)
 	scriptInterface.callFunction(2);
 }
 
-void Events::eventPlayerOnPodiumEdit(Player* player, Item* item, const Outfit_t& outfit, bool podiumVisible,
+void Events::eventPlayerOnPodiumEdit(Player* player, Item* item, const Look& outfit, bool podiumVisible,
                                      Direction direction)
 {
 	// Player:onPodiumEdit(item, outfit, direction, isVisible) or Player.onPodiumEdit(self, item, outfit, direction,
