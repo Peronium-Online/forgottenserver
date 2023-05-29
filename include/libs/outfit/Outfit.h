@@ -1,7 +1,7 @@
 #ifndef PR_OUTFIT_H
 #define PR_OUTFIT_H
 
-#include <cinttypes>
+#include <cstdint>
 #include <string>
 
 struct Outfit

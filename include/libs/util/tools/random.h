@@ -1,7 +1,7 @@
 #ifndef FS_RANDOM_H
 #define FS_RANDOM_H
 
-#include <cinttypes>
+#include <cstdint>
 #include <random>
 
 std::mt19937& getRandomGenerator();
