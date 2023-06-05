@@ -5,7 +5,7 @@
 #define FS_TILE_H
 
 #include "cylinder.h"
-#include "item.h"
+#include "libs/item/Item.h"
 #include "libs/util/tools/bitwise.h"
 
 class BedItem;

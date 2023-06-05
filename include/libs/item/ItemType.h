@@ -6,6 +6,7 @@
 #include "constants/const.h"
 #include "constants/enums.h"
 #include "libs/item/itemenums.h"
+#include "libs/util/xml/XMLElementBuilder.h"
 
 #include <array>
 #include <cstdint>
@@ -50,9 +51,10 @@ struct Abilities
 	bool regeneration = false;
 };
 
-class ItemType
+class ItemType final : virtual XMLElementBuilder<ItemType*>
 {
 public:
+	ItemType() = default;
 	ItemType(uint16_t id) : id(id){};
 
 	// non-copyable
@@ -158,6 +160,8 @@ public:
 	bool showCount = true;
 	bool supply = false;
 
+	ItemType* loadFromXMLNode(pugi::xml_node node, bool reloading) override;
+
 	bool isGroundTile() const { return group == ITEM_GROUP_GROUND; }
 	bool isContainer() const { return group == ITEM_GROUP_CONTAINER; }
 	bool isSplash() const { return group == ITEM_GROUP_SPLASH; }
@@ -238,6 +242,100 @@ public:
 				break;
 			default:
 				break;
+		}
+	}
+
+	void setType(const std::string& type)
+	{
+		auto itemType = ItemTypesMap->get(type);
+		if (!ItemTypesMap->isNone(itemType)) {
+			this->type = itemType;
+			if (this->type == ITEM_TYPE_CONTAINER) {
+				this->group = ITEM_GROUP_CONTAINER;
+			}
+		} else {
+			std::cout << "[Warning - ItemType::setType] Unknown item type: " << type << std::endl;
+		}
+	}
+
+	void setAttackSpeed(uint32_t attackSpeed)
+	{
+		if (attackSpeed > 0 && attackSpeed < 100) {
+			std::cout << "[Warning - ItemType::setAttackSpeed]AttackSpeed lower than 100 for item: " << id << std::endl;
+			attackSpeed = 100;
+		}
+		this->attackSpeed = attackSpeed;
+	}
+
+	void setFloorChange(const std::string& floorChange)
+	{
+		auto tileState = TileStatesMap->get(floorChange);
+		if (!TileStatesMap->isNone(tileState)) {
+			this->floorChange |= tileState;
+		} else {
+			std::cout << "[Warning - ItemType::setFloorChange] Unknown floorChange: " << floorChange << std::endl;
+		}
+	};
+
+	void setCorpseType(const std::string& corpseType)
+	{
+		auto race = RaceTypesMap->get(corpseType);
+		if (!RaceTypesMap->isNone(race)) {
+			this->corpseType = race;
+		} else {
+			std::cout << "[Warning - ItemType::setCorpseType] Unknown corpseType: " << corpseType << std::endl;
+		}
+	}
+
+	void setFluidSource(const std::string& fluidSource)
+	{
+		auto fluid = FluidTypesMap->get(fluidSource);
+		if (!FluidTypesMap->isNone(fluid)) {
+			this->fluidSource = fluid;
+		} else {
+			std::cout << "[Warning - ItemType::setFluidSource] Unknown fluidSource: " << fluidSource << std::endl;
+		}
+	}
+
+	void setWeaponType(const std::string& weaponType)
+	{
+		auto weapon = WeaponTypesMap->get(weaponType);
+		if (!WeaponTypesMap->isNone(weapon)) {
+			this->weaponType = weapon;
+		} else {
+			std::cout << "[Warning - ItemType::setWeaponType] Unknown weaponType: " << weaponType << std::endl;
+		}
+	}
+
+	void setSlotType(const std::string& slotType)
+	{
+		auto tmpStrValue = boost::algorithm::to_lower_copy<std::string>(slotType);
+		if (tmpStrValue == "head") {
+			this->slotPosition |= SLOTP_HEAD;
+		} else if (tmpStrValue == "body") {
+			this->slotPosition |= SLOTP_ARMOR;
+		} else if (tmpStrValue == "legs") {
+			this->slotPosition |= SLOTP_LEGS;
+		} else if (tmpStrValue == "feet") {
+			this->slotPosition |= SLOTP_FEET;
+		} else if (tmpStrValue == "backpack") {
+			this->slotPosition |= SLOTP_BACKPACK;
+		} else if (tmpStrValue == "two-handed") {
+			this->slotPosition |= SLOTP_TWO_HAND;
+		} else if (tmpStrValue == "right-hand") {
+			this->slotPosition &= ~SLOTP_LEFT;
+		} else if (tmpStrValue == "left-hand") {
+			this->slotPosition &= ~SLOTP_RIGHT;
+		} else if (tmpStrValue == "necklace") {
+			this->slotPosition |= SLOTP_NECKLACE;
+		} else if (tmpStrValue == "ring") {
+			this->slotPosition |= SLOTP_RING;
+		} else if (tmpStrValue == "ammo") {
+			this->slotPosition |= SLOTP_AMMO;
+		} else if (tmpStrValue == "hand") {
+			this->slotPosition |= SLOTP_HAND;
+		} else {
+			std::cout << "[Warning - ItemType::setSlotType] Unknown slotType: " << slotType << std::endl;
 		}
 	}
 };

@@ -2,6 +2,7 @@
 
 #include "libs/item/itemenums.h"
 #include "libs/util/tools/bitwise.h"
+#include "libs/util/tools/pugicast.h"
 
 bool Items::load(const OTBNode& node, PropStream stream)
 {
@@ -160,4 +161,18 @@ bool Items::loadFromOTB()
 	OTBLoadable::loadFromOTB();
 
 	this->items.shrink_to_fit();
+}
+
+bool Items::load(pugi::xml_node node, bool)
+{
+	auto iType = (new ItemType())->loadFromXMLNode(node, false);
+	if (!iType) {
+		return false;
+	}
+
+	if (!iType->name.empty()) {
+		this->addNameToItems(iType->name, iType->id);
+	}
+
+	return true;
 }

@@ -6,6 +6,8 @@
 #include "libs/util/otb/OTBLoadable.h"
 #include "libs/util/xml/XMLLoadable.h"
 
+using NameMap = std::unordered_map<std::string, uint16_t>;
+
 constexpr auto OTBI = OTBIdentifier{{'O', 'T', 'B', 'I'}};
 
 class Items final : virtual public XMLLoadable, OTBLoadable
@@ -22,6 +24,7 @@ private:
 
 	std::vector<ItemType> items;
 	ClientIdToServerIdMap clientIdToServerIdMap;
+	NameMap nameToItems;
 
 	void addItem(ItemType& item)
 	{
@@ -32,11 +35,33 @@ private:
 		this->items.insert(this->items.begin() + item.id, std::move(item));
 	}
 
+	void addNameToItems(const std::string& name, uint16_t id)
+	{
+		std::string lowerCaseName = boost::algorithm::to_lower_copy(name);
+		if (nameToItems.find(lowerCaseName) == nameToItems.end()) {
+			nameToItems.emplace(std::move(lowerCaseName), id);
+		}
+	}
+
 public:
 	Items(const Items&) = delete;
 	Items& operator=(const Items&) = delete;
 
+	static Items& getInstance()
+	{
+		static Items instance;
+		return instance;
+	}
+
 	bool loadFromOTB() override;
+
+	ItemType* getItemType(size_t id)
+	{
+		if (id < items.size()) {
+			return &items[id];
+		}
+		return &items.front();
+	}
 };
 
 #endif

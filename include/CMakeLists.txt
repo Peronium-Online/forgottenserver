@@ -3,6 +3,7 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/constants/const.h
 	${CMAKE_CURRENT_LIST_DIR}/constants/definitions.h
 	${CMAKE_CURRENT_LIST_DIR}/constants/enums.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/datastructures/Dictionary.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/xml/XMLElement.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/xml/XMLLoadable.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/bitwise.h
@@ -13,6 +14,12 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/random.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/strings.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/ClientIdToServerIdMap.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/Item.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/itemenums.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/itemmaps.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/Items.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemType.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monster.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterLoot.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monsters.h
