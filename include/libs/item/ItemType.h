@@ -4,8 +4,8 @@
 #include "../../src/condition.h"
 #include "../../src/position.h"
 #include "constants/const.h"
-#include "constants/enums.h"
 #include "libs/item/itemenums.h"
+#include "libs/util/tools/gamehelpers.h"
 #include "libs/util/xml/XMLElementBuilder.h"
 
 #include <array>
@@ -116,11 +116,11 @@ public:
 
 	MagicEffectClasses magicEffect = CONST_ME_NONE;
 	Direction bedPartnerDir = DIRECTION_NONE;
-	WeaponType_t weaponType = WEAPON_NONE;
-	Ammo_t ammoType = AMMO_NONE;
+	WeaponTypes weaponType = WEAPON_NONE;
+	AmmoTypes ammoType = AMMO_NONE;
 	ShootType_t shootType = CONST_ANI_NONE;
 	RaceType_t corpseType = RACE_NONE;
-	FluidTypes_t fluidSource = FLUID_NONE;
+	FluidTypes fluidSource = FLUID_NONE;
 
 	uint8_t floorChange = 0;
 	uint8_t alwaysOnTopOrder = 0;
@@ -307,6 +307,26 @@ public:
 		}
 	}
 
+	void setAmmoType(const std::string& ammoType)
+	{
+		auto ammo = AmmoTypesMap->get(ammoType);
+		if (!AmmoTypesMap->isNone(ammo)) {
+			this->ammoType = ammo;
+		} else {
+			std::cout << "[Warning - ItemType::setAmmoType] Unknown ammoType: " << ammoType << std::endl;
+		}
+	}
+
+	void setShootType(const std::string& shootType)
+	{
+		ShootType_t shoot = getShootType(boost::algorithm::to_lower_copy<std::string>(shootType));
+		if (shoot != CONST_ANI_NONE) {
+			this->shootType = shoot;
+		} else {
+			std::cout << "[Warning - ItemType::setShootType] Unknown shootType: " << shootType << std::endl;
+		}
+	}
+
 	void setSlotType(const std::string& slotType)
 	{
 		auto tmpStrValue = boost::algorithm::to_lower_copy<std::string>(slotType);
@@ -338,6 +358,72 @@ public:
 			std::cout << "[Warning - ItemType::setSlotType] Unknown slotType: " << slotType << std::endl;
 		}
 	}
+
+	void setMagicEffect(const std::string& magicEffect)
+	{
+		MagicEffectClasses effect = getMagicEffect(boost::algorithm::to_lower_copy<std::string>(magicEffect));
+		if (effect != CONST_ME_NONE) {
+			this->magicEffect = effect;
+		} else {
+			std::cout << "[Warning - ItemType::setMagicEffect] Unknown effect: " << magicEffect << std::endl;
+		}
+	}
+
+	void setHitChance(int8_t hitChance) { this->hitChance = std::min<int8_t>(100, std::max<int8_t>(-100, hitChance)); }
+
+	void setMaxHitChance(uint8_t hitChance) { this->maxHitChance = std::min<uint8_t>(100, hitChance); }
+
+	void setHealthGain(uint32_t gain)
+	{
+		this->abilities->regeneration = true;
+		this->abilities->healthGain = gain;
+	}
+
+	void setHealthTicks(uint32_t ticks)
+	{
+		this->abilities->regeneration = true;
+		this->abilities->healthTicks = ticks;
+	}
+
+	void setManaGain(uint32_t gain)
+	{
+		this->abilities->regeneration = true;
+		this->abilities->manaGain = gain;
+	}
+
+	void setManaTicks(uint32_t ticks)
+	{
+		this->abilities->regeneration = true;
+		this->abilities->manaTicks = ticks;
+	}
+
+	void setSwordSkill(int32_t skill) { this->abilities->skills[SKILL_SWORD] = skill; }
+	void setAxeSkill(int32_t skill) { this->abilities->skills[SKILL_AXE] = skill; }
+	void setClubSkill(int32_t skill) { this->abilities->skills[SKILL_CLUB] = skill; }
+	void setDistSkill(int32_t skill) { this->abilities->skills[SKILL_DISTANCE] = skill; }
+	void setFishSkill(int32_t skill) { this->abilities->skills[SKILL_FISHING] = skill; }
+	void setShieldSkill(int32_t skill) { this->abilities->skills[SKILL_SHIELD] = skill; }
+	void setFistSkill(int32_t skill) { this->abilities->skills[SKILL_FIST] = skill; }
+
+	void setCriticalHitAmount(int32_t amount)
+	{
+		this->abilities->specialSkills[SPECIALSKILL_CRITICALHITAMOUNT] = amount;
+	}
+	void setCriticalHitChance(int32_t chance)
+	{
+		this->abilities->specialSkills[SPECIALSKILL_CRITICALHITCHANCE] = chance;
+	}
+	void setManaLeechAmount(int32_t amount) { this->abilities->specialSkills[SPECIALSKILL_MANALEECHAMOUNT] = amount; }
+	void setManaLeechChance(int32_t chance) { this->abilities->specialSkills[SPECIALSKILL_MANALEECHCHANCE] = chance; }
+	void setLifeLeechAmount(int32_t amount) { this->abilities->specialSkills[SPECIALSKILL_LIFELEECHAMOUNT] = amount; }
+	void setLifeLeechChance(int32_t chance) { this->abilities->specialSkills[SPECIALSKILL_LIFELEECHCHANCE] = chance; }
+
+	void setMaxHitPoints(int32_t max) { this->abilities->stats[STAT_MAXHITPOINTS] = max; }
+	void setMaxHitPointsPercent(int32_t percent) { this->abilities->statsPercent[STAT_MAXHITPOINTS] = percent; }
+	void setMaxManaPoints(int32_t max) { this->abilities->stats[STAT_MAXMANAPOINTS] = max; }
+	void setMaxManaPointsPercent(int32_t percent) { this->abilities->statsPercent[STAT_MAXMANAPOINTS] = percent; }
+	void setMagicPoints(int32_t max) { this->abilities->stats[STAT_MAGICPOINTS] = max; }
+	void setMagicPointsPercent(int32_t percent) { this->abilities->statsPercent[STAT_MAGICPOINTS] = percent; }
 };
 
 #endif

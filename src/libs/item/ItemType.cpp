@@ -109,47 +109,87 @@ ItemType* ItemType::loadFromXMLNode(pugi::xml_node node, bool reloading)
 			} else if (lowerCasedKey == "slottype") {
 				iType->setSlotType(value);
 			} else if (lowerCasedKey == "ammotype") {
+				iType->setAmmoType(value);
 			} else if (lowerCasedKey == "shoottype") {
+				iType->setShootType(value);
 			} else if (lowerCasedKey == "effect") {
+				iType->setMagicEffect(value);
 			} else if (lowerCasedKey == "range") {
+				iType->shootRange = pugi::cast<uint16_t>(value.c_str());
 			} else if (lowerCasedKey == "stopduration") {
+				iType->stopTime = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "decayto") {
+				iType->decayTo = pugi::cast<uint32_t>(value.c_str());
 			} else if (lowerCasedKey == "transformequipto") {
+				iType->transformEquipTo = pugi::cast<uint16_t>(value.c_str());
 			} else if (lowerCasedKey == "transformdeequipto") {
+				iType->transformDeEquipTo = pugi::cast<uint16_t>(value.c_str());
 			} else if (lowerCasedKey == "duration") {
+				iType->decayTime = pugi::cast<uint32_t>(value.c_str());
 			} else if (lowerCasedKey == "showduration") {
+				iType->showDuration = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "charges") {
+				iType->charges = pugi::cast<uint32_t>(value.c_str());
 			} else if (lowerCasedKey == "showcharges") {
+				iType->showCharges = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "showattributes") {
+				iType->showAttributes = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "hitchance") {
+				iType->setHitChance(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "maxhitchance") {
+				iType->setMaxHitChance(pugi::cast<uint32_t>(value.c_str()));
 			} else if (lowerCasedKey == "invisible") {
+				iType->abilities->invisible = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "speed") {
+				iType->abilities->speed = pugi::cast<int32_t>(value.c_str());
 			} else if (lowerCasedKey == "healthgain") {
+				iType->setHealthGain(pugi::cast<uint32_t>(value.c_str()));
 			} else if (lowerCasedKey == "healthticks") {
+				iType->setHealthTicks(pugi::cast<uint32_t>(value.c_str()));
 			} else if (lowerCasedKey == "managain") {
+				iType->setManaGain(pugi::cast<uint32_t>(value.c_str()));
 			} else if (lowerCasedKey == "manaticks") {
+				iType->setManaTicks(pugi::cast<uint32_t>(value.c_str()));
 			} else if (lowerCasedKey == "manashield") {
+				iType->abilities->manaShield = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "skillsword") {
+				iType->setSwordSkill(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "skillaxe") {
+				iType->setAxeSkill(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "skillclub") {
+				iType->setClubSkill(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "skilldist") {
+				iType->setDistSkill(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "skillfish") {
+				iType->setFishSkill(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "skillshield") {
+				iType->setShieldSkill(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "skillfist") {
+				iType->setFistSkill(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "maxhitpoints") {
+				iType->setMaxHitPoints(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "maxhitpointspercent") {
+				iType->setMaxHitPointsPercent(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "maxmanapoints") {
+				iType->setMaxManaPoints(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "maxmanapointspercent") {
-			} else if (lowerCasedKey == "magicpoints") {
-			} else if (lowerCasedKey == "magiclevelpoints") {
+				iType->setMaxManaPointsPercent(pugi::cast<int32_t>(value.c_str()));
+			} else if (lowerCasedKey == "magicpoints" || lowerCasedKey == "magiclevelpoints") {
+				iType->setMagicPoints(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "magicpointspercent") {
+				iType->setMagicPointsPercent(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "criticalhitchance") {
+				iType->setCriticalHitChance(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "criticalhitamount") {
+				iType->setCriticalHitAmount(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "lifeleechchance") {
+				iType->setLifeLeechChance(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "lifeleechamount") {
+				iType->setLifeLeechAmount(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "manaleechchance") {
+				iType->setManaLeechChance(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "manaleechamount") {
+				iType->setManaLeechAmount(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "fieldabsorbpercentenergy") {
 			} else if (lowerCasedKey == "fieldabsorbpercentfire") {
 			} else if (lowerCasedKey == "fieldabsorbpercentpoison") {

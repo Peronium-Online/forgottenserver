@@ -7,7 +7,6 @@
 using MagicEffectNames = std::unordered_map<std::string, MagicEffectClasses>;
 using ShootTypeNames = std::unordered_map<std::string, ShootType_t>;
 using CombatTypeNames = std::unordered_map<CombatType_t, std::string, std::hash<int32_t>>;
-using AmmoTypeNames = std::unordered_map<std::string, Ammo_t>;
 using WeaponActionNames = std::unordered_map<std::string, WeaponAction_t>;
 using SkullNames = std::unordered_map<std::string, Skulls_t>;
 
@@ -216,46 +215,6 @@ CombatTypeNames combatTypeNames = {
     {COMBAT_ICEDAMAGE, "ice"},           {COMBAT_HOLYDAMAGE, "holy"},           {COMBAT_DEATHDAMAGE, "death"},
 };
 
-AmmoTypeNames ammoTypeNames = {
-    {"spear", AMMO_SPEAR},
-    {"bolt", AMMO_BOLT},
-    {"arrow", AMMO_ARROW},
-    {"poisonarrow", AMMO_ARROW},
-    {"burstarrow", AMMO_ARROW},
-    {"throwingstar", AMMO_THROWINGSTAR},
-    {"throwingknife", AMMO_THROWINGKNIFE},
-    {"smallstone", AMMO_STONE},
-    {"largerock", AMMO_STONE},
-    {"snowball", AMMO_SNOWBALL},
-    {"powerbolt", AMMO_BOLT},
-    {"infernalbolt", AMMO_BOLT},
-    {"huntingspear", AMMO_SPEAR},
-    {"enchantedspear", AMMO_SPEAR},
-    {"royalspear", AMMO_SPEAR},
-    {"sniperarrow", AMMO_ARROW},
-    {"onyxarrow", AMMO_ARROW},
-    {"piercingbolt", AMMO_BOLT},
-    {"etherealspear", AMMO_SPEAR},
-    {"flasharrow", AMMO_ARROW},
-    {"flammingarrow", AMMO_ARROW},
-    {"shiverarrow", AMMO_ARROW},
-    {"eartharrow", AMMO_ARROW},
-    {"tarsalarrow", AMMO_ARROW},
-    {"vortexbolt", AMMO_BOLT},
-    {"prismaticbolt", AMMO_BOLT},
-    {"crystallinearrow", AMMO_ARROW},
-    {"drillbolt", AMMO_BOLT},
-    {"envenomedarrow", AMMO_ARROW},
-    {"gloothspear", AMMO_SPEAR},
-    {"simplearrow", AMMO_ARROW},
-    {"redstar", AMMO_THROWINGSTAR},
-    {"greenstar", AMMO_THROWINGSTAR},
-    {"leafstar", AMMO_THROWINGSTAR},
-    {"diamondarrow", AMMO_ARROW},
-    {"spectralbolt", AMMO_BOLT},
-    {"royalstar", AMMO_THROWINGSTAR},
-};
-
 WeaponActionNames weaponActionNames = {
     {"move", WEAPONACTION_MOVE},
     {"removecharge", WEAPONACTION_REMOVECHARGE},
@@ -306,15 +265,6 @@ std::string getCombatName(CombatType_t combatType)
 		return combatName->second;
 	}
 	return "unknown";
-}
-
-Ammo_t getAmmoType(const std::string& strValue)
-{
-	auto ammoType = ammoTypeNames.find(strValue);
-	if (ammoType != ammoTypeNames.end()) {
-		return ammoType->second;
-	}
-	return AMMO_NONE;
 }
 
 WeaponAction_t getWeaponAction(const std::string& strValue)
@@ -429,86 +379,6 @@ size_t combatTypeToIndex(CombatType_t combatType)
 }
 
 CombatType_t indexToCombatType(size_t v) { return static_cast<CombatType_t>(1 << v); }
-
-uint8_t serverFluidToClient(uint8_t serverFluid)
-{
-	uint8_t size = sizeof(clientToServerFluidMap) / sizeof(uint8_t);
-	for (uint8_t i = 0; i < size; ++i) {
-		if (clientToServerFluidMap[i] == serverFluid) {
-			return i;
-		}
-	}
-	return 0;
-}
-
-uint8_t clientFluidToServer(uint8_t clientFluid)
-{
-	uint8_t size = sizeof(clientToServerFluidMap) / sizeof(uint8_t);
-	if (clientFluid >= size) {
-		return 0;
-	}
-	return clientToServerFluidMap[clientFluid];
-}
-
-itemAttrTypes stringToItemAttribute(const std::string& str)
-{
-	if (str == "aid") {
-		return ITEM_ATTRIBUTE_ACTIONID;
-	} else if (str == "uid") {
-		return ITEM_ATTRIBUTE_UNIQUEID;
-	} else if (str == "description") {
-		return ITEM_ATTRIBUTE_DESCRIPTION;
-	} else if (str == "text") {
-		return ITEM_ATTRIBUTE_TEXT;
-	} else if (str == "date") {
-		return ITEM_ATTRIBUTE_DATE;
-	} else if (str == "writer") {
-		return ITEM_ATTRIBUTE_WRITER;
-	} else if (str == "name") {
-		return ITEM_ATTRIBUTE_NAME;
-	} else if (str == "article") {
-		return ITEM_ATTRIBUTE_ARTICLE;
-	} else if (str == "pluralname") {
-		return ITEM_ATTRIBUTE_PLURALNAME;
-	} else if (str == "weight") {
-		return ITEM_ATTRIBUTE_WEIGHT;
-	} else if (str == "attack") {
-		return ITEM_ATTRIBUTE_ATTACK;
-	} else if (str == "defense") {
-		return ITEM_ATTRIBUTE_DEFENSE;
-	} else if (str == "extradefense") {
-		return ITEM_ATTRIBUTE_EXTRADEFENSE;
-	} else if (str == "armor") {
-		return ITEM_ATTRIBUTE_ARMOR;
-	} else if (str == "hitchance") {
-		return ITEM_ATTRIBUTE_HITCHANCE;
-	} else if (str == "shootrange") {
-		return ITEM_ATTRIBUTE_SHOOTRANGE;
-	} else if (str == "owner") {
-		return ITEM_ATTRIBUTE_OWNER;
-	} else if (str == "duration") {
-		return ITEM_ATTRIBUTE_DURATION;
-	} else if (str == "decaystate") {
-		return ITEM_ATTRIBUTE_DECAYSTATE;
-	} else if (str == "corpseowner") {
-		return ITEM_ATTRIBUTE_CORPSEOWNER;
-	} else if (str == "charges") {
-		return ITEM_ATTRIBUTE_CHARGES;
-	} else if (str == "fluidtype") {
-		return ITEM_ATTRIBUTE_FLUIDTYPE;
-	} else if (str == "doorid") {
-		return ITEM_ATTRIBUTE_DOORID;
-	} else if (str == "decayto") {
-		return ITEM_ATTRIBUTE_DECAYTO;
-	} else if (str == "wrapid") {
-		return ITEM_ATTRIBUTE_WRAPID;
-	} else if (str == "storeitem") {
-		return ITEM_ATTRIBUTE_STOREITEM;
-	} else if (str == "attackspeed") {
-		return ITEM_ATTRIBUTE_ATTACK_SPEED;
-	}
-	return ITEM_ATTRIBUTE_NONE;
-}
 
 SpellGroup_t stringToSpellGroup(const std::string& value)
 {

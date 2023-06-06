@@ -220,7 +220,7 @@ Dictionary<RaceType_t>* RaceTypesMap = new Dictionary<RaceType_t>(
         {"ink", RACE_INK},
     },
     RACE_NONE);
-Dictionary<WeaponType_t>* WeaponTypesMap = new Dictionary<WeaponType_t>(
+Dictionary<WeaponTypes>* WeaponTypesMap = new Dictionary<WeaponTypes>(
     {
         {"sword", WEAPON_SWORD},
         {"club", WEAPON_CLUB},
@@ -232,7 +232,7 @@ Dictionary<WeaponType_t>* WeaponTypesMap = new Dictionary<WeaponType_t>(
         {"quiver", WEAPON_QUIVER},
     },
     WEAPON_NONE);
-Dictionary<FluidTypes_t>* FluidTypesMap = new Dictionary<FluidTypes_t>(
+Dictionary<FluidTypes>* FluidTypesMap = new Dictionary<FluidTypes>(
     {
         {"water", FLUID_WATER},
         {"blood", FLUID_BLOOD},
@@ -256,3 +256,42 @@ Dictionary<FluidTypes_t>* FluidTypesMap = new Dictionary<FluidTypes_t>(
         {"ink", FLUID_INK},
     },
     FLUID_NONE);
+
+Dictionary<AmmoTypes>* AmmoTypesMap = new Dictionary<AmmoTypes>({{"spear", AMMO_SPEAR},
+                                                                 {"bolt", AMMO_BOLT},
+                                                                 {"arrow", AMMO_ARROW},
+                                                                 {"poisonarrow", AMMO_ARROW},
+                                                                 {"burstarrow", AMMO_ARROW},
+                                                                 {"throwingstar", AMMO_THROWINGSTAR},
+                                                                 {"throwingknife", AMMO_THROWINGKNIFE},
+                                                                 {"smallstone", AMMO_STONE},
+                                                                 {"largerock", AMMO_STONE},
+                                                                 {"snowball", AMMO_SNOWBALL},
+                                                                 {"powerbolt", AMMO_BOLT},
+                                                                 {"infernalbolt", AMMO_BOLT},
+                                                                 {"huntingspear", AMMO_SPEAR},
+                                                                 {"enchantedspear", AMMO_SPEAR},
+                                                                 {"royalspear", AMMO_SPEAR},
+                                                                 {"sniperarrow", AMMO_ARROW},
+                                                                 {"onyxarrow", AMMO_ARROW},
+                                                                 {"piercingbolt", AMMO_BOLT},
+                                                                 {"etherealspear", AMMO_SPEAR},
+                                                                 {"flasharrow", AMMO_ARROW},
+                                                                 {"flammingarrow", AMMO_ARROW},
+                                                                 {"shiverarrow", AMMO_ARROW},
+                                                                 {"eartharrow", AMMO_ARROW},
+                                                                 {"tarsalarrow", AMMO_ARROW},
+                                                                 {"vortexbolt", AMMO_BOLT},
+                                                                 {"prismaticbolt", AMMO_BOLT},
+                                                                 {"crystallinearrow", AMMO_ARROW},
+                                                                 {"drillbolt", AMMO_BOLT},
+                                                                 {"envenomedarrow", AMMO_ARROW},
+                                                                 {"gloothspear", AMMO_SPEAR},
+                                                                 {"simplearrow", AMMO_ARROW},
+                                                                 {"redstar", AMMO_THROWINGSTAR},
+                                                                 {"greenstar", AMMO_THROWINGSTAR},
+                                                                 {"leafstar", AMMO_THROWINGSTAR},
+                                                                 {"diamondarrow", AMMO_ARROW},
+                                                                 {"spectralbolt", AMMO_BOLT},
+                                                                 {"royalstar", AMMO_THROWINGSTAR}},
+                                                                AMMO_NONE);
