@@ -642,6 +642,132 @@ public:
 	{
 		this->abilities->reflect[combatTypeToIndex(COMBAT_HEALING)].chance += chance;
 	}
+
+	void setBoostPercent(int16_t boost)
+	{
+		for (auto& i : this->abilities->boostPercent) {
+			i += boost;
+		}
+	}
+	void setBoostPercentElements(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_ENERGYDAMAGE)] += boost;
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_FIREDAMAGE)] += boost;
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_EARTHDAMAGE)] += boost;
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_ICEDAMAGE)] += boost;
+	}
+	void setBoostPercentMagic(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_ENERGYDAMAGE)] += boost;
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_FIREDAMAGE)] += boost;
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_EARTHDAMAGE)] += boost;
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_ICEDAMAGE)] += boost;
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_HOLYDAMAGE)] += boost;
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_DEATHDAMAGE)] += boost;
+	}
+	void setBoostPercentEnergy(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_ENERGYDAMAGE)] += boost;
+	}
+	void setBoostPercentFire(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_FIREDAMAGE)] += boost;
+	}
+	void setBoostPercentPhysical(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_PHYSICALDAMAGE)] += boost;
+	}
+	void setBoostPercentEarth(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_EARTHDAMAGE)] += boost;
+	}
+	void setBoostPercentIce(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_ICEDAMAGE)] += boost;
+	}
+	void setBoostPercentHoly(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_HOLYDAMAGE)] += boost;
+	}
+	void setBoostPercentDeath(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_DEATHDAMAGE)] += boost;
+	}
+	void setBoostPercentLifeDrain(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_LIFEDRAIN)] += boost;
+	}
+	void setBoostPercentManaDrain(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_MANADRAIN)] += boost;
+	}
+	void setBoostPercentDrown(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_DROWNDAMAGE)] += boost;
+	}
+	void setBoostPercentHealing(int16_t boost)
+	{
+		this->abilities->boostPercent[combatTypeToIndex(COMBAT_HEALING)] += boost;
+	}
+
+	void setMagicLevelEnergy(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_ENERGYDAMAGE)] += value;
+	}
+	void setMagicLevelFire(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_FIREDAMAGE)] += value;
+	}
+	void setMagicLevelPhysical(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_PHYSICALDAMAGE)] += value;
+	}
+	void setMagicLevelEarth(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_EARTHDAMAGE)] += value;
+	}
+	void setMagicLevelIce(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_ICEDAMAGE)] += value;
+	}
+	void setMagicLevelHoly(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_HOLYDAMAGE)] += value;
+	}
+	void setMagicLevelDeath(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_DEATHDAMAGE)] += value;
+	}
+	void setMagicLevelLifeDrain(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_LIFEDRAIN)] += value;
+	}
+	void setMagicLevelManaDrain(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_MANADRAIN)] += value;
+	}
+	void setMagicLevelDrown(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_DROWNDAMAGE)] += value;
+	}
+	void setMagicLevelHealing(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_HEALING)] += value;
+	}
+	void setMagicLevelUndefined(int16_t value)
+	{
+		this->abilities->specialMagicLevelSkill[combatTypeToIndex(COMBAT_UNDEFINEDDAMAGE)] += value;
+	}
+
+	void setSuppressDrunk() { this->abilities->conditionSuppressions |= CONDITION_DRUNK; }
+	void setSuppressEnergy() { this->abilities->conditionSuppressions |= CONDITION_ENERGY; }
+	void setSuppressFire() { this->abilities->conditionSuppressions |= CONDITION_FIRE; }
+	void setSuppressPoison() { this->abilities->conditionSuppressions |= CONDITION_POISON; }
+	void setSuppressDrown() { this->abilities->conditionSuppressions |= CONDITION_DROWN; }
+	void setSuppressBleeding() { this->abilities->conditionSuppressions |= CONDITION_BLEEDING; }
+	void setSuppressFreezing() { this->abilities->conditionSuppressions |= CONDITION_FREEZING; }
+	void setSuppressDazzle() { this->abilities->conditionSuppressions |= CONDITION_DAZZLED; }
+	void setSuppressCurse() { this->abilities->conditionSuppressions |= CONDITION_CURSED; }
 };
 
 #endif
