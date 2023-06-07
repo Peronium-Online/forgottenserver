@@ -191,58 +191,97 @@ ItemType* ItemType::loadFromXMLNode(pugi::xml_node node, bool reloading)
 			} else if (lowerCasedKey == "manaleechamount") {
 				iType->setManaLeechAmount(pugi::cast<int32_t>(value.c_str()));
 			} else if (lowerCasedKey == "fieldabsorbpercentenergy") {
+				iType->setFieldAbsorbPercentEnergy(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "fieldabsorbpercentfire") {
-			} else if (lowerCasedKey == "fieldabsorbpercentpoison") {
-			} else if (lowerCasedKey == "fieldabsorbpercentearth") {
+				iType->setFieldAbsorbPercentFire(pugi::cast<int16_t>(value.c_str()));
+			} else if (lowerCasedKey == "fieldabsorbpercentpoison" || lowerCasedKey == "fieldabsorbpercentearth") {
+				iType->setFieldAbsorbPercentEarth(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentall") {
-			} else if (lowerCasedKey == "absorbpercentallelements") {
-			} else if (lowerCasedKey == "absorbpercentelements") {
+				iType->setAbsorbPercent(pugi::cast<int16_t>(value.c_str()));
+			} else if (lowerCasedKey == "absorbpercentallelements" || lowerCasedKey == "absorbpercentelements") {
+				iType->setAbsorbPercentElements(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentmagic") {
+				iType->setAbsorbPercentMagic(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentenergy") {
+				iType->setAbsorbPercentEnergy(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentfire") {
-			} else if (lowerCasedKey == "absorbpercentpoison") {
-			} else if (lowerCasedKey == "absorbpercentearth") {
+				iType->setAbsorbPercentFire(pugi::cast<int16_t>(value.c_str()));
+			} else if (lowerCasedKey == "absorbpercentpoison" || lowerCasedKey == "absorbpercentearth") {
+				iType->setAbsorbPercentEarth(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentice") {
+				iType->setAbsorbPercentIce(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentholy") {
+				iType->setAbsorbPercentHoly(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentdeath") {
+				iType->setAbsorbPercentDeath(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentlifedrain") {
+				iType->setAbsorbPercentLifeDrain(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentmanadrain") {
+				iType->setAbsorbPercentManaDrain(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentdrown") {
+				iType->setAbsorbPercentDrown(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentphysical") {
+				iType->setAbsorbPercentPhysical(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercenthealing") {
+				iType->setAbsorbPercentHealing(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "absorbpercentundefined") {
-			} else if (lowerCasedKey == "reflectpercentall") {
-			} else if (lowerCasedKey == "reflectpercentallelements") {
+				iType->setAbsorbPercentUndefined(pugi::cast<int16_t>(value.c_str()));
+			} else if (lowerCasedKey == "reflectpercentall" || lowerCasedKey == "reflectpercentallelements") {
+				iType->setReflectPercent(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentelements") {
+				iType->setReflectPercentElements(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentmagic") {
+				iType->setReflectPercentMagic(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentenergy") {
+				iType->setReflectPercentEnergy(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentfire") {
-			} else if (lowerCasedKey == "reflectpercentpoison") {
-			} else if (lowerCasedKey == "reflectpercentearth") {
+				iType->setReflectPercentFire(pugi::cast<int16_t>(value.c_str()));
+			} else if (lowerCasedKey == "reflectpercentpoison" || lowerCasedKey == "reflectpercentearth") {
+				iType->setReflectPercentEarth(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentice") {
+				iType->setReflectPercentIce(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentholy") {
+				iType->setReflectPercentHoly(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentdeath") {
+				iType->setReflectPercentDeath(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentlifedrain") {
+				iType->setReflectPercentLifeDrain(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentmanadrain") {
+				iType->setReflectPercentManaDrain(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentdrown") {
+				iType->setReflectPercentDrown(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercentphysical") {
+				iType->setReflectPercentPhysical(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectpercenthealing") {
-			} else if (lowerCasedKey == "reflectchanceall") {
-			} else if (lowerCasedKey == "reflectchanceallelements") {
+				iType->setReflectPercentHealing(pugi::cast<int16_t>(value.c_str()));
+			} else if (lowerCasedKey == "reflectchanceall" || lowerCasedKey == "reflectchanceallelements") {
+				iType->setReflectChance(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchanceelements") {
+				iType->setReflectChanceElements(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchancemagic") {
+				iType->setReflectChanceMagic(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchanceenergy") {
+				iType->setReflectChanceEnergy(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchancefire") {
-			} else if (lowerCasedKey == "reflectchancepoison") {
-			} else if (lowerCasedKey == "reflectchanceearth") {
+				iType->setReflectChanceFire(pugi::cast<int16_t>(value.c_str()));
+			} else if (lowerCasedKey == "reflectchancepoison" || lowerCasedKey == "reflectchanceearth") {
+				iType->setReflectChanceEarth(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchanceice") {
+				iType->setReflectChanceIce(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchanceholy") {
+				iType->setReflectChanceHoly(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchancedeath") {
+				iType->setReflectChanceDeath(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchancelifedrain") {
+				iType->setReflectChanceLifeDrain(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchancemanadrain") {
+				iType->setReflectChanceManaDrain(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchancedrown") {
+				iType->setReflectChanceDrown(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchancephysical") {
+				iType->setReflectChancePhysical(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "reflectchancehealing") {
+				iType->setReflectChanceHealing(pugi::cast<int16_t>(value.c_str()));
 			} else if (lowerCasedKey == "boostpercentall") {
 			} else if (lowerCasedKey == "boostpercentallelements") {
 			} else if (lowerCasedKey == "boostpercentelements") {

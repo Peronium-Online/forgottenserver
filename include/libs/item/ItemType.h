@@ -424,6 +424,224 @@ public:
 	void setMaxManaPointsPercent(int32_t percent) { this->abilities->statsPercent[STAT_MAXMANAPOINTS] = percent; }
 	void setMagicPoints(int32_t max) { this->abilities->stats[STAT_MAGICPOINTS] = max; }
 	void setMagicPointsPercent(int32_t percent) { this->abilities->statsPercent[STAT_MAGICPOINTS] = percent; }
+
+	void setFieldAbsorbPercentEnergy(int16_t percent)
+	{
+		this->abilities->fieldAbsorbPercent[combatTypeToIndex(COMBAT_ENERGYDAMAGE)] += percent;
+	}
+	void setFieldAbsorbPercentFire(int16_t percent)
+	{
+		this->abilities->fieldAbsorbPercent[combatTypeToIndex(COMBAT_FIREDAMAGE)] += percent;
+	}
+	void setFieldAbsorbPercentEarth(int16_t percent)
+	{
+		this->abilities->fieldAbsorbPercent[combatTypeToIndex(COMBAT_EARTHDAMAGE)] += percent;
+	}
+
+	void setAbsorbPercent(int16_t percent)
+	{
+		for (auto& i : this->abilities->absorbPercent) {
+			i += percent;
+		}
+	}
+	void setAbsorbPercentElements(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_ENERGYDAMAGE)] += percent;
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_FIREDAMAGE)] += percent;
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_EARTHDAMAGE)] += percent;
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_ICEDAMAGE)] += percent;
+	}
+	void setAbsorbPercentMagic(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_ENERGYDAMAGE)] += percent;
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_FIREDAMAGE)] += percent;
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_EARTHDAMAGE)] += percent;
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_ICEDAMAGE)] += percent;
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_HOLYDAMAGE)] += percent;
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_DEATHDAMAGE)] += percent;
+	}
+	void setAbsorbPercentEnergy(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_ENERGYDAMAGE)] += percent;
+	}
+	void setAbsorbPercentFire(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_FIREDAMAGE)] += percent;
+	}
+	void setAbsorbPercentPhysical(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_PHYSICALDAMAGE)] += percent;
+	}
+	void setAbsorbPercentEarth(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_EARTHDAMAGE)] += percent;
+	}
+	void setAbsorbPercentIce(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_ICEDAMAGE)] += percent;
+	}
+	void setAbsorbPercentHoly(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_HOLYDAMAGE)] += percent;
+	}
+	void setAbsorbPercentDeath(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_DEATHDAMAGE)] += percent;
+	}
+	void setAbsorbPercentLifeDrain(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_LIFEDRAIN)] += percent;
+	}
+	void setAbsorbPercentManaDrain(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_MANADRAIN)] += percent;
+	}
+	void setAbsorbPercentDrown(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_DROWNDAMAGE)] += percent;
+	}
+	void setAbsorbPercentHealing(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_HEALING)] += percent;
+	}
+	void setAbsorbPercentUndefined(int16_t percent)
+	{
+		this->abilities->absorbPercent[combatTypeToIndex(COMBAT_UNDEFINEDDAMAGE)] += percent;
+	}
+
+	void setReflectPercent(int16_t percent)
+	{
+		for (auto& i : this->abilities->reflect) {
+			i.percent += percent;
+		}
+	}
+	void setReflectPercentElements(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ENERGYDAMAGE)].percent += percent;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_FIREDAMAGE)].percent += percent;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_EARTHDAMAGE)].percent += percent;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ICEDAMAGE)].percent += percent;
+	}
+	void setReflectPercentMagic(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ENERGYDAMAGE)].percent += percent;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_FIREDAMAGE)].percent += percent;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_EARTHDAMAGE)].percent += percent;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ICEDAMAGE)].percent += percent;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_HOLYDAMAGE)].percent += percent;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_DEATHDAMAGE)].percent += percent;
+	}
+	void setReflectPercentEnergy(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ENERGYDAMAGE)].percent += percent;
+	}
+	void setReflectPercentFire(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_FIREDAMAGE)].percent += percent;
+	}
+	void setReflectPercentPhysical(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_PHYSICALDAMAGE)].percent += percent;
+	}
+	void setReflectPercentEarth(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_EARTHDAMAGE)].percent += percent;
+	}
+	void setReflectPercentIce(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ICEDAMAGE)].percent += percent;
+	}
+	void setReflectPercentHoly(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_HOLYDAMAGE)].percent += percent;
+	}
+	void setReflectPercentDeath(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_DEATHDAMAGE)].percent += percent;
+	}
+	void setReflectPercentLifeDrain(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_LIFEDRAIN)].percent += percent;
+	}
+	void setReflectPercentManaDrain(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_MANADRAIN)].percent += percent;
+	}
+	void setReflectPercentDrown(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_DROWNDAMAGE)].percent += percent;
+	}
+	void setReflectPercentHealing(int16_t percent)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_HEALING)].percent += percent;
+	}
+
+	void setReflectChance(int16_t chance)
+	{
+		for (auto& i : this->abilities->reflect) {
+			i.chance += chance;
+		}
+	}
+	void setReflectChanceElements(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ENERGYDAMAGE)].chance += chance;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_FIREDAMAGE)].chance += chance;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_EARTHDAMAGE)].chance += chance;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ICEDAMAGE)].chance += chance;
+	}
+	void setReflectChanceMagic(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ENERGYDAMAGE)].chance += chance;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_FIREDAMAGE)].chance += chance;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_EARTHDAMAGE)].chance += chance;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ICEDAMAGE)].chance += chance;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_HOLYDAMAGE)].chance += chance;
+		this->abilities->reflect[combatTypeToIndex(COMBAT_DEATHDAMAGE)].chance += chance;
+	}
+	void setReflectChanceEnergy(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ENERGYDAMAGE)].chance += chance;
+	}
+	void setReflectChanceFire(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_FIREDAMAGE)].chance += chance;
+	}
+	void setReflectChancePhysical(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_PHYSICALDAMAGE)].chance += chance;
+	}
+	void setReflectChanceEarth(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_EARTHDAMAGE)].chance += chance;
+	}
+	void setReflectChanceIce(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_ICEDAMAGE)].chance += chance;
+	}
+	void setReflectChanceHoly(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_HOLYDAMAGE)].chance += chance;
+	}
+	void setReflectChanceDeath(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_DEATHDAMAGE)].chance += chance;
+	}
+	void setReflectChanceLifeDrain(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_LIFEDRAIN)].chance += chance;
+	}
+	void setReflectChanceManaDrain(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_MANADRAIN)].chance += chance;
+	}
+	void setReflectChanceDrown(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_DROWNDAMAGE)].chance += chance;
+	}
+	void setReflectChanceHealing(int16_t chance)
+	{
+		this->abilities->reflect[combatTypeToIndex(COMBAT_HEALING)].chance += chance;
+	}
 };
 
 #endif
