@@ -6,7 +6,10 @@
 #include "libs/util/otb/OTBLoadable.h"
 #include "libs/util/xml/XMLLoadable.h"
 
+#include <map>
+
 using NameMap = std::unordered_map<std::string, uint16_t>;
+using CurrencyMap = std::map<uint64_t, uint16_t, std::greater<uint64_t>>;
 
 constexpr auto OTBI = OTBIdentifier{{'O', 'T', 'B', 'I'}};
 
@@ -25,6 +28,7 @@ private:
 	std::vector<ItemType> items;
 	ClientIdToServerIdMap clientIdToServerIdMap;
 	NameMap nameToItems;
+	CurrencyMap currencyItems;
 
 	void addItem(ItemType& item)
 	{
@@ -62,6 +66,10 @@ public:
 		}
 		return &items.front();
 	}
+
+	bool hasCurrencyItemOf(uint64_t amount) { return currencyItems.find(amount) != currencyItems.end(); }
+
+	void addCurrencyItem(uint64_t amount, uint16_t id) { currencyItems.insert(CurrencyMap::value_type(amount, id)); }
 };
 
 #endif

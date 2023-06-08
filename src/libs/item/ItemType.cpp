@@ -2,6 +2,7 @@
 
 #include "libs/item/Items.h"
 #include "libs/item/itemmaps.h"
+#include "libs/util/tools/direction.h"
 #include "libs/util/tools/pugicast.h"
 
 ItemType* ItemType::loadFromXMLNode(pugi::xml_node node, bool reloading)
@@ -371,30 +372,158 @@ ItemType* ItemType::loadFromXMLNode(pugi::xml_node node, bool reloading)
 					iType->setSuppressCurse();
 				}
 			} else if (lowerCasedKey == "field") {
+				auto cd = (new ConditionDamageBuilder())->loadFromXMLNode(attributeNode, false);
+				iType->setField(value, cd);
 			} else if (lowerCasedKey == "replaceable") {
+				iType->replaceable = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "partnerdirection") {
+				iType->bedPartnerDir = getDirection(value);
 			} else if (lowerCasedKey == "leveldoor") {
-			} else if (lowerCasedKey == "maletransformto") {
-			} else if (lowerCasedKey == "malesleeper") {
-			} else if (lowerCasedKey == "femaletransformto") {
-			} else if (lowerCasedKey == "femalesleeper") {
+				iType->levelDoor = pugi::cast<uint32_t>(value.c_str());
+			} else if (lowerCasedKey == "maletransformto" || lowerCasedKey == "malesleeper") {
+				iType->setMaleTransformTo(pugi::cast<uint16_t>(value.c_str()));
+			} else if (lowerCasedKey == "femaletransformto" || lowerCasedKey == "femalesleeper") {
+				iType->setFemaleTransformTo(pugi::cast<uint16_t>(value.c_str()));
 			} else if (lowerCasedKey == "transformto") {
+				iType->transformToFree = pugi::cast<uint16_t>(value.c_str());
 			} else if (lowerCasedKey == "destroyto") {
+				iType->destroyTo = pugi::cast<uint16_t>(value.c_str());
 			} else if (lowerCasedKey == "elementice") {
+				iType->setIceElementDamage(pugi::cast<uint16_t>(value.c_str()));
 			} else if (lowerCasedKey == "elementearth") {
+				iType->setEarthElementDamage(pugi::cast<uint16_t>(value.c_str()));
 			} else if (lowerCasedKey == "elementfire") {
+				iType->setFireElementDamage(pugi::cast<uint16_t>(value.c_str()));
 			} else if (lowerCasedKey == "elementenergy") {
+				iType->setEnergyElementDamage(pugi::cast<uint16_t>(value.c_str()));
 			} else if (lowerCasedKey == "elementdeath") {
+				iType->setDeathElementDamage(pugi::cast<uint16_t>(value.c_str()));
 			} else if (lowerCasedKey == "elementholy") {
+				iType->setHolyElementDamage(pugi::cast<uint16_t>(value.c_str()));
 			} else if (lowerCasedKey == "walkstack") {
+				iType->walkStack = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "blocking") {
+				iType->blockSolid = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "allowdistread") {
+				iType->allowDistRead = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "storeitem") {
+				iType->storeItem = pugi::cast<bool>(value.c_str());
 			} else if (lowerCasedKey == "worth") {
+				iType->setWorth(pugi::cast<uint64_t>(value.c_str()));
 			} else if (lowerCasedKey == "supply") {
+				iType->supply = pugi::cast<bool>(value.c_str());
 			}
 
 			return Items::getInstance().getItemType(fromId);
 		}
+	}
+}
+
+void ItemType::setField(const std::string& element, ConditionDamage* cd)
+{
+	this->group = ITEM_GROUP_MAGICFIELD;
+	this->type = ITEM_TYPE_MAGICFIELD;
+
+	if (element == "fire") {
+		this->combatType = COMBAT_FIREDAMAGE;
+	} else if (element == "energy") {
+		this->combatType = COMBAT_ENERGYDAMAGE;
+	} else if (element == "poison") {
+		this->combatType = COMBAT_EARTHDAMAGE;
+	} else if (element == "drown") {
+		this->combatType = COMBAT_DROWNDAMAGE;
+	} else if (element == "physical") {
+		this->combatType = COMBAT_PHYSICALDAMAGE;
+	} else {
+		this->combatType = COMBAT_NONE;
+		std::cout << "[Warning - ItemType::setField] Unknown field value: " << element << std::endl;
+	}
+
+	this->conditionDamage.reset(cd);
+}
+
+void ItemType::setMaleTransformTo(uint16_t id)
+{
+	this->transformToOnUse[PLAYERSEX_MALE] = id;
+	ItemType* other = Items::getInstance().getItemType(id);
+	if (other->transformToFree == 0) {
+		other->transformToFree = this->id;
+	}
+
+	if (this->transformToOnUse[PLAYERSEX_FEMALE] == 0) {
+		this->transformToOnUse[PLAYERSEX_FEMALE] = id;
+	}
+}
+
+void ItemType::setFemaleTransformTo(uint16_t id)
+{
+	this->transformToOnUse[PLAYERSEX_FEMALE] = id;
+	ItemType* other = Items::getInstance().getItemType(id);
+	if (other->transformToFree == 0) {
+		other->transformToFree = this->id;
+	}
+
+	if (this->transformToOnUse[PLAYERSEX_MALE] == 0) {
+		this->transformToOnUse[PLAYERSEX_MALE] = id;
+	}
+}
+
+ConditionDamage* ConditionDamageBuilder::loadFromXMLNode(pugi::xml_node node, bool)
+{
+	CombatType_t combatType = COMBAT_NONE;
+
+	auto element = node.attribute("value").as_string();
+	if (element == "fire") {
+		this->conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_FIRE);
+	} else if (element == "energy") {
+		this->conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_ENERGY);
+	} else if (element == "poison") {
+		this->conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_POISON);
+	} else if (element == "drown") {
+		this->conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_DROWN);
+	} else if (element == "physical") {
+		this->conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_BLEEDING);
+	} else {
+		std::cout << "[Warning - ConditionDamageBuilder::loadFromXMLNode] Unknown field value: " << element
+		          << std::endl;
+		return nullptr;
+	}
+
+	int32_t initDamage = -1;
+	int32_t damage = 0;
+	for (auto child : node.children()) {
+		pugi::xml_attribute keyAttribute = child.attribute("key");
+		if (!keyAttribute) {
+			continue;
+		}
+
+		pugi::xml_attribute valueAttribute = child.attribute("value");
+		if (!valueAttribute) {
+			continue;
+		}
+
+		auto key = boost::algorithm::to_lower_copy<std::string>(keyAttribute.as_string());
+		auto value = boost::algorithm::to_lower_copy<std::string>(valueAttribute.as_string());
+		if (key == "initdamage") {
+			initDamage = pugi::cast<int32_t>(value.c_str());
+		} else if (key == "ticks") {
+			this->ticks = pugi::cast<uint32_t>(value.c_str());
+		} else if (key == "count") {
+			this->count = pugi::cast<int32_t>(value.c_str());
+		} else if (key == "start") {
+			this->start = pugi::cast<int32_t>(value.c_str());
+		} else if (key == "damage") {
+			damage = -pugi::cast<int32_t>(value.c_str());
+		}
+
+		this->withDamage(damage, initDamage);
+
+		this->conditionDamage->setParam(CONDITION_PARAM_FIELD, 1);
+
+		if (this->conditionDamage->getTotalDamage() > 0) {
+			this->conditionDamage->setParam(CONDITION_PARAM_FORCEUPDATE, 1);
+		}
+
+		return this->conditionDamage.release();
 	}
 }

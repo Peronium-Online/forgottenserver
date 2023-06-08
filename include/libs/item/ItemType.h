@@ -768,6 +768,90 @@ public:
 	void setSuppressFreezing() { this->abilities->conditionSuppressions |= CONDITION_FREEZING; }
 	void setSuppressDazzle() { this->abilities->conditionSuppressions |= CONDITION_DAZZLED; }
 	void setSuppressCurse() { this->abilities->conditionSuppressions |= CONDITION_CURSED; }
+
+	void setField(const std::string& element, ConditionDamage* cd);
+
+	void setMaleTransformTo(uint16_t id);
+	void setFemaleTransformTo(uint16_t id);
+
+	void setIceElementDamage(uint16_t value)
+	{
+		this->abilities->elementDamage = value;
+		this->abilities->elementType = COMBAT_ICEDAMAGE;
+	}
+	void setFireElementDamage(uint16_t value)
+	{
+		this->abilities->elementDamage = value;
+		this->abilities->elementType = COMBAT_FIREDAMAGE;
+	}
+	void setEarthElementDamage(uint16_t value)
+	{
+		this->abilities->elementDamage = value;
+		this->abilities->elementType = COMBAT_EARTHDAMAGE;
+	}
+	void setHolyElementDamage(uint16_t value)
+	{
+		this->abilities->elementDamage = value;
+		this->abilities->elementType = COMBAT_HOLYDAMAGE;
+	}
+	void setDeathElementDamage(uint16_t value)
+	{
+		this->abilities->elementDamage = value;
+		this->abilities->elementType = COMBAT_DEATHDAMAGE;
+	}
+	void setEnergyElementDamage(uint16_t value)
+	{
+		this->abilities->elementDamage = value;
+		this->abilities->elementType = COMBAT_ENERGYDAMAGE;
+	}
+
+	void setWorth(uint64_t amount)
+	{
+		if (Items::getInstance().hasCurrencyItemOf(amount)) {
+			std::cout << "[Warning - ItemType::setWorth] Duplicated currency worth. Item " << id << " redefines worth "
+			          << amount << std::endl;
+		} else {
+			Items::getInstance().addCurrencyItem(amount, id);
+			this->worth = amount;
+		}
+	}
+};
+
+// TODO: move this to Condition when migrated to the new structure
+class ConditionDamageBuilder final : virtual XMLElementBuilder<ConditionDamage*>
+{
+private:
+	uint32_t ticks = 0;
+	int32_t start = 0;
+	int32_t count = 1;
+
+	std::unique_ptr<ConditionDamage> conditionDamage;
+
+public:
+	ConditionDamage* loadFromXMLNode(pugi::xml_node node, bool reloading) override;
+
+	ConditionDamageBuilder* withDamage(int32_t damage, int32_t initDamage = -1)
+	{
+		if (this->start > 0) {
+			std::list<int32_t> damageList;
+			ConditionDamage::generateDamageList(damage, this->start, damageList);
+			for (int32_t damageValue : damageList) {
+				this->conditionDamage->addDamage(1, this->ticks, -damageValue);
+			}
+
+			this->start = 0;
+		} else {
+			this->conditionDamage->addDamage(this->count, this->ticks, damage);
+		}
+
+		if (initDamage > 0 || initDamage < -1) {
+			this->conditionDamage->setInitDamage(-initDamage);
+		} else if (initDamage == -1 && this->start != 0) {
+			this->conditionDamage->setInitDamage(this->start);
+		}
+
+		return this;
+	}
 };
 
 #endif
