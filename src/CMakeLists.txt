@@ -31,8 +31,6 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/iomap.cpp
 	${CMAKE_CURRENT_LIST_DIR}/iomapserialize.cpp
 	${CMAKE_CURRENT_LIST_DIR}/iomarket.cpp
-	${CMAKE_CURRENT_LIST_DIR}/item.cpp
-	${CMAKE_CURRENT_LIST_DIR}/items.cpp
 	${CMAKE_CURRENT_LIST_DIR}/luascript.cpp
 	${CMAKE_CURRENT_LIST_DIR}/mailbox.cpp
 	${CMAKE_CURRENT_LIST_DIR}/map.cpp
@@ -79,6 +77,7 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/strings.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/itemmaps.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/Item.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/Items.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemType.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monster.cpp
@@ -128,9 +127,6 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/iomap.h
 	${CMAKE_CURRENT_LIST_DIR}/iomapserialize.h
 	${CMAKE_CURRENT_LIST_DIR}/iomarket.h
-	${CMAKE_CURRENT_LIST_DIR}/item.h
-	${CMAKE_CURRENT_LIST_DIR}/itemloader.h
-	${CMAKE_CURRENT_LIST_DIR}/items.h
 	${CMAKE_CURRENT_LIST_DIR}/lockfree.h
 	${CMAKE_CURRENT_LIST_DIR}/luascript.h
 	${CMAKE_CURRENT_LIST_DIR}/luavariant.h

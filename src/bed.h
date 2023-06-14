@@ -4,7 +4,7 @@
 #ifndef FS_BED_H
 #define FS_BED_H
 
-#include "item.h"
+#include "libs/item/Item.h"
 
 class House;
 class Player;

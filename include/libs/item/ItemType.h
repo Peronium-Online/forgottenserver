@@ -5,6 +5,7 @@
 #include "../../src/position.h"
 #include "constants/const.h"
 #include "libs/item/itemenums.h"
+#include "libs/item/itemmaps.h"
 #include "libs/util/tools/gamehelpers.h"
 #include "libs/util/xml/XMLElementBuilder.h"
 

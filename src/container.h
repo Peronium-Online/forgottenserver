@@ -5,7 +5,7 @@
 #define FS_CONTAINER_H
 
 #include "cylinder.h"
-#include "item.h"
+#include "libs/item/Item.h"
 #include "tile.h"
 
 class Container;

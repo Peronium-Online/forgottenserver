@@ -10,12 +10,13 @@
 #include "housetile.h"
 #include "inbox.h"
 #include "iomap.h"
+#include "libs/item/Items.h"
 #include "spectators.h"
 #include "storeinbox.h"
 
 extern Game g_game;
 
-Container::Container(uint16_t type) : Container(type, items[type].maxItems) {}
+Container::Container(uint16_t type) : Container(type, Items::getInstance().getItemType(type)->maxItems) {}
 
 Container::Container(uint16_t type, uint16_t size, bool unlocked /*= true*/, bool pagination /*= false*/) :
     Item(type), maxSize(size), unlocked(unlocked), pagination(pagination)

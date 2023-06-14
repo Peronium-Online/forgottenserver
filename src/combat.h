@@ -6,7 +6,7 @@
 
 #include "baseevents.h"
 #include "condition.h"
-#include "item.h"
+#include "libs/item/Item.h"
 #include "libs/util/tools/date.h"
 
 class Creature;
