@@ -93,9 +93,13 @@ private:
 public:
 	ItemAttributes() = default;
 
+	bool equals(const ItemAttributes& other) const;
+
 	static bool isIntAttrType(ItemAttrTypes type) { return (type & intAttributeTypes) == type; }
 	static bool isStrAttrType(ItemAttrTypes type) { return (type & stringAttributeTypes) == type; }
 	inline static bool isCustomAttrType(ItemAttrTypes type) { return (type & ITEM_ATTRIBUTE_CUSTOM) == type; }
+
+	bool isUndefined() { return attributeBits == 0; }
 
 	const Attribute* getExistingAttr(ItemAttrTypes type) const;
 

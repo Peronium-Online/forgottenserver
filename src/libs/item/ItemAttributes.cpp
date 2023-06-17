@@ -1,5 +1,36 @@
 #include "libs/item/ItemAttributes.h"
 
+bool ItemAttributes::equals(const ItemAttributes& other) const
+{
+	if (attributeBits != other.attributeBits) {
+		return false;
+	}
+
+	const auto& otherAttributeList = other.attributes;
+	for (const auto& attribute : attributes) {
+		if (ItemAttributes::isIntAttrType(attribute.type)) {
+			for (const auto& otherAttribute : otherAttributeList) {
+				if (attribute.type == otherAttribute.type && attribute.value.integer != otherAttribute.value.integer) {
+					return false;
+				}
+			}
+		} else if (ItemAttributes::isStrAttrType(attribute.type)) {
+			for (const auto& otherAttribute : otherAttributeList) {
+				if (attribute.type == otherAttribute.type && *attribute.value.string != *otherAttribute.value.string) {
+					return false;
+				}
+			}
+		} else {
+			for (const auto& otherAttribute : otherAttributeList) {
+				if (attribute.type == otherAttribute.type && *attribute.value.custom != *otherAttribute.value.custom) {
+					return false;
+				}
+			}
+		}
+	}
+	return true;
+}
+
 const ItemAttributes::Attribute* ItemAttributes::getExistingAttr(ItemAttrTypes type) const
 {
 	if (hasAttribute(type)) {

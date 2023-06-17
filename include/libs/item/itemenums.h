@@ -100,7 +100,7 @@ enum ClientVersions
 
 const uint32_t ROOT_ATTRIBUTE = 0X01;
 
-enum ItemAttributes
+enum ItemAttributeTypes
 {
 	ITEM_ATTR_FIRST = 0x10,
 	ITEM_ATTR_SERVERID = ITEM_ATTR_FIRST,
@@ -399,6 +399,13 @@ enum ItemTypes
 	ITEM_TYPE_LAST
 };
 
+enum ItemDecayState : uint8_t
+{
+	DECAYING_FALSE = 0,
+	DECAYING_TRUE,
+	DECAYING_PENDING,
+};
+
 enum SlotPositionBits : uint32_t
 {
 	SLOTP_WHEREEVER = 0xFFFFFFFF,
@@ -492,7 +499,7 @@ enum Attr_ReadValue
 	ATTR_READ_END,
 };
 
-enum AttrTypes_t
+enum AttrTypes
 {
 	// ATTR_DESCRIPTION = 1,
 	// ATTR_EXT_FILE = 2,
