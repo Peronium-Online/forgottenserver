@@ -2,6 +2,7 @@
 
 #include "../../container.h"
 #include "../../game.h"
+#include "libs/item/ItemFactory.h"
 #include "libs/item/Items.h"
 
 extern Game g_game;
@@ -9,6 +10,7 @@ extern Game g_game;
 Item::Item(const uint16_t type, uint16_t count) : id(type)
 {
 	const ItemType* it = Items::getInstance().getItemType(id);
+	this->iType = it;
 
 	if (it->isFluidContainer() || it->isSplash()) {
 		setFluidType(count);
@@ -29,7 +31,7 @@ Item::Item(const uint16_t type, uint16_t count) : id(type)
 	setDefaultDuration();
 }
 
-Item::Item(const Item& i) : Thing(), id(i.id), count(i.count), loadedFromMap(i.loadedFromMap)
+Item::Item(const Item& i) : Thing(), id(i.id), count(i.count), loadedFromMap(i.loadedFromMap), iType(i.iType)
 {
 	if (i.iAttributes) {
 		iAttributes.reset(new ItemAttributes(*i.iAttributes));
@@ -38,7 +40,7 @@ Item::Item(const Item& i) : Thing(), id(i.id), count(i.count), loadedFromMap(i.l
 
 Item* Item::clone() const
 {
-	Item* item = Item::CreateItem(id, count);
+	Item* item = ItemFactory::create(id, count);
 	if (iAttributes) {
 		item->iAttributes.reset(new ItemAttributes(*iAttributes));
 		if (item->getDuration() > 0) {
@@ -75,6 +77,399 @@ Container* Item::CreateItemAsContainer(const uint16_t type, uint16_t size)
 	}
 
 	Container* newItem = new Container(type, size);
+	newItem->iType = it;
 	newItem->incrementReferenceCounter();
 	return newItem;
+}
+
+void Item::setSubType(uint16_t n)
+{
+	if (iType->isFluidContainer() || iType->isSplash()) {
+		setFluidType(n);
+	} else if (iType->stackable) {
+		setItemCount(n);
+	} else if (iType->charges != 0) {
+		setCharges(n);
+	} else {
+		setItemCount(n);
+	}
+}
+
+void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream)
+{
+	switch (idx) {
+		case ATTR_COUNT:
+		case ATTR_RUNE_CHARGES: {
+			uint8_t count;
+			if (!stream.read<uint8_t>(count)) {
+				throw ItemAttrError{ATTR_COUNT, "Unable to read count attribute"};
+			}
+
+			setSubType(count);
+			break;
+		}
+
+		case ATTR_ACTION_ID: {
+			uint16_t actionId;
+			if (!stream.read<uint16_t>(actionId)) {
+				throw ItemAttrError{ATTR_ACTION_ID, "Unable to read actionId attribute"};
+			}
+
+			setActionId(actionId);
+			break;
+		}
+
+		case ATTR_UNIQUE_ID: {
+			uint16_t uniqueId;
+			if (!stream.read<uint16_t>(uniqueId)) {
+				throw ItemAttrError{ATTR_UNIQUE_ID, "Unable to read uniqueId attribute"};
+			}
+
+			setUniqueId(uniqueId);
+			break;
+		}
+
+		case ATTR_TEXT: {
+			std::string text;
+			if (!stream.readString(text)) {
+				throw ItemAttrError{ATTR_TEXT, "Unable to read text attribute"};
+			}
+
+			setText(text);
+			break;
+		}
+
+		case ATTR_WRITTENDATE: {
+			uint32_t writtenDate;
+			if (!stream.read<uint32_t>(writtenDate)) {
+				throw ItemAttrError{ATTR_WRITTENDATE, "Unable to read writtenDate attribute"};
+			}
+
+			setDate(writtenDate);
+			break;
+		}
+
+		case ATTR_WRITTENBY: {
+			std::string writer;
+			if (!stream.readString(writer)) {
+				throw ItemAttrError{ATTR_WRITTENBY, "Unable to read writer attribute"};
+			}
+
+			setWriter(writer);
+			break;
+		}
+
+		case ATTR_DESC: {
+			std::string text;
+			if (!stream.readString(text)) {
+				throw ItemAttrError{ATTR_DESC, "Unable to read description attribute"};
+			}
+
+			setSpecialDescription(text);
+			break;
+		}
+
+		case ATTR_CHARGES: {
+			uint16_t charges;
+			if (!stream.read<uint16_t>(charges)) {
+				throw ItemAttrError{ATTR_CHARGES, "Unable to read charges attribute"};
+			}
+
+			setSubType(charges);
+			break;
+		}
+
+		case ATTR_DURATION: {
+			int32_t duration;
+			if (!stream.read<int32_t>(duration)) {
+				throw ItemAttrError{ATTR_DURATION, "Unable to read duration attribute"};
+			}
+
+			setDuration(duration);
+			break;
+		}
+
+		case ATTR_DECAYING_STATE: {
+			uint8_t state;
+			if (!stream.read<uint8_t>(state)) {
+				throw ItemAttrError{ATTR_DECAYING_STATE, "Unable to read decayState attribute"};
+			}
+
+			if (state != DECAYING_FALSE) {
+				setDecaying(DECAYING_PENDING);
+			}
+			break;
+		}
+
+		case ATTR_NAME: {
+			std::string name;
+			if (!stream.readString(name)) {
+				throw ItemAttrError{ATTR_NAME, "Unable to read name attribute"};
+			}
+
+			iAttributes->setStrAttr(ITEM_ATTRIBUTE_NAME, name);
+			break;
+		}
+
+		case ATTR_ARTICLE: {
+			std::string article;
+			if (!stream.readString(article)) {
+				throw ItemAttrError{ATTR_ARTICLE, "Unable to read article attribute"};
+			}
+
+			iAttributes->setStrAttr(ITEM_ATTRIBUTE_ARTICLE, article);
+			break;
+		}
+
+		case ATTR_PLURALNAME: {
+			std::string pluralName;
+			if (!stream.readString(pluralName)) {
+				throw ItemAttrError{ATTR_PLURALNAME, "Unable to read pluralName attribute"};
+			}
+
+			iAttributes->setStrAttr(ITEM_ATTRIBUTE_PLURALNAME, pluralName);
+			break;
+		}
+
+		case ATTR_WEIGHT: {
+			uint32_t weight;
+			if (!stream.read<uint32_t>(weight)) {
+				throw ItemAttrError{ATTR_WEIGHT, "Unable to read weight attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_WEIGHT, weight);
+			break;
+		}
+
+		case ATTR_ATTACK: {
+			int32_t attack;
+			if (!stream.read<int32_t>(attack)) {
+				throw ItemAttrError{ATTR_ATTACK, "Unable to read attack attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_ATTACK, attack);
+			break;
+		}
+
+		case ATTR_ATTACK_SPEED: {
+			uint32_t attackSpeed;
+			if (!stream.read<uint32_t>(attackSpeed)) {
+				throw ItemAttrError{ATTR_ATTACK_SPEED, "Unable to read attackSpeed attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_ATTACK_SPEED, attackSpeed);
+			break;
+		}
+
+		case ATTR_DEFENSE: {
+			int32_t defense;
+			if (!stream.read<int32_t>(defense)) {
+				throw ItemAttrError{ATTR_DEFENSE, "Unable to read defense attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_DEFENSE, defense);
+			break;
+		}
+
+		case ATTR_EXTRADEFENSE: {
+			int32_t extraDefense;
+			if (!stream.read<int32_t>(extraDefense)) {
+				throw ItemAttrError{ATTR_EXTRADEFENSE, "Unable to read extraDefense attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_EXTRADEFENSE, extraDefense);
+			break;
+		}
+
+		case ATTR_ARMOR: {
+			int32_t armor;
+			if (!stream.read<int32_t>(armor)) {
+				throw ItemAttrError{ATTR_ARMOR, "Unable to read armor attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_ARMOR, armor);
+			break;
+		}
+
+		case ATTR_HITCHANCE: {
+			int8_t hitChance;
+			if (!stream.read<int8_t>(hitChance)) {
+				throw ItemAttrError{ATTR_HITCHANCE, "Unable to read hitChance attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_HITCHANCE, hitChance);
+			break;
+		}
+
+		case ATTR_SHOOTRANGE: {
+			uint8_t shootRange;
+			if (!stream.read<uint8_t>(shootRange)) {
+				throw ItemAttrError{ATTR_SHOOTRANGE, "Unable to read shootRange attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_SHOOTRANGE, shootRange);
+			break;
+		}
+
+		case ATTR_DECAYTO: {
+			int32_t decayTo;
+			if (!stream.read<int32_t>(decayTo)) {
+				throw ItemAttrError{ATTR_DECAYTO, "Unable to read decayTo attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_DECAYTO, decayTo);
+			break;
+		}
+
+		case ATTR_WRAPID: {
+			uint16_t wrapId;
+			if (!stream.read<uint16_t>(wrapId)) {
+				throw ItemAttrError{ATTR_WRAPID, "Unable to read wrapId attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_WRAPID, wrapId);
+			break;
+		}
+
+		case ATTR_STOREITEM: {
+			uint8_t storeItem;
+			if (!stream.read<uint8_t>(storeItem)) {
+				throw ItemAttrError{ATTR_STOREITEM, "Unable to read storeItem attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_STOREITEM, storeItem);
+			break;
+		}
+
+		case ATTR_OPENCONTAINER: {
+			uint8_t openContainer;
+			if (!stream.read<uint8_t>(openContainer)) {
+				throw ItemAttrError{ATTR_OPENCONTAINER, "Unable to read openContainer attribute"};
+			}
+
+			iAttributes->setIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER, openContainer);
+			break;
+		}
+
+		case ATTR_REFLECT: {
+			uint16_t size;
+			if (!stream.read<uint16_t>(size)) {
+				throw ItemAttrError{ATTR_REFLECT, "Unable to read reflect attribute"};
+			}
+
+			for (uint16_t i = 0; i < size; ++i) {
+				CombatType_t combatType;
+				Reflect reflect;
+
+				if (!stream.read<CombatType_t>(combatType) || !stream.read<uint16_t>(reflect.percent) ||
+				    !stream.read<uint16_t>(reflect.chance)) {
+					throw ItemAttrError{ATTR_REFLECT, "Unable to read reflect attribute"};
+				}
+
+				getAttributes()->reflect[combatType] = reflect;
+			}
+			break;
+		}
+
+		case ATTR_BOOST: {
+			uint16_t size;
+			if (!stream.read<uint16_t>(size)) {
+				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+			}
+
+			for (uint16_t i = 0; i < size; ++i) {
+				CombatType_t combatType;
+				uint16_t percent;
+
+				if (!stream.read<CombatType_t>(combatType) || !stream.read<uint16_t>(percent)) {
+					throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				}
+
+				getAttributes()->boostPercent[combatType] = percent;
+			}
+			break;
+		}
+
+		// these should be handled through derived classes If these are called then something has changed in the
+		// items.xml since the map was saved just read the values
+
+		// Depot class
+		case ATTR_DEPOT_ID: {
+			if (!stream.skip(2)) {
+				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+			}
+			break;
+		}
+
+		// Door class
+		case ATTR_HOUSEDOORID: {
+			if (!stream.skip(1)) {
+				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+			}
+			break;
+		}
+
+		// Bed class
+		case ATTR_SLEEPERGUID: {
+			if (!stream.skip(4)) {
+				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+			}
+			break;
+		}
+
+		case ATTR_SLEEPSTART: {
+			if (!stream.skip(4)) {
+				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+			}
+			break;
+		}
+
+		// Podium class
+		case ATTR_PODIUMOUTFIT: {
+			if (!stream.skip(15)) {
+				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+			}
+			break;
+		}
+
+		// Teleport class
+		case ATTR_TELE_DEST: {
+			if (!stream.skip(5)) {
+				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+			}
+			break;
+		}
+
+		// Container class
+		case ATTR_CONTAINER_ITEMS: {
+			throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+		}
+
+		case ATTR_CUSTOM_ATTRIBUTES: {
+			uint64_t size;
+			if (!stream.read<uint64_t>(size)) {
+				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+			}
+
+			for (uint64_t i = 0; i < size; i++) {
+				// Unserialize key type and value
+				std::string key;
+				if (!stream.readString(key)) {
+					throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				};
+
+				// Unserialize value type and value
+				ItemAttributes::CustomAttribute val;
+				if (!val.unserialize(propStream)) {
+					throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				}
+
+				setCustomAttribute(key, val);
+			}
+			break;
+		}
+
+		default:
+			throw ItemAttrError{ATTR_UNKNOWN, "Unknown attribute"};
+	}
 }

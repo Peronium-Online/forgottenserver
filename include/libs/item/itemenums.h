@@ -141,6 +141,7 @@ enum ItemAttributeTypes
 	ITEM_ATTR_LAST
 };
 
+// Item attributes that are used for parsing
 enum ItemAttrTypes : uint32_t
 {
 	ITEM_ATTRIBUTE_NONE,
@@ -492,15 +493,9 @@ enum FluidTypes : uint8_t
 	FLUID_MEAD = FLUID_BROWN + 40,
 };
 
-enum Attr_ReadValue
+enum ItemAttrTypesIndex
 {
-	ATTR_READ_CONTINUE,
-	ATTR_READ_ERROR,
-	ATTR_READ_END,
-};
-
-enum AttrTypes
-{
+	ATTR_UNKNOWN = 0,
 	// ATTR_DESCRIPTION = 1,
 	// ATTR_EXT_FILE = 2,
 	ATTR_TILE_FLAGS = 3,

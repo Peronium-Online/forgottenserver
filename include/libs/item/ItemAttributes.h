@@ -108,6 +108,9 @@ public:
 
 	void setIntAttr(ItemAttrTypes type, int64_t value);
 	int64_t getIntAttr(ItemAttrTypes type) const;
+
+	void setStrAttr(ItemAttrTypes type, const std::string& value);
+	const std::string& getStrAttr(ItemAttrTypes type) const;
 };
 
 #endif

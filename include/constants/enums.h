@@ -628,6 +628,7 @@ enum MonstersEvent_t : uint8_t
 	MONSTERS_EVENT_SAY = 5,
 };
 
+// TODO: move this to a better place
 struct Reflect
 {
 	Reflect() = default;

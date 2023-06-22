@@ -1,5 +1,7 @@
 #include "libs/item/ItemAttributes.h"
 
+#include <iostream>
+
 bool ItemAttributes::equals(const ItemAttributes& other) const
 {
 	if (attributeBits != other.attributeBits) {
@@ -82,4 +84,34 @@ void ItemAttributes::setIntAttr(ItemAttrTypes type, int64_t value)
 	}
 
 	getAttr(type).value.integer = value;
+}
+
+const std::string& ItemAttributes::getStrAttr(ItemAttrTypes type) const
+{
+	if (!isStrAttrType(type)) {
+		std::cout << "Warning: trying to get non-string attribute: " << type << std::endl;
+
+		return "";
+	}
+
+	const Attribute* attr = getExistingAttr(type);
+	if (!attr) {
+		return "";
+	}
+	return *attr->value.string;
+}
+
+void ItemAttributes::setStrAttr(ItemAttrTypes type, const std::string& value)
+{
+	if (!isStrAttrType(type)) {
+		return;
+	}
+
+	if (value.empty()) {
+		return;
+	}
+
+	Attribute& attr = getAttr(type);
+	delete attr.value.string;
+	attr.value.string = new std::string(value);
 }
