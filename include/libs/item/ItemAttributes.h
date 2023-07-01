@@ -9,6 +9,7 @@
 class ItemAttributes
 {
 private:
+	typedef std::unordered_map<std::string, CustomLuaAttribute> CustomAttributeMap;
 	struct Attribute
 	{
 		ItemAttrTypes type;
@@ -16,7 +17,7 @@ private:
 		{
 			int64_t integer;
 			std::string* string;
-			std::unordered_map<std::string, CustomLuaAttribute>* custom;
+			CustomAttributeMap* custom;
 		} value;
 
 		explicit Attribute(ItemAttrTypes type) : type(type) { memset(&value, 0, sizeof(value)); }
@@ -28,7 +29,7 @@ private:
 			} else if (ItemAttributes::isStrAttrType(type)) {
 				value.string = new std::string(*i.value.string);
 			} else if (ItemAttributes::isCustomAttrType(type)) {
-				value.custom = new std::unordered_map<std::string, CustomLuaAttribute>(*i.value.custom);
+				value.custom = new CustomAttributeMap(*i.value.custom);
 			} else {
 				memset(&value, 0, sizeof(value));
 			}
@@ -103,7 +104,7 @@ public:
 
 	const Attribute* getExistingAttr(ItemAttrTypes type) const;
 
-	bool hasAttribute(ItemAttrTypes type) const { return (type & attributeBits) != 0; }
+	bool hasAttr(ItemAttrTypes type) const { return (type & attributeBits) != 0; }
 	Attribute& getAttr(ItemAttrTypes type);
 
 	void setIntAttr(ItemAttrTypes type, int64_t value);
@@ -111,6 +112,126 @@ public:
 
 	void setStrAttr(ItemAttrTypes type, const std::string& value);
 	const std::string& getStrAttr(ItemAttrTypes type) const;
+
+	CustomAttributeMap* getCustomAttrMap()
+	{
+		if (!hasAttr(ITEM_ATTRIBUTE_CUSTOM)) {
+			return nullptr;
+		}
+
+		return getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom;
+	}
+
+	template <typename R>
+	void setCustomAttr(int64_t key, R value)
+	{
+		auto tmp = std::to_string(key);
+		setCustomAttr(tmp, value);
+	}
+
+	void setCustomAttr(int64_t key, CustomLuaAttribute& value)
+	{
+		auto tmp = std::to_string(key);
+		setCustomAttr(tmp, value);
+	}
+
+	template <typename R>
+	void setCustomAttr(std::string& key, R value)
+	{
+		boost::algorithm::to_lower(key);
+		if (hasAttr(ITEM_ATTRIBUTE_CUSTOM)) {
+			removeCustomAttr(key);
+		} else {
+			getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom = new CustomAttributeMap();
+		}
+		getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom->emplace(key, value);
+	}
+
+	void setCustomAttr(std::string& key, CustomLuaAttribute& value)
+	{
+		boost::algorithm::to_lower(key);
+		if (hasAttr(ITEM_ATTRIBUTE_CUSTOM)) {
+			removeCustomAttr(key);
+		} else {
+			getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom = new CustomAttributeMap();
+		}
+		getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom->insert(std::make_pair(std::move(key), std::move(value)));
+	}
+
+	const CustomLuaAttribute* getCustomAttr(int64_t key)
+	{
+		auto tmp = std::to_string(key);
+		return getCustomAttr(tmp);
+	}
+
+	const CustomLuaAttribute* getCustomAttr(const std::string& key)
+	{
+		if (const CustomAttributeMap* customAttrMap = getCustomAttrMap()) {
+			auto it = customAttrMap->find(boost::algorithm::to_lower_copy(key));
+			if (it != customAttrMap->end()) {
+				return &(it->second);
+			}
+		}
+		return nullptr;
+	}
+
+	bool removeCustomAttr(int64_t key)
+	{
+		auto tmp = std::to_string(key);
+		return removeCustomAttr(tmp);
+	}
+
+	bool removeCustomAttr(const std::string& key)
+	{
+		if (CustomAttributeMap* customAttrMap = getCustomAttrMap()) {
+			auto it = customAttrMap->find(boost::algorithm::to_lower_copy(key));
+			if (it != customAttrMap->end()) {
+				customAttrMap->erase(it);
+				return true;
+			}
+		}
+		return false;
+	}
+};
+
+struct Reflect
+{
+	Reflect() = default;
+	Reflect(uint16_t percent, uint16_t chance) : percent(percent), chance(chance){};
+
+	Reflect& operator+=(const Reflect& other)
+	{
+		percent += other.percent;
+		chance = std::min<uint16_t>(100, chance + other.chance);
+		return *this;
+	}
+
+	uint16_t percent = 0;
+	uint16_t chance = 0;
+
+	static Reflect UNDEFINED;
+};
+
+class MutableItemAttributes
+{
+private:
+	std::map<CombatType_t, Reflect> reflect;
+	std::map<CombatType_t, uint16_t> boostPercent;
+
+public:
+	void setReflect(CombatType_t combatType, const Reflect& reflect) { this->reflect[combatType] = reflect; }
+	const Reflect& getReflect(CombatType_t combatType)
+	{
+		auto it = reflect.find(combatType);
+		return it != reflect.end() ? it->second : Reflect::UNDEFINED;
+	}
+
+	void setBoostPercent(CombatType_t combatType, uint16_t percent) { boostPercent[combatType] = percent; }
+	int16_t getBoostPercent(CombatType_t combatType)
+	{
+		auto it = boostPercent.find(combatType);
+		return it != boostPercent.end() ? it->second : 0;
+	}
 };
 
 #endif

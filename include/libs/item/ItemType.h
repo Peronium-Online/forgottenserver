@@ -1,8 +1,8 @@
 #ifndef PR_ITEMTYPE_H
 #define PR_ITEMTYPE_H
 
-#include "../../src/condition.h"
-#include "../../src/position.h"
+#include "../../../src/condition.h"
+#include "../../../src/position.h"
 #include "constants/const.h"
 #include "libs/item/itemenums.h"
 #include "libs/item/itemmaps.h"
@@ -11,7 +11,6 @@
 
 #include <array>
 #include <cstdint>
-#include <unique_ptr.h>
 
 struct Abilities
 {

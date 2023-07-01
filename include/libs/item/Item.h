@@ -27,6 +27,7 @@ class Item : virtual public Thing
 {
 private:
 	std::unique_ptr<ItemAttributes> iAttributes;
+	std::unique_ptr<MutableItemAttributes> mAttributes;
 	uint32_t referenceCounter = 0;
 	bool loadedFromMap = false;
 
@@ -35,6 +36,7 @@ private:
 protected:
 	uint16_t id; // the same id as in ItemType
 
+	// TODO: criar novo tipo para attributos mutaveis (eg. reflect, charges, ...)
 	const ItemType* iType;
 
 public:
@@ -120,7 +122,7 @@ public:
 	virtual uint32_t getWeight() const;
 	uint32_t getBaseWeight() const
 	{
-		if (iAttributes->hasAttribute(ITEM_ATTRIBUTE_WEIGHT)) {
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_WEIGHT)) {
 			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_WEIGHT);
 		}
 		return iType->weight;

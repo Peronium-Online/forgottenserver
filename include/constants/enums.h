@@ -628,23 +628,6 @@ enum MonstersEvent_t : uint8_t
 	MONSTERS_EVENT_SAY = 5,
 };
 
-// TODO: move this to a better place
-struct Reflect
-{
-	Reflect() = default;
-	Reflect(uint16_t percent, uint16_t chance) : percent(percent), chance(chance){};
-
-	Reflect& operator+=(const Reflect& other)
-	{
-		percent += other.percent;
-		chance = std::min<uint16_t>(100, chance + other.chance);
-		return *this;
-	}
-
-	uint16_t percent = 0;
-	uint16_t chance = 0;
-};
-
 enum ClientDamageType
 {
 	CLIENT_DAMAGETYPE_PHYSICAL = 0,

@@ -36,6 +36,10 @@ Item::Item(const Item& i) : Thing(), id(i.id), count(i.count), loadedFromMap(i.l
 	if (i.iAttributes) {
 		iAttributes.reset(new ItemAttributes(*i.iAttributes));
 	}
+
+	if (i.mAttributes) {
+		mAttributes.reset(new MutableItemAttributes(*i.mAttributes));
+	}
 }
 
 Item* Item::clone() const
@@ -43,6 +47,7 @@ Item* Item::clone() const
 	Item* item = ItemFactory::create(id, count);
 	if (iAttributes) {
 		item->iAttributes.reset(new ItemAttributes(*iAttributes));
+		item->mAttributes.reset(new MutableItemAttributes(*mAttributes));
 		if (item->getDuration() > 0) {
 			item->incrementReferenceCounter();
 			item->setDecaying(DECAYING_TRUE);
@@ -366,7 +371,7 @@ void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream
 					throw ItemAttrError{ATTR_REFLECT, "Unable to read reflect attribute"};
 				}
 
-				getAttributes()->reflect[combatType] = reflect;
+				mAttributes->setReflect(combatType, reflect);
 			}
 			break;
 		}
@@ -374,7 +379,7 @@ void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream
 		case ATTR_BOOST: {
 			uint16_t size;
 			if (!stream.read<uint16_t>(size)) {
-				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				throw ItemAttrError{ATTR_BOOST, "Unable to read boost attribute"};
 			}
 
 			for (uint16_t i = 0; i < size; ++i) {
@@ -382,10 +387,10 @@ void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream
 				uint16_t percent;
 
 				if (!stream.read<CombatType_t>(combatType) || !stream.read<uint16_t>(percent)) {
-					throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+					throw ItemAttrError{ATTR_BOOST, "Unable to read boost attribute"};
 				}
 
-				getAttributes()->boostPercent[combatType] = percent;
+				mAttributes->setBoostPercent(combatType, percent);
 			}
 			break;
 		}
@@ -396,7 +401,7 @@ void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream
 		// Depot class
 		case ATTR_DEPOT_ID: {
 			if (!stream.skip(2)) {
-				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				throw ItemAttrError{ATTR_DEPOT_ID, "Unable to read depotId attribute"};
 			}
 			break;
 		}
@@ -404,7 +409,7 @@ void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream
 		// Door class
 		case ATTR_HOUSEDOORID: {
 			if (!stream.skip(1)) {
-				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				throw ItemAttrError{ATTR_HOUSEDOORID, "Unable to read houseDoorId attribute"};
 			}
 			break;
 		}
@@ -412,14 +417,14 @@ void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream
 		// Bed class
 		case ATTR_SLEEPERGUID: {
 			if (!stream.skip(4)) {
-				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				throw ItemAttrError{ATTR_SLEEPERGUID, "Unable to read sleeperGuid attribute"};
 			}
 			break;
 		}
 
 		case ATTR_SLEEPSTART: {
 			if (!stream.skip(4)) {
-				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				throw ItemAttrError{ATTR_SLEEPSTART, "Unable to read sleepStart attribute"};
 			}
 			break;
 		}
@@ -427,7 +432,7 @@ void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream
 		// Podium class
 		case ATTR_PODIUMOUTFIT: {
 			if (!stream.skip(15)) {
-				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				throw ItemAttrError{ATTR_PODIUMOUTFIT, "Unable to read podiumOutfit attribute"};
 			}
 			break;
 		}
@@ -435,36 +440,36 @@ void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream
 		// Teleport class
 		case ATTR_TELE_DEST: {
 			if (!stream.skip(5)) {
-				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				throw ItemAttrError{ATTR_TELE_DEST, "Unable to read teleDestattribute"};
 			}
 			break;
 		}
 
 		// Container class
 		case ATTR_CONTAINER_ITEMS: {
-			throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+			throw ItemAttrError{ATTR_CONTAINER_ITEMS, "Unable to containerItems attribute"};
 		}
 
 		case ATTR_CUSTOM_ATTRIBUTES: {
 			uint64_t size;
 			if (!stream.read<uint64_t>(size)) {
-				throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				throw ItemAttrError{ATTR_CUSTOM_ATTRIBUTES, "Unable to read customAttributes attribute"};
 			}
 
 			for (uint64_t i = 0; i < size; i++) {
 				// Unserialize key type and value
 				std::string key;
 				if (!stream.readString(key)) {
-					throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+					throw ItemAttrError{ATTR_CUSTOM_ATTRIBUTES, "Unable to read customAttributes key attribute"};
 				};
 
 				// Unserialize value type and value
-				ItemAttributes::CustomAttribute val;
-				if (!val.unserialize(propStream)) {
-					throw ItemAttrError{ATTR_COUNT, "Unable to read actionId attribute"};
+				CustomLuaAttribute val;
+				if (!val.unserialize(stream)) {
+					throw ItemAttrError{ATTR_CUSTOM_ATTRIBUTES, "Unable to read customAttributes val attribute"};
 				}
 
-				setCustomAttribute(key, val);
+				iAttributes->setCustomAttr(key, val);
 			}
 			break;
 		}

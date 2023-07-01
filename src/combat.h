@@ -181,20 +181,15 @@ class MagicField final : public Item
 public:
 	explicit MagicField(uint16_t type) : Item(type), createTime(OTSYS_TIME()) {}
 
-	MagicField* getMagicField() override { return this; }
-	const MagicField* getMagicField() const override { return this; }
+	static MagicField* toMagicField(Item* item) { return dynamic_cast<MagicField*>(item); }
+	static const MagicField* toMagicField(const Item* item) { return dynamic_cast<const MagicField*>(item); }
 
-	bool isReplaceable() const { return Item::items[getID()].replaceable; }
-	CombatType_t getCombatType() const
-	{
-		const ItemType& it = items[getID()];
-		return it.combatType;
-	}
+	bool isReplaceable() const { return iType->replaceable; }
+	CombatType_t getCombatType() const { return iType->combatType; }
 	int32_t getDamage() const
 	{
-		const ItemType& it = items[getID()];
-		if (it.conditionDamage) {
-			return it.conditionDamage->getTotalDamage();
+		if (iType->conditionDamage) {
+			return iType->conditionDamage->getTotalDamage();
 		}
 		return 0;
 	}
