@@ -100,6 +100,19 @@ void Item::setSubType(uint16_t n)
 	}
 }
 
+uint16_t Item::getSubType() const
+{
+	if (iType->isFluidContainer() || iType->isSplash()) {
+		getFluidType();
+	} else if (iType->stackable) {
+		getItemCount();
+	} else if (iType->charges != 0) {
+		getCharges();
+	} else {
+		getItemCount();
+	}
+}
+
 void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream)
 {
 	switch (idx) {
@@ -477,4 +490,42 @@ void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream
 		default:
 			throw ItemAttrError{ATTR_UNKNOWN, "Unknown attribute"};
 	}
+}
+
+Cylinder* Item::getTopParent()
+{
+	Cylinder* aux = getParent();
+	Cylinder* prevaux = dynamic_cast<Cylinder*>(this);
+	if (!aux) {
+		return prevaux;
+	}
+
+	while (aux->getParent()) {
+		prevaux = aux;
+		aux = aux->getParent();
+	}
+
+	if (prevaux) {
+		return prevaux;
+	}
+	return aux;
+}
+
+const Cylinder* Item::getTopParent() const
+{
+	const Cylinder* aux = getParent();
+	const Cylinder* prevaux = dynamic_cast<const Cylinder*>(this);
+	if (!aux) {
+		return prevaux;
+	}
+
+	while (aux->getParent()) {
+		prevaux = aux;
+		aux = aux->getParent();
+	}
+
+	if (prevaux) {
+		return prevaux;
+	}
+	return aux;
 }

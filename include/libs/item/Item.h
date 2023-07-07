@@ -1,5 +1,5 @@
-// #ifdef PR_ITEM_H
-// #define PR_ITEM_H
+#ifndef PR_ITEM_H
+#define PR_ITEM_H
 
 #include "../../../src/thing.h"
 #include "libs/item/ItemAttributes.h"
@@ -26,8 +26,6 @@ struct ItemAttrError : std::runtime_error
 class Item : virtual public Thing
 {
 private:
-	std::unique_ptr<ItemAttributes> iAttributes;
-	std::unique_ptr<MutableItemAttributes> mAttributes;
 	uint32_t referenceCounter = 0;
 	bool loadedFromMap = false;
 
@@ -36,8 +34,9 @@ private:
 protected:
 	uint16_t id; // the same id as in ItemType
 
-	// TODO: criar novo tipo para attributos mutaveis (eg. reflect, charges, ...)
 	const ItemType* iType;
+	std::unique_ptr<ItemAttributes> iAttributes;
+	std::unique_ptr<MutableItemAttributes> mAttributes;
 
 public:
 	Item(const uint16_t type, uint16_t count = 0);
@@ -72,7 +71,11 @@ public:
 	bool hasWalkStack() const { return iType->walkStack; }
 	bool isSupply() const { return iType->isSupply(); }
 	bool isPushable() const override final { return isMoveable(); }
+	bool canReadText() const { return iType->canReadText; }
+	bool canWriteText() const { return iType->canWriteText; }
+	bool isShowingCount() const { return iType->showCount; }
 
+	uint16_t getSubType() const;
 	void setSubType(uint16_t n);
 
 	void incrementReferenceCounter() { ++referenceCounter; }
@@ -128,8 +131,24 @@ public:
 		return iType->weight;
 	}
 
+	uint16_t getID() const { return id; }
+	uint16_t getClientID() const { return iType->clientId; }
+	uint16_t getActionId() const
+	{
+		if (!iAttributes) {
+			return 0;
+		}
+		return static_cast<uint16_t>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_ACTIONID));
+	}
 	void setActionId(uint16_t n) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_ACTIONID, n); }
 
+	uint16_t getUniqueId() const
+	{
+		if (!iAttributes) {
+			return 0;
+		}
+		return static_cast<uint16_t>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_UNIQUEID));
+	}
 	void setUniqueId(uint16_t n) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_UNIQUEID, n); }
 
 	void setText(const std::string& text) { iAttributes->setStrAttr(ITEM_ATTRIBUTE_TEXT, text); }
@@ -139,6 +158,30 @@ public:
 	void setWriter(const std::string& writer) { iAttributes->setStrAttr(ITEM_ATTRIBUTE_WRITER, writer); }
 
 	void setSpecialDescription(const std::string& desc) { iAttributes->setStrAttr(ITEM_ATTRIBUTE_DESCRIPTION, desc); }
+
+	ItemTypes getType() const { return iType->type; }
+
+	uint32_t getCorpseOwner() const { return iAttributes->getIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER); }
+
+	uint16_t getMaxTextLen() const { return iType->maxTextLen; }
+
+	const std::string& getName() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_NAME)) {
+			return iAttributes->getStrAttr(ITEM_ATTRIBUTE_NAME);
+		}
+		return iType->name;
+	}
+	const std::string getPluralName() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_PLURALNAME)) {
+			return iAttributes->getStrAttr(ITEM_ATTRIBUTE_PLURALNAME);
+		}
+		return iType->getPluralName();
+	}
+
+	Cylinder* getTopParent();
+	const Cylinder* getTopParent() const;
 };
 
-// #endif
+#endif

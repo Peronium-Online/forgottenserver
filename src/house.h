@@ -42,17 +42,18 @@ public:
 	Door(const Door&) = delete;
 	Door& operator=(const Door&) = delete;
 
-	Door* getDoor() override { return this; }
-	const Door* getDoor() const override { return this; }
+	static bool isDoor(Item* item) { return item->getType() == ITEM_TYPE_DOOR; }
+
+	static Door* toDoor(Item* item) { return static_cast<Door*>(item); }
+	static const Door* toDoor(const Item* item) { return static_cast<const Door*>(item); }
 
 	House* getHouse() { return house; }
 
-	// serialization
-	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream) override;
+	void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream) override;
 	void serializeAttr(PropWriteStream&) const override {}
 
-	void setDoorId(uint32_t doorId) { setIntAttr(ITEM_ATTRIBUTE_DOORID, doorId); }
-	uint32_t getDoorId() const { return getIntAttr(ITEM_ATTRIBUTE_DOORID); }
+	void setDoorId(uint32_t doorId) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_DOORID, doorId); }
+	uint32_t getDoorId() const { return iAttributes->getIntAttr(ITEM_ATTRIBUTE_DOORID); }
 
 	bool canUse(const Player* player);
 

@@ -14,10 +14,12 @@ class BedItem final : public Item
 public:
 	explicit BedItem(uint16_t id);
 
-	BedItem* getBed() override { return this; }
-	const BedItem* getBed() const override { return this; }
+	static bool isBedItem(Item* item) { return item->getType() == ITEM_TYPE_BED; }
 
-	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream) override;
+	static BedItem* toBedItem(Item* item) { return static_cast<BedItem*>(item); }
+	static const BedItem* toBedItem(const Item* item) { return static_cast<const BedItem*>(item); }
+
+	void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream) override;
 	void serializeAttr(PropWriteStream& propWriteStream) const override;
 
 	bool canRemove() const override { return !house; }

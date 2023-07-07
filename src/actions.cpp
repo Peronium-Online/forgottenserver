@@ -16,6 +16,8 @@
 #include "libs/util/tools/strings.h"
 #include "spells.h"
 
+#include <fmt/format.h>
+
 extern Game g_game;
 extern Spells* g_spells;
 extern Actions* g_actions;
@@ -281,15 +283,15 @@ ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, 
 
 Action* Actions::getAction(const Item* item)
 {
-	if (item->hasAttribute(ITEM_ATTRIBUTE_UNIQUEID)) {
-		auto it = uniqueItemMap.find(item->getUniqueId());
+	if (auto uniqueId = item->getUniqueId()) {
+		auto it = uniqueItemMap.find(uniqueId);
 		if (it != uniqueItemMap.end()) {
 			return &it->second;
 		}
 	}
 
-	if (item->hasAttribute(ITEM_ATTRIBUTE_ACTIONID)) {
-		auto it = actionItemMap.find(item->getActionId());
+	if (auto actionId = item->getActionId()) {
+		auto it = actionItemMap.find(actionId);
 		if (it != actionItemMap.end()) {
 			return &it->second;
 		}
@@ -306,7 +308,8 @@ Action* Actions::getAction(const Item* item)
 
 ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey)
 {
-	if (Door* door = item->getDoor()) {
+	if (Door::isDoor(item)) {
+		auto door = Door::toDoor(item);
 		if (!door->canUse(player)) {
 			return RETURNVALUE_NOTPOSSIBLE;
 		}
@@ -322,12 +325,13 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 			if (item->isRemoved()) {
 				return RETURNVALUE_CANNOTUSETHISOBJECT;
 			}
-		} else if (action->function && action->function(player, item, pos, nullptr, pos, isHotkey)) {
+		} else if (action->function && action->function.operator()(player, item, pos, nullptr, pos, isHotkey)) {
 			return RETURNVALUE_NOERROR;
 		}
 	}
 
-	if (BedItem* bed = item->getBed()) {
+	if (BedItem::isBedItem(item)) {
+		auto bed = BedItem::toBedItem(item);
 		if (!bed->canUse(player)) {
 			if (!bed->getHouse()) {
 				return RETURNVALUE_YOUCANNOTUSETHISBED;
@@ -377,11 +381,10 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 		return RETURNVALUE_NOERROR;
 	}
 
-	const ItemType& it = Item::items[item->getID()];
-	if (it.canReadText) {
-		if (it.canWriteText) {
-			player->setWriteItem(item, it.maxTextLen);
-			player->sendTextWindow(item, it.maxTextLen, true);
+	if (item->canReadText()) {
+		if (item->canWriteText()) {
+			player->setWriteItem(item, item->getMaxTextLen());
+			player->sendTextWindow(item, item->getMaxTextLen(), true);
 		} else {
 			player->setWriteItem(nullptr);
 			player->sendTextWindow(item, 0, false);
@@ -395,8 +398,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 
 static void showUseHotkeyMessage(Player* player, const Item* item, uint32_t count)
 {
-	const ItemType& it = Item::items[item->getID()];
-	if (!it.showCount) {
+	if (!item->isShowingCount()) {
 		player->sendTextMessage(MESSAGE_HOTKEY_PRESSED, fmt::format("Using one of {:s}...", item->getName()));
 	} else if (count == 1) {
 		player->sendTextMessage(MESSAGE_HOTKEY_PRESSED, fmt::format("Using the last {:s}...", item->getName()));
