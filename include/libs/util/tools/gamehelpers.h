@@ -3,6 +3,7 @@
 
 #include "constants/const.h"
 #include "constants/enums.h"
+#include "libs/item/itemenums.h"
 
 #include <string>
 
@@ -12,7 +13,7 @@ MagicEffectClasses getMagicEffect(const std::string& strValue);
 
 ShootType_t getShootType(const std::string& strValue);
 
-Ammo_t getAmmoType(const std::string& strValue);
+AmmoTypes getAmmoType(const std::string& strValue);
 
 WeaponAction_t getWeaponAction(const std::string& strValue);
 
@@ -31,8 +32,6 @@ CombatType_t indexToCombatType(size_t v);
 uint8_t serverFluidToClient(uint8_t serverFluid);
 
 uint8_t clientFluidToServer(uint8_t clientFluid);
-
-itemAttrTypes stringToItemAttribute(const std::string& str);
 
 SpellGroup_t stringToSpellGroup(const std::string& value);
 

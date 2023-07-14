@@ -78,6 +78,9 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/itemmaps.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/Item.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemAttributes.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemAttrSerializer.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemFactory.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/Items.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemType.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monster.cpp

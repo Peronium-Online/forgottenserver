@@ -16,10 +16,14 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/ClientIdToServerIdMap.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/Item.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemAttributes.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemAttrSerializer.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/itemenums.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemFactory.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/itemmaps.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/Items.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemType.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/itemutils.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monster.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterLoot.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monsters.h

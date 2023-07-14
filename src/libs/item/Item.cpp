@@ -275,7 +275,7 @@ void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream
 				throw ItemAttrError{ATTR_ATTACK_SPEED, "Unable to read attackSpeed attribute"};
 			}
 
-			iAttributes->setIntAttr(ITEM_ATTRIBUTE_ATTACK_SPEED, attackSpeed);
+			this->setAttackSpeed(attackSpeed);
 			break;
 		}
 
@@ -528,4 +528,13 @@ const Cylinder* Item::getTopParent() const
 		return prevaux;
 	}
 	return aux;
+}
+
+void Item::onRemoved()
+{
+	ScriptEnvironment::removeTempItem(this);
+
+	if (iAttributes->hasAttr(ITEM_ATTRIBUTE_UNIQUEID)) {
+		g_game.removeUniqueItem(getUniqueId());
+	}
 }

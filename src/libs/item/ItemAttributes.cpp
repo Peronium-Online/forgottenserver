@@ -35,7 +35,7 @@ bool ItemAttributes::equals(const ItemAttributes& other) const
 
 const ItemAttributes::Attribute* ItemAttributes::getExistingAttr(ItemAttrTypes type) const
 {
-	if (hasAttribute(type)) {
+	if (hasAttr(type)) {
 		for (const Attribute& attribute : attributes) {
 			if (attribute.type == type) {
 				return &attribute;
@@ -47,7 +47,7 @@ const ItemAttributes::Attribute* ItemAttributes::getExistingAttr(ItemAttrTypes t
 
 ItemAttributes::Attribute& ItemAttributes::getAttr(ItemAttrTypes type)
 {
-	if (hasAttribute(type)) {
+	if (hasAttr(type)) {
 		for (Attribute& attribute : attributes) {
 			if (attribute.type == type) {
 				return attribute;
@@ -77,10 +77,6 @@ void ItemAttributes::setIntAttr(ItemAttrTypes type, int64_t value)
 {
 	if (!isIntAttrType(type)) {
 		return;
-	}
-
-	if (type == ITEM_ATTRIBUTE_ATTACK_SPEED && value < 100) {
-		value = 100;
 	}
 
 	getAttr(type).value.integer = value;

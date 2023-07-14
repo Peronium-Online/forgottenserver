@@ -225,6 +225,7 @@ public:
 		auto it = reflect.find(combatType);
 		return it != reflect.end() ? it->second : Reflect::UNDEFINED;
 	}
+	std::map<CombatType_t, Reflect> getReflects() { return reflect; }
 
 	void setBoostPercent(CombatType_t combatType, uint16_t percent) { boostPercent[combatType] = percent; }
 	int16_t getBoostPercent(CombatType_t combatType)
@@ -232,6 +233,7 @@ public:
 		auto it = boostPercent.find(combatType);
 		return it != boostPercent.end() ? it->second : 0;
 	}
+	std::map<CombatType_t, uint16_t> getBoosts() { return boostPercent; }
 };
 
 #endif

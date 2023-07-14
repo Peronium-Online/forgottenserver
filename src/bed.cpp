@@ -15,13 +15,13 @@ extern Game g_game;
 
 BedItem::BedItem(uint16_t id) : Item(id) { internalRemoveSleeper(); }
 
-Attr_ReadValue BedItem::readAttr(AttrTypes_t attr, PropStream& propStream)
+void BedItem::setAttributeFromPropStream(ItemAttrTypesIndex attr, PropStream& propStream)
 {
 	switch (attr) {
 		case ATTR_SLEEPERGUID: {
 			uint32_t guid;
 			if (!propStream.read<uint32_t>(guid)) {
-				return ATTR_READ_ERROR;
+				throw ItemAttrError{ATTR_SLEEPERGUID, "Unable to read sleeper guid attribute"};
 			}
 
 			if (guid != 0) {
@@ -32,23 +32,20 @@ Attr_ReadValue BedItem::readAttr(AttrTypes_t attr, PropStream& propStream)
 					sleeperGUID = guid;
 				}
 			}
-			return ATTR_READ_CONTINUE;
 		}
 
 		case ATTR_SLEEPSTART: {
 			uint32_t sleep_start;
 			if (!propStream.read<uint32_t>(sleep_start)) {
-				return ATTR_READ_ERROR;
+				throw ItemAttrError{ATTR_SLEEPSTART, "Unable to read sleep start attribute"};
 			}
 
 			sleepStart = static_cast<uint64_t>(sleep_start);
-			return ATTR_READ_CONTINUE;
 		}
 
 		default:
-			break;
+			return Item::setAttributeFromPropStream(attr, propStream);
 	}
-	return Item::readAttr(attr, propStream);
 }
 
 void BedItem::serializeAttr(PropWriteStream& propWriteStream) const
@@ -67,7 +64,7 @@ void BedItem::serializeAttr(PropWriteStream& propWriteStream) const
 
 BedItem* BedItem::getNextBedItem() const
 {
-	Direction dir = Item::items[id].bedPartnerDir;
+	Direction dir = iType->bedPartnerDir;
 	Position targetPos = getNextPosition(dir, getPosition());
 
 	Tile* tile = g_game.map.getTile(targetPos);
@@ -109,7 +106,7 @@ bool BedItem::trySleep(Player* player)
 	}
 
 	if (sleeperGUID != 0) {
-		if (Item::items[id].transformToFree != 0 && house->getOwner() == player->getGUID()) {
+		if (iType->transformToFree != 0 && house->getOwner() == player->getGUID()) {
 			wakeUp(nullptr);
 		}
 
@@ -228,17 +225,17 @@ void BedItem::regeneratePlayer(Player* player) const
 
 void BedItem::updateAppearance(const Player* player)
 {
-	const ItemType& it = Item::items[id];
-	if (it.type == ITEM_TYPE_BED) {
-		if (player && it.transformToOnUse[player->getSex()] != 0) {
-			const ItemType& newType = Item::items[it.transformToOnUse[player->getSex()]];
-			if (newType.type == ITEM_TYPE_BED) {
-				g_game.transformItem(this, it.transformToOnUse[player->getSex()]);
+	if (getType() == ITEM_TYPE_BED) {
+		if (player && iType->transformToOnUse[player->getSex()] != 0) {
+			auto newItemTypeId = iType->transformToOnUse[player->getSex()];
+			auto newType = Items::getInstance().getItemType(newItemTypeId);
+			if (newType->type == ITEM_TYPE_BED) {
+				g_game.transformItem(this, newItemTypeId);
 			}
-		} else if (it.transformToFree != 0) {
-			const ItemType& newType = Item::items[it.transformToFree];
-			if (newType.type == ITEM_TYPE_BED) {
-				g_game.transformItem(this, it.transformToFree);
+		} else if (iType->transformToFree != 0) {
+			auto newType = Items::getInstance().getItemType(iType->transformToFree);
+			if (newType->type == ITEM_TYPE_BED) {
+				g_game.transformItem(this, iType->transformToFree);
 			}
 		}
 	}

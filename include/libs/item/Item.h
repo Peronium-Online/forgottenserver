@@ -71,9 +71,27 @@ public:
 	bool hasWalkStack() const { return iType->walkStack; }
 	bool isSupply() const { return iType->isSupply(); }
 	bool isPushable() const override final { return isMoveable(); }
+	bool isShowingCount() const { return iType->showCount; }
+	bool isFluidContainer() const { return iType->isFluidContainer(); }
+	bool isSplash() const { return iType->isSplash(); }
+	bool isStoreItem() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_STOREITEM)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_STOREITEM) == 1;
+		}
+		return iType->storeItem;
+	}
+	bool isOpenContainer() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_OPENCONTAINER)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER) == 1;
+		}
+		return false;
+	}
+
 	bool canReadText() const { return iType->canReadText; }
 	bool canWriteText() const { return iType->canWriteText; }
-	bool isShowingCount() const { return iType->showCount; }
+	virtual bool canRemove() const { return true; }
 
 	uint16_t getSubType() const;
 	void setSubType(uint16_t n);
@@ -118,11 +136,22 @@ public:
 		}
 	}
 
+	ItemDecayState getDecaying() const
+	{
+		return static_cast<ItemDecayState>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_DECAYSTATE));
+	}
 	void setDecaying(ItemDecayState decayState) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
 
 	int32_t getThrowRange() const override final { return (isPickupable() ? 15 : 2); }
 
-	virtual uint32_t getWeight() const;
+	virtual uint32_t getWeight() const
+	{
+		uint32_t weight = getBaseWeight();
+		if (isStackable()) {
+			return weight * std::max<uint32_t>(1, getItemCount());
+		}
+		return weight;
+	}
 	uint32_t getBaseWeight() const
 	{
 		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_WEIGHT)) {
@@ -151,12 +180,16 @@ public:
 	}
 	void setUniqueId(uint16_t n) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_UNIQUEID, n); }
 
+	const std::string& getText() const { return iAttributes->getStrAttr(ITEM_ATTRIBUTE_TEXT); }
 	void setText(const std::string& text) { iAttributes->setStrAttr(ITEM_ATTRIBUTE_TEXT, text); }
 
+	time_t getDate() const { return static_cast<time_t>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_DATE)); }
 	void setDate(int32_t n) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_DATE, n); }
 
+	const std::string& getWriter() const { return iAttributes->getStrAttr(ITEM_ATTRIBUTE_WRITER); }
 	void setWriter(const std::string& writer) { iAttributes->setStrAttr(ITEM_ATTRIBUTE_WRITER, writer); }
 
+	const std::string& getSpecialDescription() const { return iAttributes->getStrAttr(ITEM_ATTRIBUTE_DESCRIPTION); }
 	void setSpecialDescription(const std::string& desc) { iAttributes->setStrAttr(ITEM_ATTRIBUTE_DESCRIPTION, desc); }
 
 	ItemTypes getType() const { return iType->type; }
@@ -164,6 +197,54 @@ public:
 	uint32_t getCorpseOwner() const { return iAttributes->getIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER); }
 
 	uint16_t getMaxTextLen() const { return iType->maxTextLen; }
+
+	int32_t getAttack() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_ATTACK)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_ATTACK);
+		}
+		return iType->attack;
+	}
+
+	uint32_t getAttackSpeed() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_ATTACK_SPEED)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_ATTACK_SPEED);
+		}
+		return iType->attackSpeed;
+	}
+	void setAttackSpeed(uint32_t speed)
+	{
+		if (speed < 100) {
+			speed = 100;
+		}
+
+		this->iAttributes->setIntAttr(ITEM_ATTRIBUTE_ATTACK_SPEED, speed);
+	}
+
+	int32_t getDefense() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_DEFENSE)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_DEFENSE);
+		}
+		return iType->defense;
+	}
+
+	int32_t getExtraDefense() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_EXTRADEFENSE)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_EXTRADEFENSE);
+		}
+		return iType->extraDefense;
+	}
+
+	int32_t getArmor() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_ARMOR)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_ARMOR);
+		}
+		return iType->armor;
+	}
 
 	const std::string& getName() const
 	{
@@ -182,6 +263,52 @@ public:
 
 	Cylinder* getTopParent();
 	const Cylinder* getTopParent() const;
+
+	const std::string getArticle() const { return iAttributes->getStrAttr(ITEM_ATTRIBUTE_ARTICLE); }
+
+	int8_t getHitChance() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_HITCHANCE)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_HITCHANCE);
+		}
+		return iType->hitChance;
+	}
+
+	uint8_t getShootRange() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_SHOOTRANGE)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_SHOOTRANGE);
+		}
+		return iType->shootRange;
+	}
+
+	int32_t getDecayTo() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_DECAYTO)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_DECAYTO);
+		}
+		return iType->decayTo;
+	}
+
+	int32_t getWrapId() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_WRAPID)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_WRAPID);
+		}
+		return 0;
+	}
+
+	bool hasCustomAttribute() const { return iAttributes->hasAttr(ITEM_ATTRIBUTE_CUSTOM); }
+	std::unordered_map<std::string, CustomLuaAttribute>* getCustomAttributeMap() const
+	{
+		return iAttributes->getCustomAttrMap();
+	}
+
+	std::map<CombatType_t, Reflect> getReflects() const { return mAttributes->getReflects(); }
+
+	std::map<CombatType_t, uint16_t> getBoosts() const { return mAttributes->getBoosts(); }
+
+	virtual void onRemoved();
 };
 
 #endif
