@@ -69,6 +69,17 @@ public:
 
 	bool hasCurrencyItemOf(uint64_t amount) { return currencyItems.find(amount) != currencyItems.end(); }
 
+	bool isCurrencyItem(uint16_t id)
+	{
+		for (auto& currencyPair : currencyItems) {
+			if (currencyPair.second == id) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	void addCurrencyItem(uint64_t amount, uint16_t id) { currencyItems.insert(CurrencyMap::value_type(amount, id)); }
 };
 

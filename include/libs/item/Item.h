@@ -47,9 +47,6 @@ public:
 	bool equals(const Item* otherItem) const;
 	virtual Item* clone() const;
 
-	// TODO: Move to Container.h
-	static Container* CreateItemAsContainer(const uint16_t type, uint16_t size);
-
 	virtual void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream);
 
 	bool isBlocking() const { return iType->blockSolid; }
@@ -84,7 +81,7 @@ public:
 	bool isOpenContainer() const
 	{
 		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_OPENCONTAINER)) {
-			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER) == 1;
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER) > 0;
 		}
 		return false;
 	}
@@ -112,6 +109,14 @@ public:
 
 	uint16_t getItemCount() const { return count; }
 	void setItemCount(uint8_t n) { count = n; }
+	uint32_t countByType(int32_t subType)
+	{
+		if (subType == -1 || subType == getSubType()) {
+			return getItemCount();
+		}
+
+		return 0;
+	}
 
 	uint16_t getCharges() const { return static_cast<uint16_t>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_CHARGES)); }
 	void setCharges(uint16_t n) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_CHARGES, n); }
@@ -141,6 +146,14 @@ public:
 		return static_cast<ItemDecayState>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_DECAYSTATE));
 	}
 	void setDecaying(ItemDecayState decayState) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
+	int32_t getDecayTo() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_DECAYTO)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_DECAYTO);
+		}
+		return iType->decayTo;
+	}
+	virtual void startDecaying();
 
 	int32_t getThrowRange() const override final { return (isPickupable() ? 15 : 2); }
 
@@ -161,6 +174,7 @@ public:
 	}
 
 	uint16_t getID() const { return id; }
+	void setID(uint16_t newid);
 	uint16_t getClientID() const { return iType->clientId; }
 	uint16_t getActionId() const
 	{
@@ -264,6 +278,8 @@ public:
 	Cylinder* getTopParent();
 	const Cylinder* getTopParent() const;
 
+	const Player* getHoldingPlayer() const;
+
 	const std::string getArticle() const { return iAttributes->getStrAttr(ITEM_ATTRIBUTE_ARTICLE); }
 
 	int8_t getHitChance() const
@@ -282,14 +298,6 @@ public:
 		return iType->shootRange;
 	}
 
-	int32_t getDecayTo() const
-	{
-		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_DECAYTO)) {
-			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_DECAYTO);
-		}
-		return iType->decayTo;
-	}
-
 	int32_t getWrapId() const
 	{
 		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_WRAPID)) {
@@ -298,6 +306,13 @@ public:
 		return 0;
 	}
 
+	uint32_t getOwner() const { return iAttributes->getIntAttr(ITEM_ATTRIBUTE_OWNER); }
+	void setOwner(uint32_t owner) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_OWNER, owner); }
+
+	WeaponTypes getWeaponType() const { return iType->weaponType; }
+
+	AmmoTypes getAmmoType() const { return iType->ammoType; }
+
 	bool hasCustomAttribute() const { return iAttributes->hasAttr(ITEM_ATTRIBUTE_CUSTOM); }
 	std::unordered_map<std::string, CustomLuaAttribute>* getCustomAttributeMap() const
 	{
@@ -305,10 +320,24 @@ public:
 	}
 
 	std::map<CombatType_t, Reflect> getReflects() const { return mAttributes->getReflects(); }
+	const Reflect& getReflect(CombatType_t combatType) { return mAttributes->getReflect(combatType); }
 
 	std::map<CombatType_t, uint16_t> getBoosts() const { return mAttributes->getBoosts(); }
 
+	std::array<int16_t, COMBAT_COUNT> getAbsorbs() const { return iType->abilities->absorbPercent; }
+	std::array<int16_t, COMBAT_COUNT> getFieldAbsorbs() const { return iType->abilities->fieldAbsorbPercent; }
+
+	uint8_t getOpenContainerCID() const { return iAttributes->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER); }
+
+	int32_t getSlotPosition() const { return iType->slotPosition; }
+
+	uint32_t getWorth() const;
+
+	LightInfo getLightInfo() const;
+
 	virtual void onRemoved();
+
+	bool hasAbilities() const { return !!iType->abilities; }
 };
 
 #endif

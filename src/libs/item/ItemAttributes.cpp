@@ -111,3 +111,25 @@ void ItemAttributes::setStrAttr(ItemAttrTypes type, const std::string& value)
 	delete attr.value.string;
 	attr.value.string = new std::string(value);
 }
+
+void ItemAttributes::removeAttr(ItemAttrTypes type)
+{
+	if (!hasAttr(type)) {
+		return;
+	}
+
+	auto prev_it = attributes.rbegin();
+	if ((*prev_it).type == type) {
+		attributes.pop_back();
+	} else {
+		auto it = prev_it, end = attributes.rend();
+		while (++it != end) {
+			if ((*it).type == type) {
+				(*it) = attributes.back();
+				attributes.pop_back();
+				break;
+			}
+		}
+	}
+	attributeBits &= ~type;
+}

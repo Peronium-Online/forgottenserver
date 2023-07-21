@@ -73,20 +73,6 @@ bool Item::equals(const Item* otherItem) const
 	return otherAttributes->equals(*iAttributes);
 }
 
-Container* Item::CreateItemAsContainer(const uint16_t type, uint16_t size)
-{
-	auto it = Items::getInstance().getItemType(type);
-	if (it->id == 0 || it->group == ITEM_GROUP_DEPRECATED || it->stackable || it->useable || it->moveable ||
-	    it->pickupable || it->isDepot() || it->isSplash() || it->isDoor()) {
-		return nullptr;
-	}
-
-	Container* newItem = new Container(type, size);
-	newItem->iType = it;
-	newItem->incrementReferenceCounter();
-	return newItem;
-}
-
 void Item::setSubType(uint16_t n)
 {
 	if (iType->isFluidContainer() || iType->isSplash()) {
@@ -538,3 +524,33 @@ void Item::onRemoved()
 		g_game.removeUniqueItem(getUniqueId());
 	}
 }
+
+void Item::startDecaying() { g_game.startDecay(this); }
+
+void Item::setID(uint16_t newid)
+{
+	id = newid;
+
+	auto newIType = Items::getInstance().getItemType(newid);
+	uint32_t newDuration = newIType->decayTime * 1000;
+
+	if (newDuration == 0 && !newIType->stopTime && newIType->decayTo < 0) {
+		iAttributes->removeAttr(ITEM_ATTRIBUTE_DECAYSTATE);
+		iAttributes->removeAttr(ITEM_ATTRIBUTE_DURATION);
+	}
+
+	iAttributes->removeAttr(ITEM_ATTRIBUTE_CORPSEOWNER);
+
+	if (newDuration > 0 && (!iType->stopTime || !iAttributes->hasAttr(ITEM_ATTRIBUTE_DURATION))) {
+		setDecaying(DECAYING_FALSE);
+		setDuration(newDuration);
+	}
+
+	iType = newIType;
+}
+
+const Player* Item::getHoldingPlayer() const { return dynamic_cast<const Player*>(getTopParent()); }
+
+uint32_t Item::getWorth() const { return iType->worth * count; }
+
+LightInfo Item::getLightInfo() const { return {iType->lightLevel, iType->lightColor}; }

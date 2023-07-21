@@ -113,6 +113,8 @@ public:
 	void setStrAttr(ItemAttrTypes type, const std::string& value);
 	const std::string& getStrAttr(ItemAttrTypes type) const;
 
+	void removeAttr(ItemAttrTypes type);
+
 	CustomAttributeMap* getCustomAttrMap()
 	{
 		if (!hasAttr(ITEM_ATTRIBUTE_CUSTOM)) {

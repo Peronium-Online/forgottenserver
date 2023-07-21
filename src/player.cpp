@@ -15,6 +15,7 @@
 #include "game.h"
 #include "inbox.h"
 #include "iologindata.h"
+#include "libs/item/ItemFactory.h"
 #include "libs/monster/Monster.h"
 #include "libs/outfit/Outfits.h"
 #include "libs/util/tools/random.h"
@@ -220,17 +221,16 @@ Item* Player::getWeapon(slots_t slot, bool ignoreAmmo) const
 		return nullptr;
 	}
 
-	WeaponType_t weaponType = item->getWeaponType();
+	WeaponTypes weaponType = item->getWeaponType();
 	if (weaponType == WEAPON_NONE || weaponType == WEAPON_SHIELD || weaponType == WEAPON_AMMO ||
 	    weaponType == WEAPON_QUIVER) {
 		return nullptr;
 	}
 
 	if (!ignoreAmmo && weaponType == WEAPON_DISTANCE) {
-		const ItemType& itemType = Item::items[item->getID()];
-		if (itemType.ammoType != AMMO_NONE) {
+		if (item->getAmmoType() != AMMO_NONE) {
 			Item* ammoItem = inventory[CONST_SLOT_AMMO];
-			if (!ammoItem || ammoItem->getAmmoType() != itemType.ammoType) {
+			if (!ammoItem || ammoItem->getAmmoType() != item->getAmmoType()) {
 				// no ammo item was found, search for quiver instead
 				Container* quiver = inventory[CONST_SLOT_RIGHT] ? inventory[CONST_SLOT_RIGHT]->getContainer() : nullptr;
 				if (!quiver || quiver->getWeaponType() != WEAPON_QUIVER) {
@@ -240,7 +240,7 @@ Item* Player::getWeapon(slots_t slot, bool ignoreAmmo) const
 
 				for (ContainerIterator containerItem = quiver->iterator(); containerItem.hasNext();
 				     containerItem.advance()) {
-					if (itemType.ammoType == (*containerItem)->getAmmoType()) {
+					if (item->getAmmoType() == (*containerItem)->getAmmoType()) {
 						const Weapon* weapon = g_weapons->getWeapon(*containerItem);
 						if (weapon && weapon->ammoCheck(this)) {
 							return *containerItem;
@@ -271,7 +271,7 @@ Item* Player::getWeapon(bool ignoreAmmo /* = false*/) const
 	return nullptr;
 }
 
-WeaponType_t Player::getWeaponType() const
+WeaponTypes Player::getWeaponType() const
 {
 	Item* item = getWeapon();
 	if (!item) {
@@ -288,7 +288,7 @@ int32_t Player::getWeaponSkill(const Item* item) const
 
 	int32_t attackSkill;
 
-	WeaponType_t weaponType = item->getWeaponType();
+	WeaponTypes weaponType = item->getWeaponType();
 	switch (weaponType) {
 		case WEAPON_SWORD: {
 			attackSkill = getSkillLevel(SKILL_SWORD);
@@ -885,7 +885,7 @@ DepotLocker& Player::getDepotLocker()
 {
 	if (!depotLocker) {
 		depotLocker = std::make_shared<DepotLocker>(ITEM_LOCKER);
-		depotLocker->internalAddThing(Item::CreateItem(ITEM_MARKET));
+		depotLocker->internalAddThing(ItemFactory::create(ITEM_MARKET));
 		depotLocker->internalAddThing(inbox);
 
 		DepotChest* depotChest = new DepotChest(ITEM_DEPOT, false);
@@ -1098,14 +1098,14 @@ void Player::openSavedContainers()
 
 		Container* itemContainer = item->getContainer();
 		if (itemContainer) {
-			uint8_t cid = item->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER);
+			uint8_t cid = item->getOpenContainerCID();
 			if (cid > 0) {
 				openContainersList.emplace(cid, itemContainer);
 			}
 			for (ContainerIterator it = itemContainer->iterator(); it.hasNext(); it.advance()) {
 				Container* subContainer = (*it)->getContainer();
 				if (subContainer) {
-					uint8_t subcid = (*it)->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER);
+					uint8_t subcid = (*it)->getOpenContainerCID();
 					if (subcid > 0) {
 						openContainersList.emplace(subcid, subContainer);
 					}
@@ -2060,8 +2060,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 				continue;
 			}
 
-			const ItemType& it = Item::items[item->getID()];
-			if (!it.abilities) {
+			if (!item->hasAbilities()) {
 				if (damage <= 0) {
 					damage = 0;
 					return BLOCK_ARMOR;
@@ -2070,7 +2069,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 				continue;
 			}
 
-			const int16_t& absorbPercent = it.abilities->absorbPercent[combatIndex];
+			const int16_t& absorbPercent = item->getAbsorbs()[combatIndex];
 			if (absorbPercent != 0) {
 				damage -= std::round(damage * (absorbPercent / 100.));
 
@@ -2083,7 +2082,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			reflect += item->getReflect(combatType);
 
 			if (field) {
-				const int16_t& fieldAbsorbPercent = it.abilities->fieldAbsorbPercent[combatIndex];
+				const int16_t& fieldAbsorbPercent = item->getFieldAbsorbs()[combatIndex];
 				if (fieldAbsorbPercent != 0) {
 					damage -= std::round(damage * (fieldAbsorbPercent / 100.));
 
@@ -2574,7 +2573,7 @@ ReturnValue Player::queryAdd(int32_t index, const Thing& thing, uint32_t count, 
 					}
 				} else if (inventory[CONST_SLOT_LEFT]) {
 					const Item* leftItem = inventory[CONST_SLOT_LEFT];
-					WeaponType_t type = item->getWeaponType(), leftType = leftItem->getWeaponType();
+					WeaponTypes type = item->getWeaponType(), leftType = leftItem->getWeaponType();
 
 					if (leftItem->getSlotPosition() & SLOTP_TWO_HAND) {
 						if (leftItem->getWeaponType() != WEAPON_DISTANCE || type != WEAPON_QUIVER) {
@@ -2603,7 +2602,7 @@ ReturnValue Player::queryAdd(int32_t index, const Thing& thing, uint32_t count, 
 		case CONST_SLOT_LEFT: {
 			if (slotPosition & SLOTP_LEFT) {
 				if (!g_config.getBoolean(ConfigManager::CLASSIC_EQUIPMENT_SLOTS)) {
-					WeaponType_t type = item->getWeaponType();
+					WeaponTypes type = item->getWeaponType();
 					const Item* rightItem = inventory[CONST_SLOT_RIGHT];
 					if (type == WEAPON_NONE || type == WEAPON_SHIELD || type == WEAPON_AMMO || type == WEAPON_QUIVER) {
 						ret = RETURNVALUE_CANNOTBEDRESSED;
@@ -2629,7 +2628,7 @@ ReturnValue Player::queryAdd(int32_t index, const Thing& thing, uint32_t count, 
 					}
 				} else if (inventory[CONST_SLOT_RIGHT]) {
 					const Item* rightItem = inventory[CONST_SLOT_RIGHT];
-					WeaponType_t type = item->getWeaponType(), rightType = rightItem->getWeaponType();
+					WeaponTypes type = item->getWeaponType(), rightType = rightItem->getWeaponType();
 
 					if (rightItem->getSlotPosition() & SLOTP_TWO_HAND) {
 						if (type != WEAPON_DISTANCE || rightItem->getWeaponType() != WEAPON_QUIVER) {
@@ -3087,13 +3086,13 @@ uint32_t Player::getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) con
 		}
 
 		if (item->getID() == itemId) {
-			count += Item::countByType(item, subType);
+			count += item->countByType(subType);
 		}
 
 		if (Container* container = item->getContainer()) {
 			for (ContainerIterator it = container->iterator(); it.hasNext(); it.advance()) {
 				if ((*it)->getID() == itemId) {
-					count += Item::countByType(*it, subType);
+					count += (*it)->countByType(subType);
 				}
 			}
 		}
@@ -3117,7 +3116,7 @@ bool Player::removeItemOfType(uint16_t itemId, uint32_t amount, int32_t subType,
 		}
 
 		if (!ignoreEquipped && item->getID() == itemId) {
-			uint32_t itemCount = Item::countByType(item, subType);
+			uint32_t itemCount = item->countByType(subType);
 			if (itemCount == 0) {
 				continue;
 			}
@@ -3126,14 +3125,15 @@ bool Player::removeItemOfType(uint16_t itemId, uint32_t amount, int32_t subType,
 
 			count += itemCount;
 			if (count >= amount) {
-				g_game.internalRemoveItems(std::move(itemList), amount, Item::items[itemId].stackable);
+				g_game.internalRemoveItems(std::move(itemList), amount,
+				                           Items::getInstance().getItemType(itemId)->stackable);
 				return true;
 			}
 		} else if (Container* container = item->getContainer()) {
 			for (ContainerIterator it = container->iterator(); it.hasNext(); it.advance()) {
 				Item* containerItem = *it;
 				if (containerItem->getID() == itemId) {
-					uint32_t itemCount = Item::countByType(containerItem, subType);
+					uint32_t itemCount = containerItem->countByType(subType);
 					if (itemCount == 0) {
 						continue;
 					}
@@ -3142,7 +3142,8 @@ bool Player::removeItemOfType(uint16_t itemId, uint32_t amount, int32_t subType,
 
 					count += itemCount;
 					if (count >= amount) {
-						g_game.internalRemoveItems(std::move(itemList), amount, Item::items[itemId].stackable);
+						g_game.internalRemoveItems(std::move(itemList), amount,
+						                           Items::getInstance().getItemType(itemId)->stackable);
 						return true;
 					}
 				}
@@ -3160,11 +3161,11 @@ std::map<uint32_t, uint32_t>& Player::getAllItemTypeCount(std::map<uint32_t, uin
 			continue;
 		}
 
-		countMap[item->getID()] += Item::countByType(item, -1);
+		countMap[item->getID()] += item->countByType(-1);
 
 		if (Container* container = item->getContainer()) {
 			for (ContainerIterator it = container->iterator(); it.hasNext(); it.advance()) {
-				countMap[(*it)->getID()] += Item::countByType(*it, -1);
+				countMap[(*it)->getID()] += (*it)->countByType(-1);
 			}
 		}
 	}
@@ -3309,13 +3310,7 @@ void Player::postRemoveNotification(Thing* thing, const Cylinder* newParent, int
 bool Player::updateSaleShopList(const Item* item)
 {
 	uint16_t itemId = item->getID();
-	bool isCurrency = false;
-	for (const auto& it : Item::items.currencyItems) {
-		if (it.second == itemId) {
-			isCurrency = true;
-			break;
-		}
-	}
+	bool isCurrency = Items::getInstance().isCurrencyItem(itemId);
 
 	if (!isCurrency) {
 		auto it = std::find_if(shopItemList.begin(), shopItemList.end(), [itemId](const ShopInfo& shopInfo) {
@@ -3341,10 +3336,10 @@ bool Player::updateSaleShopList(const Item* item)
 
 bool Player::hasShopItemForSale(uint32_t itemId, uint8_t subType) const
 {
-	const ItemType& itemType = Item::items[itemId];
+	auto itemType = Items::getInstance().getItemType(itemId);
 	return std::any_of(shopItemList.begin(), shopItemList.end(), [&](const ShopInfo& shopInfo) {
 		return shopInfo.itemId == itemId && shopInfo.buyPrice != 0 &&
-		       (!itemType.isFluidContainer() || shopInfo.subType == subType);
+		       (!itemType->isFluidContainer() || shopInfo.subType == subType);
 	});
 }
 

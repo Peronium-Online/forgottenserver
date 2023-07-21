@@ -469,7 +469,7 @@ public:
 
 	Item* getWeapon(slots_t slot, bool ignoreAmmo) const;
 	Item* getWeapon(bool ignoreAmmo = false) const;
-	WeaponType_t getWeaponType() const;
+	WeaponTypes getWeaponType() const;
 	int32_t getWeaponSkill(const Item* item) const;
 	void getShieldAndWeapon(const Item*& shield, const Item*& weapon) const;
 

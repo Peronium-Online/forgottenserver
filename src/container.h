@@ -50,7 +50,7 @@ public:
 	virtual StoreInbox* getStoreInbox() { return nullptr; }
 	virtual const StoreInbox* getStoreInbox() const { return nullptr; }
 
-	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream) override;
+	void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream) override;
 	bool unserializeItemNode(OTB::Loader& loader, const OTB::Node& node, PropStream& propStream) override;
 
 	size_t size() const { return itemlist.size(); }

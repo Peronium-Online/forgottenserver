@@ -95,3 +95,16 @@ Item* ItemFactory::create(PropStream& propStream)
 
 	return create(id, 0);
 }
+
+Container* ItemFactory::createAsContainer(const uint16_t type, uint16_t size)
+{
+	auto it = Items::getInstance().getItemType(type);
+	if (it->id == 0 || it->group == ITEM_GROUP_DEPRECATED || it->stackable || it->useable || it->moveable ||
+	    it->pickupable || it->isDepot() || it->isSplash() || it->isDoor()) {
+		return nullptr;
+	}
+
+	Container* newItem = new Container(type, size);
+	newItem->incrementReferenceCounter();
+	return newItem;
+}

@@ -8,6 +8,7 @@
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
+#include "libs/item/ItemFactory.h"
 #include "libs/monster/Monster.h"
 #include "libs/util/tools/direction.h"
 #include "libs/util/tools/random.h"
@@ -626,7 +627,7 @@ void Combat::combatTileEffects(const SpectatorVec& spectators, Creature* caster,
 			}
 		}
 
-		Item* item = Item::CreateItem(itemId);
+		Item* item = ItemFactory::create(itemId);
 		if (caster) {
 			item->setOwner(caster->getID());
 		}
@@ -1495,9 +1496,8 @@ void MagicField::onStepInField(Creature* creature)
 		return;
 	}
 
-	const ItemType& it = items[getID()];
-	if (it.conditionDamage) {
-		Condition* conditionCopy = it.conditionDamage->clone();
+	if (this->iType->conditionDamage) {
+		Condition* conditionCopy = this->iType->conditionDamage->clone();
 		uint32_t ownerId = getOwner();
 		if (ownerId) {
 			bool harmfulField = true;
