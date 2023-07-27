@@ -123,7 +123,7 @@ public:
 
 	WeaponAction_t action = WEAPONACTION_NONE;
 	CombatParams params;
-	WeaponType_t weaponType;
+	WeaponTypes weaponType;
 	std::unordered_set<uint16_t> vocationWeaponSet;
 
 protected:

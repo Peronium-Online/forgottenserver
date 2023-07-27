@@ -27,7 +27,7 @@ private:
 	friend class Container;
 };
 
-class Container : public Item, public Cylinder
+class Container : public Item, public Cylinder, OTBLoadable
 {
 public:
 	explicit Container(uint16_t type);
@@ -51,7 +51,6 @@ public:
 	virtual const StoreInbox* getStoreInbox() const { return nullptr; }
 
 	void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream) override;
-	bool unserializeItemNode(OTB::Loader& loader, const OTB::Node& node, PropStream& propStream) override;
 
 	size_t size() const { return itemlist.size(); }
 	bool empty() const { return itemlist.empty(); }
@@ -132,6 +131,8 @@ private:
 
 	Container* getParentContainer();
 	void updateItemWeight(int32_t diff);
+
+	bool load(const OTBNode& node, PropStream stream) override;
 
 	friend class ContainerIterator;
 	friend class IOMapSerialize;

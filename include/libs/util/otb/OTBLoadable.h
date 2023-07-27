@@ -12,6 +12,8 @@ using MappedFile = boost::iostreams::mapped_file_source;
 using ContentIt = MappedFile::iterator;
 using OTBIdentifier = std::array<char, 4>;
 
+constexpr auto OTBI = OTBIdentifier{{'O', 'T', 'B', 'I'}};
+
 // 1-byte aligned structs
 #pragma pack(1)
 

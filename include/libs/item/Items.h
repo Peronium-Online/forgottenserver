@@ -11,8 +11,6 @@
 using NameMap = std::unordered_map<std::string, uint16_t>;
 using CurrencyMap = std::map<uint64_t, uint16_t, std::greater<uint64_t>>;
 
-constexpr auto OTBI = OTBIdentifier{{'O', 'T', 'B', 'I'}};
-
 class Items final : virtual public XMLLoadable, OTBLoadable
 {
 private:

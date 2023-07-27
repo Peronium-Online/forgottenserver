@@ -10,6 +10,8 @@
 #include "housetile.h"
 #include "inbox.h"
 #include "iomap.h"
+#include "libs/item/ItemAttrSerializer.h"
+#include "libs/item/ItemFactory.h"
 #include "libs/item/Items.h"
 #include "spectators.h"
 #include "storeinbox.h"
@@ -19,7 +21,7 @@ extern Game g_game;
 Container::Container(uint16_t type) : Container(type, Items::getInstance().getItemType(type)->maxItems) {}
 
 Container::Container(uint16_t type, uint16_t size, bool unlocked /*= true*/, bool pagination /*= false*/) :
-    Item(type), maxSize(size), unlocked(unlocked), pagination(pagination)
+    Item(type), OTBLoadable("data/items/items.otb", OTBI), maxSize(size), unlocked(unlocked), pagination(pagination)
 {}
 
 Container::Container(Tile* tile) : Container(ITEM_BROWSEFIELD, 30, false, true)
@@ -27,8 +29,7 @@ Container::Container(Tile* tile) : Container(ITEM_BROWSEFIELD, 30, false, true)
 	TileItemVector* itemVector = tile->getItemList();
 	if (itemVector) {
 		for (Item* item : *itemVector) {
-			if ((item->getContainer() || item->hasProperty(CONST_PROP_MOVEABLE)) &&
-			    !item->hasAttribute(ITEM_ATTRIBUTE_UNIQUEID)) {
+			if ((item->getContainer() || item->isMoveable()) && item->getUniqueId() == 0) {
 				itemlist.push_front(item);
 				item->setParent(this);
 			}
@@ -75,8 +76,7 @@ Container* Container::getParentContainer()
 
 std::string Container::getName(bool addArticle /* = false*/) const
 {
-	const ItemType& it = items[id];
-	return getNameDescription(it, this, -1, addArticle);
+	return getNameDescription(iType, this, -1, addArticle);
 }
 
 bool Container::hasParent() const { return getID() != ITEM_BROWSEFIELD && !dynamic_cast<const Player*>(getParent()); }
@@ -87,48 +87,47 @@ void Container::addItem(Item* item)
 	item->setParent(this);
 }
 
-Attr_ReadValue Container::readAttr(AttrTypes_t attr, PropStream& propStream)
+void Container::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream)
 {
-	if (attr == ATTR_CONTAINER_ITEMS) {
-		if (!propStream.read<uint32_t>(serializationCount)) {
-			return ATTR_READ_ERROR;
+	if (idx == ATTR_CONTAINER_ITEMS) {
+		if (!stream.read<uint32_t>(serializationCount)) {
+			throw ItemAttrError{ATTR_CONTAINER_ITEMS, "Unable to read containerItems attribute"};
 		}
-		return ATTR_READ_END;
+		return;
 	}
-	return Item::readAttr(attr, propStream);
+	return Item::setAttributeFromPropStream(idx, stream);
 }
 
-bool Container::unserializeItemNode(OTB::Loader& loader, const OTB::Node& node, PropStream& propStream)
+bool Container::load(const OTBNode& node, PropStream stream)
 {
-	bool ret = Item::unserializeItemNode(loader, node, propStream);
+	bool ret = ItemAttrSerializer::unserializeAttr((Item*)this, stream);
 	if (!ret) {
 		return false;
 	}
 
-	for (auto& itemNode : node.children) {
-		// load container items
-		if (itemNode.type != OTBM_ITEM) {
-			// unknown type
-			return false;
-		}
-
-		PropStream itemPropStream;
-		if (!loader.getProps(itemNode, itemPropStream)) {
-			return false;
-		}
-
-		Item* item = Item::CreateItem(itemPropStream);
-		if (!item) {
-			return false;
-		}
-
-		if (!item->unserializeItemNode(loader, itemNode, itemPropStream)) {
-			return false;
-		}
-
-		addItem(item);
-		updateItemWeight(item->getWeight());
+	// load container items
+	if (node.type != OTBM_ITEM) {
+		// unknown type
+		return false;
 	}
+
+	PropStream itemPropStream;
+	if (!this->getProps(node, itemPropStream)) {
+		return false;
+	}
+
+	Item* item = ItemFactory::create(itemPropStream);
+	if (!item) {
+		return false;
+	}
+
+	if (!ItemAttrSerializer::unserializeAttr(item, stream)) {
+		return false;
+	}
+
+	addItem(item);
+	updateItemWeight(item->getWeight());
+
 	return true;
 }
 
@@ -619,7 +618,7 @@ uint32_t Container::getItemTypeCount(uint16_t itemId, int32_t subType /* = -1*/)
 	uint32_t count = 0;
 	for (Item* item : itemlist) {
 		if (item->getID() == itemId) {
-			count += countByType(item, subType);
+			count += item->countByType(subType);
 		}
 	}
 	return count;

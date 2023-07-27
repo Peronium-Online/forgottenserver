@@ -5,6 +5,8 @@
 #include "libs/item/ItemFactory.h"
 #include "libs/item/Items.h"
 
+#include <sstream>
+
 extern Game g_game;
 
 Item::Item(const uint16_t type, uint16_t count) : id(type)
@@ -554,3 +556,41 @@ const Player* Item::getHoldingPlayer() const { return dynamic_cast<const Player*
 uint32_t Item::getWorth() const { return iType->worth * count; }
 
 LightInfo Item::getLightInfo() const { return {iType->lightLevel, iType->lightColor}; }
+
+std::string Item::getNameDescription(const ItemType* it, const Item* item /*= nullptr*/, int32_t subType /*= -1*/,
+                                     bool addArticle /*= true*/)
+{
+	if (item) {
+		subType = item->getSubType();
+	}
+
+	std::ostringstream s;
+
+	const std::string& name = (item ? item->getName() : it->name);
+	if (!name.empty()) {
+		if (it->stackable && subType > 1) {
+			if (it->showCount) {
+				s << subType << ' ';
+			}
+
+			s << (item ? item->getPluralName() : it->getPluralName());
+		} else {
+			if (addArticle) {
+				const std::string& article = (item ? item->getArticle() : it->article);
+				if (!article.empty()) {
+					s << article << ' ';
+				}
+			}
+
+			s << name;
+		}
+	} else {
+		if (addArticle) {
+			s << "an ";
+		}
+		s << "item of type " << it->id;
+	}
+	return s.str();
+}
+
+std::string Item::getNameDescription() const { return getNameDescription(iType, this); }

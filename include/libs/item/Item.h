@@ -34,6 +34,8 @@ private:
 protected:
 	uint16_t id; // the same id as in ItemType
 
+	Cylinder* parent = nullptr;
+
 	const ItemType* iType;
 	std::unique_ptr<ItemAttributes> iAttributes;
 	std::unique_ptr<MutableItemAttributes> mAttributes;
@@ -47,6 +49,9 @@ public:
 	bool equals(const Item* otherItem) const;
 	virtual Item* clone() const;
 
+	static std::string getNameDescription(const ItemType* it, const Item* item = nullptr, int32_t subType = -1,
+	                                      bool addArticle = true);
+
 	virtual void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream);
 
 	bool isBlocking() const { return iType->blockSolid; }
@@ -54,7 +59,7 @@ public:
 	bool isAlwaysOnTop() const { return iType->alwaysOnTop; }
 	bool isGroundTile() const { return iType->isGroundTile(); }
 	bool isMagicField() const { return iType->isMagicField(); }
-	bool isMoveable() const { return iType->moveable; }
+	bool isMoveable() const { return iType->moveable && !iAttributes->hasAttr(ITEM_ATTRIBUTE_UNIQUEID); }
 	bool isPickupable() const { return iType->pickupable; }
 	bool isUseable() const { return iType->useable; }
 	bool isHangable() const { return iType->isHangable; }
@@ -259,6 +264,8 @@ public:
 		}
 		return iType->armor;
 	}
+
+	std::string getNameDescription() const;
 
 	const std::string& getName() const
 	{
