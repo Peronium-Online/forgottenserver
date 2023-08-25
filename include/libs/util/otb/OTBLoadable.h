@@ -13,6 +13,7 @@ using ContentIt = MappedFile::iterator;
 using OTBIdentifier = std::array<char, 4>;
 
 constexpr auto OTBI = OTBIdentifier{{'O', 'T', 'B', 'I'}};
+constexpr auto OTBM = OTBIdentifier{{'O', 'T', 'B', 'M'}};
 
 // 1-byte aligned structs
 #pragma pack(1)

@@ -6,6 +6,7 @@
 
 #include "configmanager.h"
 #include "house.h"
+#include "libs/util/otb/OTBLoadable.h"
 #include "map.h"
 #include "spawn.h"
 

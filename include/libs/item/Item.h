@@ -345,6 +345,9 @@ public:
 	virtual void onRemoved();
 
 	bool hasAbilities() const { return !!iType->abilities; }
+
+	bool isLoadedFromMap() const { return loadedFromMap; }
+	void setLoadedFromMap(bool value) { loadedFromMap = value; }
 };
 
 #endif

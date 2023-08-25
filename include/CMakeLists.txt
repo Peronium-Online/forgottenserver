@@ -3,9 +3,11 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/constants/const.h
 	${CMAKE_CURRENT_LIST_DIR}/constants/definitions.h
 	${CMAKE_CURRENT_LIST_DIR}/constants/enums.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/map/IOMap.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/map/iomapenums.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/datastructures/Dictionary.h
-	${CMAKE_CURRENT_LIST_DIR}/libs/util/xml/XMLElement.h
-	${CMAKE_CURRENT_LIST_DIR}/libs/util/xml/XMLLoadable.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/otb/otberrors.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/otb/OTBLoadable.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/bitwise.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/date.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/direction.h
@@ -16,6 +18,8 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/ClientIdToServerIdMap.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/Item.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/xml/XMLElement.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/xml/XMLLoadable.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemAttributes.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemAttrSerializer.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/itemenums.h
