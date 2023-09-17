@@ -9,10 +9,10 @@
 #include "game.h"
 #include "housetile.h"
 #include "inbox.h"
-#include "iomap.h"
 #include "libs/item/ItemAttrSerializer.h"
 #include "libs/item/ItemFactory.h"
 #include "libs/item/Items.h"
+#include "libs/map/IOMap.h"
 #include "spectators.h"
 #include "storeinbox.h"
 

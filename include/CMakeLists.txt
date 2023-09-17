@@ -40,4 +40,6 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/libs/outfit/Outfits.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocation.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocations.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/map/IOMap.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/map/iomapenums.h
 )

@@ -11,7 +11,7 @@
 using NameMap = std::unordered_map<std::string, uint16_t>;
 using CurrencyMap = std::map<uint64_t, uint16_t, std::greater<uint64_t>>;
 
-class Items final : virtual public XMLLoadable, OTBLoadable
+class Items final : virtual public XMLLoadable, public OTBLoadable
 {
 private:
 	Items() : OTBLoadable("data/items/items.otb", OTBI)

@@ -4,6 +4,8 @@
 #include "libs/item/ItemAttrSerializer.h"
 #include "libs/item/ItemFactory.h"
 #include "libs/map/iomapenums.h"
+#include "libs/util/otb/otberrors.h"
+#include "libs/util/tools/date.h"
 #include "libs/util/tools/propstream.h"
 
 #include <fmt/color.h>
@@ -340,4 +342,99 @@ Tile* IOMap::createTile(Item*& ground, Item* item, uint16_t x, uint16_t y, uint8
 	ground->startDecaying();
 	ground = nullptr;
 	return tile;
+}
+
+bool IOMap::load(const OTBNode& node, PropStream stream)
+{
+	int64_t start = OTSYS_TIME();
+	try {
+		auto& root = this->parseTree();
+
+		PropStream propStream;
+		if (!this->getProps(root, propStream)) {
+			setLastErrorString("Could not read root property.");
+			return false;
+		}
+
+		OTBM_root_header root_header;
+		if (!propStream.read(root_header)) {
+			setLastErrorString("Could not read header.");
+			return false;
+		}
+
+		uint32_t headerVersion = root_header.version;
+		if (headerVersion == 0) {
+			// In otbm version 1 the count variable after splashes/fluidcontainers and stackables are saved as
+			// attributes instead, this solves a lot of problems with items that are changed
+			// (stackable/charges/fluidcontainer/splash) during an update.
+			setLastErrorString(
+			    "This map need to be upgraded by using the latest map editor version to be able to load correctly.");
+			return false;
+		}
+
+		if (headerVersion > 2) {
+			setLastErrorString("Unknown OTBM version detected.");
+			return false;
+		}
+
+		if (root_header.majorVersionItems < 3) {
+			setLastErrorString(
+			    "This map need to be upgraded by using the latest map editor version to be able to load correctly.");
+			return false;
+		}
+
+		if (root_header.majorVersionItems > Items::getInstance().otbMajorVersion) {
+			setLastErrorString(
+			    "The map was saved with a different items.otb version, an upgraded items.otb is required.");
+			return false;
+		}
+
+		if (root_header.minorVersionItems < CLIENT_VERSION_810) {
+			setLastErrorString("This map needs to be updated.");
+			return false;
+		}
+
+		if (root_header.minorVersionItems > Items::getInstance().otbMinorVersion) {
+			std::cout << "[Warning - IOMap::loadMap] This map needs an updated items.otb." << std::endl;
+		}
+
+		std::cout << "> Map size: " << root_header.width << "x" << root_header.height << '.' << std::endl;
+		map->width = root_header.width;
+		map->height = root_header.height;
+
+		if (root.children.size() != 1 || root.children[0].type != OTBM_MAP_DATA) {
+			setLastErrorString("Could not read data node.");
+			return false;
+		}
+
+		auto& mapNode = root.children[0];
+		if (!parseMapDataAttributes(mapNode, *map)) {
+			return false;
+		}
+
+		for (auto& mapDataNode : mapNode.children) {
+			if (mapDataNode.type == OTBM_TILE_AREA) {
+				if (!parseTileArea(mapDataNode, *map)) {
+					return false;
+				}
+			} else if (mapDataNode.type == OTBM_TOWNS) {
+				if (!parseTowns(mapDataNode, *map)) {
+					return false;
+				}
+			} else if (mapDataNode.type == OTBM_WAYPOINTS && headerVersion > 1) {
+				if (!parseWaypoints(mapDataNode, *map)) {
+					return false;
+				}
+			} else {
+				setLastErrorString("Unknown map node.");
+				return false;
+			}
+		}
+	} catch (const InvalidOTBFormat& err) {
+		setLastErrorString(err.what());
+		return false;
+	}
+
+	std::cout << "> Map loading time: " << (OTSYS_TIME() - start) / (1000.) << " seconds." << std::endl;
+	return true;
 }

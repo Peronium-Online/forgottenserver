@@ -28,7 +28,6 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/housetile.cpp
 	${CMAKE_CURRENT_LIST_DIR}/inbox.cpp
 	${CMAKE_CURRENT_LIST_DIR}/iologindata.cpp
-	${CMAKE_CURRENT_LIST_DIR}/iomap.cpp
 	${CMAKE_CURRENT_LIST_DIR}/iomapserialize.cpp
 	${CMAKE_CURRENT_LIST_DIR}/iomarket.cpp
 	${CMAKE_CURRENT_LIST_DIR}/luascript.cpp
@@ -92,6 +91,7 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/libs/outfit/Outfits.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocation.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/vocation/Vocations.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/map/IOMap.cpp
 	PARENT_SCOPE)
 
 set(peronium_HDR
@@ -127,7 +127,6 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/housetile.h
 	${CMAKE_CURRENT_LIST_DIR}/inbox.h
 	${CMAKE_CURRENT_LIST_DIR}/iologindata.h
-	${CMAKE_CURRENT_LIST_DIR}/iomap.h
 	${CMAKE_CURRENT_LIST_DIR}/iomapserialize.h
 	${CMAKE_CURRENT_LIST_DIR}/iomarket.h
 	${CMAKE_CURRENT_LIST_DIR}/lockfree.h

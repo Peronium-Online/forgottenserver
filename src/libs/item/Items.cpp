@@ -154,6 +154,8 @@ bool Items::load(const OTBNode& node, PropStream stream)
 	iType->alwaysOnTopOrder = alwaysOnTopOrder;
 
 	this->addItem(*iType);
+
+	return true;
 }
 
 bool Items::loadFromOTB()
