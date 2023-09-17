@@ -9,6 +9,9 @@
 #include "container.h"
 #include "position.h"
 
+#include <set>
+#include <unordered_set>
+
 class BedItem;
 class House;
 class HouseTile;
@@ -50,7 +53,6 @@ public:
 	House* getHouse() { return house; }
 
 	void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream) override;
-	void serializeAttr(PropWriteStream&) const override {}
 
 	void setDoorId(uint32_t doorId) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_DOORID, doorId); }
 	uint32_t getDoorId() const { return iAttributes->getIntAttr(ITEM_ATTRIBUTE_DOORID); }
@@ -94,7 +96,7 @@ public:
 
 	explicit HouseTransferItem(House* house) : Item(0), house(house) {}
 
-	void onTradeEvent(TradeEvents_t event, Player* owner) override;
+	void onTradeEvent(TradeEvents event, Player* owner) override;
 	bool canTransform() const override { return false; }
 
 private:

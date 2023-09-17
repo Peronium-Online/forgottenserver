@@ -13,6 +13,7 @@
 #include "libs/item/ItemFactory.h"
 #include "libs/item/Items.h"
 #include "libs/map/IOMap.h"
+#include "libs/map/iomapenums.h"
 #include "spectators.h"
 #include "storeinbox.h"
 

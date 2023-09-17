@@ -94,6 +94,7 @@ public:
 	bool canReadText() const { return iType->canReadText; }
 	bool canWriteText() const { return iType->canWriteText; }
 	virtual bool canRemove() const { return true; }
+	virtual bool canTransform() const { return true; }
 
 	uint16_t getSubType() const;
 	void setSubType(uint16_t n);
@@ -343,6 +344,7 @@ public:
 	LightInfo getLightInfo() const;
 
 	virtual void onRemoved();
+	virtual void onTradeEvent(TradeEvents, Player*) {}
 
 	bool hasAbilities() const { return !!iType->abilities; }
 

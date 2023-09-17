@@ -557,4 +557,10 @@ enum ITEMPROPERTY
 	CONST_PROP_SUPPORTHANGABLE,
 };
 
+enum TradeEvents
+{
+	ON_TRADE_TRANSFER,
+	ON_TRADE_CANCEL,
+};
+
 #endif

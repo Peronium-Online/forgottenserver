@@ -11,6 +11,7 @@
 #include "housetile.h"
 #include "inbox.h"
 #include "iologindata.h"
+#include "libs/item/ItemFactory.h"
 #include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/xml.h"
 
@@ -348,7 +349,7 @@ HouseTransferItem* HouseTransferItem::createHouseTransferItem(House* house)
 	return transferItem;
 }
 
-void HouseTransferItem::onTradeEvent(TradeEvents_t event, Player* owner)
+void HouseTransferItem::onTradeEvent(TradeEvents event, Player* owner)
 {
 	if (event == ON_TRADE_TRANSFER) {
 		if (house) {
@@ -491,18 +492,18 @@ void AccessList::getList(std::string& list) const { list = this->list; }
 
 Door::Door(uint16_t type) : Item(type) {}
 
-Attr_ReadValue Door::readAttr(AttrTypes_t attr, PropStream& propStream)
+void Door::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream)
 {
-	if (attr == ATTR_HOUSEDOORID) {
+	if (idx == ATTR_HOUSEDOORID) {
 		uint8_t doorId;
-		if (!propStream.read<uint8_t>(doorId)) {
-			return ATTR_READ_ERROR;
+		if (!stream.read<uint8_t>(doorId)) {
+			throw ItemAttrError{idx, "doorId"};
 		}
 
 		setDoorId(doorId);
-		return ATTR_READ_CONTINUE;
+		return;
 	}
-	return Item::readAttr(attr, propStream);
+	return Item::setAttributeFromPropStream(idx, stream);
 }
 
 void Door::setHouse(House* house)
@@ -669,7 +670,7 @@ void Houses::payHouses(RentPeriod_t rentPeriod) const
 			if (house->getPayRentWarnings() < 7) {
 				int32_t daysLeft = 7 - house->getPayRentWarnings();
 
-				Item* letter = Item::CreateItem(ITEM_LETTER_STAMPED);
+				Item* letter = ItemFactory::create(ITEM_LETTER_STAMPED);
 				std::string period;
 
 				switch (rentPeriod) {
