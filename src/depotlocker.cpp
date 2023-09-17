@@ -9,15 +9,15 @@
 
 DepotLocker::DepotLocker(uint16_t type) : Container(type), depotId(0) {}
 
-Attr_ReadValue DepotLocker::readAttr(AttrTypes_t attr, PropStream& propStream)
+void DepotLocker::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream)
 {
-	if (attr == ATTR_DEPOT_ID) {
-		if (!propStream.read<uint16_t>(depotId)) {
-			return ATTR_READ_ERROR;
+	if (idx == ATTR_DEPOT_ID) {
+		if (!stream.read<uint16_t>(depotId)) {
+			throw ItemAttrError{ATTR_CONTAINER_ITEMS, "Unable to read containerItems attribute"};
 		}
-		return ATTR_READ_CONTINUE;
+		return;
 	}
-	return Item::readAttr(attr, propStream);
+	return Item::setAttributeFromPropStream(idx, stream);
 }
 
 ReturnValue DepotLocker::queryAdd(int32_t, const Thing&, uint32_t, uint32_t, Creature*) const
