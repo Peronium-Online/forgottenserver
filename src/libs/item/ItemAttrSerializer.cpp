@@ -190,3 +190,21 @@ bool ItemAttrSerializer::serializeAttr(const Item* item, PropWriteStream& propWr
 		}
 	}
 }
+
+bool ItemAttrSerializer::serializeBedAttr(const BedItem* bed, PropWriteStream& propWriteStream)
+{
+	auto sleeperGUID = bed->getSleeper();
+	if (sleeperGUID != 0) {
+		propWriteStream.write<uint8_t>(ATTR_SLEEPERGUID);
+		propWriteStream.write<uint32_t>(sleeperGUID);
+	}
+
+	auto sleepStart = bed->getSleepStart();
+	if (sleepStart != 0) {
+		propWriteStream.write<uint8_t>(ATTR_SLEEPSTART);
+		// FIXME: should be stored as 64-bit, but we need to retain backwards compatibility
+		propWriteStream.write<uint32_t>(static_cast<uint32_t>(sleepStart));
+	}
+
+	return true;
+}

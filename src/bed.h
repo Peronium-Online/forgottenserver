@@ -20,7 +20,6 @@ public:
 	static const BedItem* toBedItem(const Item* item) { return static_cast<const BedItem*>(item); }
 
 	void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream) override;
-	void serializeAttr(PropWriteStream& propWriteStream) const override;
 
 	bool canRemove() const override { return !house; }
 
@@ -28,6 +27,8 @@ public:
 
 	House* getHouse() const { return house; }
 	void setHouse(House* h) { house = h; }
+
+	uint64_t getSleepStart() const { return sleepStart; }
 
 	bool canUse(Player* player);
 
