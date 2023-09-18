@@ -805,16 +805,7 @@ public:
 		this->abilities->elementType = COMBAT_ENERGYDAMAGE;
 	}
 
-	void setWorth(uint64_t amount)
-	{
-		if (Items::getInstance().hasCurrencyItemOf(amount)) {
-			std::cout << "[Warning - ItemType::setWorth] Duplicated currency worth. Item " << id << " redefines worth "
-			          << amount << std::endl;
-		} else {
-			Items::getInstance().addCurrencyItem(amount, id);
-			this->worth = amount;
-		}
-	}
+	void setWorth(uint64_t amount);
 };
 
 // TODO: move this to Condition when migrated to the new structure

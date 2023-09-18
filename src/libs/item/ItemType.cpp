@@ -527,3 +527,14 @@ ConditionDamage* ConditionDamageBuilder::loadFromXMLNode(pugi::xml_node node, bo
 		return this->conditionDamage.release();
 	}
 }
+
+void ItemType::setWorth(uint64_t amount)
+{
+	if (Items::getInstance().hasCurrencyItemOf(amount)) {
+		std::cout << "[Warning - ItemType::setWorth] Duplicated currency worth. Item " << id << " redefines worth "
+		          << amount << std::endl;
+	} else {
+		Items::getInstance().addCurrencyItem(amount, id);
+		this->worth = amount;
+	}
+}

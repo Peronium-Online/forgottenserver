@@ -48,20 +48,6 @@ void BedItem::setAttributeFromPropStream(ItemAttrTypesIndex attr, PropStream& pr
 	}
 }
 
-void BedItem::serializeAttr(PropWriteStream& propWriteStream) const
-{
-	if (sleeperGUID != 0) {
-		propWriteStream.write<uint8_t>(ATTR_SLEEPERGUID);
-		propWriteStream.write<uint32_t>(sleeperGUID);
-	}
-
-	if (sleepStart != 0) {
-		propWriteStream.write<uint8_t>(ATTR_SLEEPSTART);
-		// FIXME: should be stored as 64-bit, but we need to retain backwards compatibility
-		propWriteStream.write<uint32_t>(static_cast<uint32_t>(sleepStart));
-	}
-}
-
 BedItem* BedItem::getNextBedItem() const
 {
 	Direction dir = iType->bedPartnerDir;
