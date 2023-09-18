@@ -1,7 +1,7 @@
 #ifndef PR_ITEM_ATTR_SERIALIZER_H
 #define PR_ITEM_ATTR_SERIALIZER_H
 
-#include "../../src/bed.h"
+#include "../../../src/bed.h"
 #include "libs/item/Item.h"
 #include "libs/util/tools/propstream.h"
 

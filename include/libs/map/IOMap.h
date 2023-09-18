@@ -1,8 +1,8 @@
 #ifndef PR_IOMAP_H
 #define PR_IOMAP_H
 
-#include "../../src/configmanager.h"
-#include "../../src/map.h"
+#include "../../../src/configmanager.h"
+#include "../../../src/map.h"
 #include "libs/util/otb/OTBLoadable.h"
 
 extern ConfigManager g_config;

@@ -1,7 +1,6 @@
 #ifndef PR_ITEMMAPS_H
 #define PR_ITEMMAPS_H
 
-#include "../../../src/tile.h"
 #include "libs/item/itemenums.h"
 #include "libs/util/datastructures/Dictionary.h"
 
