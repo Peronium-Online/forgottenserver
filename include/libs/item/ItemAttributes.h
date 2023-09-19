@@ -1,6 +1,7 @@
 #ifndef PR_ITEM_ATTRIBUTES_H
 #define PR_ITEM_ATTRIBUTES_H
 
+#include "libs/item/ReflectAttribute.h"
 #include "libs/item/itemenums.h"
 #include "libs/util/datastructures/CustomLuaAttribute.h"
 
@@ -194,24 +195,6 @@ public:
 		}
 		return false;
 	}
-};
-
-struct Reflect
-{
-	Reflect() = default;
-	Reflect(uint16_t percent, uint16_t chance) : percent(percent), chance(chance){};
-
-	Reflect& operator+=(const Reflect& other)
-	{
-		percent += other.percent;
-		chance = std::min<uint16_t>(100, chance + other.chance);
-		return *this;
-	}
-
-	uint16_t percent = 0;
-	uint16_t chance = 0;
-
-	static Reflect UNDEFINED;
 };
 
 class MutableItemAttributes

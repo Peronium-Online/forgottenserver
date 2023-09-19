@@ -6,6 +6,7 @@
 
 #include "constants/enums.h"
 #include "database.h"
+#include "libs/item/ReflectAttribute.h"
 #include "libs/monster/MonsterLoot.h"
 #include "libs/outfit/Outfit.h"
 #include "position.h"
