@@ -28,6 +28,7 @@ set(peronium_HDR
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/Items.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemType.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/itemutils.h
+	${CMAKE_CURRENT_LIST_DIR}/libs/item/ReflectAttribute.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monster.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/MonsterLoot.h
 	${CMAKE_CURRENT_LIST_DIR}/libs/monster/Monsters.h

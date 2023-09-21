@@ -331,6 +331,7 @@ public:
 	const Reflect& getReflect(CombatType_t combatType) { return mAttributes->getReflect(combatType); }
 
 	std::map<CombatType_t, uint16_t> getBoosts() const { return mAttributes->getBoosts(); }
+	int16_t getBoostPercent(CombatType_t combatType) { return mAttributes->getBoostPercent(combatType); }
 
 	std::array<int16_t, COMBAT_COUNT> getAbsorbs() const { return iType->abilities->absorbPercent; }
 	std::array<int16_t, COMBAT_COUNT> getFieldAbsorbs() const { return iType->abilities->fieldAbsorbPercent; }

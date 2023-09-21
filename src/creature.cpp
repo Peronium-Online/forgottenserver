@@ -8,6 +8,7 @@
 #include "combat.h"
 #include "configmanager.h"
 #include "game.h"
+#include "libs/item/ItemFactory.h"
 #include "libs/monster/Monster.h"
 #include "libs/util/tools/random.h"
 #include "party.h"
@@ -749,15 +750,15 @@ bool Creature::dropCorpse(Creature* lastHitCreature, Creature* mostDamageCreatur
 		Item* splash;
 		switch (getRace()) {
 			case RACE_VENOM:
-				splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_SLIME);
+				splash = ItemFactory::create(ITEM_FULLSPLASH, FLUID_SLIME);
 				break;
 
 			case RACE_BLOOD:
-				splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_BLOOD);
+				splash = ItemFactory::create(ITEM_FULLSPLASH, FLUID_BLOOD);
 				break;
 
 			case RACE_INK:
-				splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_INK);
+				splash = ItemFactory::create(ITEM_FULLSPLASH, FLUID_INK);
 				break;
 
 			default:
@@ -801,7 +802,7 @@ bool Creature::hasBeenAttacked(uint32_t attackerId)
 	return (OTSYS_TIME() - it->second.ticks) <= g_config.getNumber(ConfigManager::PZ_LOCKED);
 }
 
-Item* Creature::getCorpse(Creature*, Creature*) { return Item::CreateItem(getLookCorpse()); }
+Item* Creature::getCorpse(Creature*, Creature*) { return ItemFactory::create(getLookCorpse()); }
 
 void Creature::changeHealth(int32_t healthChange, bool sendHealthChange /* = true*/)
 {
@@ -1450,7 +1451,7 @@ int64_t Creature::getStepDuration() const
 
 	Item* ground = tile->getGround();
 	if (ground) {
-		groundSpeed = Item::items[ground->getID()].speed;
+		groundSpeed = Items::getInstance().getItemType(ground->getID())->speed;
 		if (groundSpeed == 0) {
 			groundSpeed = 150;
 		}
