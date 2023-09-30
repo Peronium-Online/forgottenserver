@@ -11,8 +11,10 @@ class Podium final : public Item
 public:
 	explicit Podium(uint16_t type) : Item(type){};
 
-	Podium* getPodium() override { return this; }
-	const Podium* getPodium() const override { return this; }
+	static bool isPodium(Item* item) { return item->getType() == ITEM_TYPE_PODIUM; }
+
+	static Podium* toPodium(Item* item) { return static_cast<Podium*>(item); }
+	static const Podium* toPodium(const Item* item) { return static_cast<const Podium*>(item); }
 
 	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream) override;
 	void serializeAttr(PropWriteStream& propWriteStream) const override;

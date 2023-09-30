@@ -527,6 +527,23 @@ void Item::onRemoved()
 	}
 }
 
+bool Item::canDecay() const
+{
+	if (isRemoved()) {
+		return false;
+	}
+
+	if (getDecayTo() < 0 || getDecayTime() == 0) {
+		return false;
+	}
+
+	if (hasUniqueId()) {
+		return false;
+	}
+
+	return true;
+}
+
 void Item::startDecaying() { g_game.startDecay(this); }
 
 void Item::setID(uint16_t newid)
@@ -594,3 +611,127 @@ std::string Item::getNameDescription(const ItemType* it, const Item* item /*= nu
 }
 
 std::string Item::getNameDescription() const { return getNameDescription(iType, this); }
+
+std::string Item::getWeightDescription(const ItemType* it, uint32_t weight, uint32_t count /*= 1*/)
+{
+	std::ostringstream ss;
+	if (it->stackable && count > 1 && it->showCount != 0) {
+		ss << "They weigh ";
+	} else {
+		ss << "It weighs ";
+	}
+
+	if (weight < 10) {
+		ss << "0.0" << weight;
+	} else if (weight < 100) {
+		ss << "0." << weight;
+	} else {
+		std::string weightString = std::to_string(weight);
+		weightString.insert(weightString.end() - 2, '.');
+		ss << weightString;
+	}
+
+	ss << " oz.";
+	return ss.str();
+}
+
+std::string Item::getWeightDescription(uint32_t weight) const
+{
+	return getWeightDescription(iType, weight, getItemCount());
+}
+
+std::string Item::getWeightDescription() const
+{
+	uint32_t weight = getWeight();
+	if (weight == 0) {
+		return std::string();
+	}
+	return getWeightDescription(weight);
+}
+
+void Item::setDefaultSubtype()
+{
+	setItemCount(1);
+
+	if (iType->charges != 0) {
+		if (iType->stackable) {
+			setItemCount(iType->charges);
+		} else {
+			setCharges(iType->charges);
+		}
+	}
+}
+
+Reflect Item::getReflect(CombatType_t combatType, bool total /* = true */) const
+{
+	Reflect reflect;
+	if (mAttributes) {
+		reflect += mAttributes->getReflect(combatType);
+	}
+
+	if (total && iType->abilities) {
+		reflect += iType->abilities->reflect[combatTypeToIndex(combatType)];
+	}
+
+	return reflect;
+}
+
+uint16_t Item::getBoostPercent(CombatType_t combatType, bool total /* = true */) const
+{
+	uint16_t boostPercent = 0;
+	if (mAttributes) {
+		boostPercent += mAttributes->getBoostPercent(combatType);
+	}
+
+	if (total && iType->abilities) {
+		boostPercent += iType->abilities->boostPercent[combatTypeToIndex(combatType)];
+	}
+
+	return boostPercent;
+}
+
+bool Item::hasUsedAttributes() const
+{
+	bool has = false;
+	iAttributes->forEachAttribute([&](ItemAttrTypes type, const Attribute& attr) {
+		if (type == ITEM_ATTRIBUTE_CHARGES) {
+			uint16_t charges = static_cast<uint16_t>(attr.value.integer);
+			if (charges != iType->charges) {
+				has = true;
+			}
+		} else if (attr.type == ITEM_ATTRIBUTE_DURATION) {
+			uint32_t duration = static_cast<uint32_t>(attr.value.integer);
+			if (duration != getDefaultDuration()) {
+				has = true;
+			}
+		}
+		// this line below was in the original version, but it seems to be introducing a bug
+		// else {
+		// 	return true;
+		// }
+	});
+
+	return has;
+}
+
+bool Item::hasMarketAttributes() const
+{
+	if (!iAttributes) {
+		return true;
+	}
+
+	// discard items with custom boost and reflect
+	for (uint16_t i = 0; i < COMBAT_COUNT; ++i) {
+		if (getBoostPercent(indexToCombatType(i), false) > 0) {
+			return false;
+		}
+
+		Reflect tmpReflect = getReflect(indexToCombatType(i), false);
+		if (tmpReflect.chance != 0 || tmpReflect.percent != 0) {
+			return false;
+		}
+	}
+
+	// discard items with other modified attributes
+	return !hasUsedAttributes();
+}

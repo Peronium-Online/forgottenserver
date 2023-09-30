@@ -33,7 +33,7 @@ bool ItemAttributes::equals(const ItemAttributes& other) const
 	return true;
 }
 
-const ItemAttributes::Attribute* ItemAttributes::getExistingAttr(ItemAttrTypes type) const
+const Attribute* ItemAttributes::getExistingAttr(ItemAttrTypes type) const
 {
 	if (hasAttr(type)) {
 		for (const Attribute& attribute : attributes) {
@@ -45,7 +45,7 @@ const ItemAttributes::Attribute* ItemAttributes::getExistingAttr(ItemAttrTypes t
 	return nullptr;
 }
 
-ItemAttributes::Attribute& ItemAttributes::getAttr(ItemAttrTypes type)
+Attribute& ItemAttributes::getAttr(ItemAttrTypes type)
 {
 	if (hasAttr(type)) {
 		for (Attribute& attribute : attributes) {
@@ -132,4 +132,11 @@ void ItemAttributes::removeAttr(ItemAttrTypes type)
 		}
 	}
 	attributeBits &= ~type;
+}
+
+void ItemAttributes::forEachAttribute(const std::function<void(ItemAttrTypes type, const Attribute& attribute)>& func)
+{
+	for (const Attribute& attribute : attributes) {
+		func(attribute.type, attribute);
+	}
 }

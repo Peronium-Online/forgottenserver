@@ -10,6 +10,7 @@
 
 using NameMap = std::unordered_map<std::string, uint16_t>;
 using CurrencyMap = std::map<uint64_t, uint16_t, std::greater<uint64_t>>;
+using InventoryVector = std::vector<uint16_t>;
 
 class Items final : virtual public XMLLoadable, public OTBLoadable
 {
@@ -26,7 +27,7 @@ private:
 	std::vector<ItemType> items;
 	ClientIdToServerIdMap clientIdToServerIdMap;
 	NameMap nameToItems;
-	CurrencyMap currencyItems;
+	InventoryVector inventory;
 
 	void addItem(ItemType& item)
 	{
@@ -49,6 +50,8 @@ public:
 	Items(const Items&) = delete;
 	Items& operator=(const Items&) = delete;
 
+	static CurrencyMap currencyItems;
+
 	static Items& getInstance()
 	{
 		static Items instance;
@@ -57,10 +60,25 @@ public:
 
 	bool loadFromOTB() override;
 
-	ItemType* getItemType(size_t id)
+	bool reload();
+	void clear();
+
+	ItemType* getItemType(size_t id) { return const_cast<ItemType*>(const_cast<const Items*>(this)->getItemType(id)); }
+
+	const ItemType* getItemType(size_t id) const
 	{
 		if (id < items.size()) {
 			return &items[id];
+		}
+		return &items.front();
+	}
+
+	const ItemType* Items::getItemTypeByClientId(uint16_t spriteId) const
+	{
+		if (spriteId >= 100) {
+			if (uint16_t serverId = clientIdToServerIdMap.getServerId(spriteId)) {
+				return getItemType(serverId);
+			}
 		}
 		return &items.front();
 	}

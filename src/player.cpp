@@ -3161,11 +3161,11 @@ std::map<uint32_t, uint32_t>& Player::getAllItemTypeCount(std::map<uint32_t, uin
 			continue;
 		}
 
-		countMap[item->getID()] += item->countByType(-1);
+		countMap[item->getID()] += item->getItemCount();
 
 		if (Container* container = item->getContainer()) {
 			for (ContainerIterator it = container->iterator(); it.hasNext(); it.advance()) {
-				countMap[(*it)->getID()] += (*it)->countByType(-1);
+				countMap[(*it)->getID()] += (*it)->getItemCount();
 			}
 		}
 	}

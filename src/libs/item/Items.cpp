@@ -1,8 +1,13 @@
 #include "libs/item/Items.h"
 
+#include "../../movement.h"
+#include "../../weapons.h"
 #include "libs/item/itemenums.h"
 #include "libs/util/tools/bitwise.h"
 #include "libs/util/tools/pugicast.h"
+
+extern MoveEvents* g_moveEvents;
+extern Weapons* g_weapons;
 
 bool Items::load(const OTBNode& node, PropStream stream)
 {
@@ -176,5 +181,29 @@ bool Items::load(pugi::xml_node node, bool)
 		this->addNameToItems(iType->name, iType->id);
 	}
 
+	return true;
+}
+
+void Items::clear()
+{
+	items.clear();
+	clientIdToServerIdMap.clear();
+	nameToItems.clear();
+	currencyItems.clear();
+	inventory.clear();
+}
+
+bool Items::reload()
+{
+	clear();
+	loadFromOTB();
+
+	if (!loadFromXML()) {
+		return false;
+	}
+
+	g_moveEvents->reload();
+	g_weapons->reload();
+	g_weapons->loadDefaults();
 	return true;
 }

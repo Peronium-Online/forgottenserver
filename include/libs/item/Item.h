@@ -31,6 +31,8 @@ private:
 
 	uint16_t count = 1;
 
+	std::string getWeightDescription(uint32_t weight) const;
+
 protected:
 	uint16_t id; // the same id as in ItemType
 
@@ -51,6 +53,8 @@ public:
 
 	static std::string getNameDescription(const ItemType* it, const Item* item = nullptr, int32_t subType = -1,
 	                                      bool addArticle = true);
+	static std::string getWeightDescription(const ItemType* it, uint32_t weight, uint32_t count = 1);
+	std::string getWeightDescription() const;
 
 	virtual void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream);
 
@@ -59,7 +63,7 @@ public:
 	bool isAlwaysOnTop() const { return iType->alwaysOnTop; }
 	bool isGroundTile() const { return iType->isGroundTile(); }
 	bool isMagicField() const { return iType->isMagicField(); }
-	bool isMoveable() const { return iType->moveable && !iAttributes->hasAttr(ITEM_ATTRIBUTE_UNIQUEID); }
+	bool isMoveable() const { return iType->moveable && !hasUniqueId(); }
 	bool isPickupable() const { return iType->pickupable; }
 	bool isUseable() const { return iType->useable; }
 	bool isHangable() const { return iType->isHangable; }
@@ -124,6 +128,7 @@ public:
 		return 0;
 	}
 
+	bool hasChargesAttribute() const { return iAttributes->hasAttr(ITEM_ATTRIBUTE_CHARGES); }
 	uint16_t getCharges() const { return static_cast<uint16_t>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_CHARGES)); }
 	void setCharges(uint16_t n) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_CHARGES, n); }
 
@@ -138,6 +143,7 @@ public:
 		return iAttributes->getIntAttr(ITEM_ATTRIBUTE_DURATION);
 	}
 	void setDuration(int32_t time) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_DURATION, std::max<int32_t>(0, time)); }
+	void decreaseDuration(int32_t time) { iAttributes->increaseIntAttr(ITEM_ATTRIBUTE_DURATION, -time); }
 	uint32_t getDefaultDuration() const { return iType->decayTime * 1000; }
 	void setDefaultDuration()
 	{
@@ -147,6 +153,7 @@ public:
 		}
 	}
 
+	bool canDecay() const;
 	ItemDecayState getDecaying() const
 	{
 		return static_cast<ItemDecayState>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_DECAYSTATE));
@@ -158,6 +165,13 @@ public:
 			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_DECAYTO);
 		}
 		return iType->decayTo;
+	}
+	int32_t getDecayTime() const
+	{
+		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_DURATION)) {
+			return iAttributes->getIntAttr(ITEM_ATTRIBUTE_DURATION);
+		}
+		return iType->decayTime;
 	}
 	virtual void startDecaying();
 
@@ -191,6 +205,7 @@ public:
 	}
 	void setActionId(uint16_t n) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_ACTIONID, n); }
 
+	bool hasUniqueId() const { return iAttributes->hasAttr(ITEM_ATTRIBUTE_UNIQUEID); }
 	uint16_t getUniqueId() const
 	{
 		if (!iAttributes) {
@@ -202,12 +217,15 @@ public:
 
 	const std::string& getText() const { return iAttributes->getStrAttr(ITEM_ATTRIBUTE_TEXT); }
 	void setText(const std::string& text) { iAttributes->setStrAttr(ITEM_ATTRIBUTE_TEXT, text); }
+	void resetText() { iAttributes->removeAttr(ITEM_ATTRIBUTE_TEXT); }
 
 	time_t getDate() const { return static_cast<time_t>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_DATE)); }
 	void setDate(int32_t n) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_DATE, n); }
+	void resetDate() { iAttributes->removeAttr(ITEM_ATTRIBUTE_DATE); }
 
 	const std::string& getWriter() const { return iAttributes->getStrAttr(ITEM_ATTRIBUTE_WRITER); }
 	void setWriter(const std::string& writer) { iAttributes->setStrAttr(ITEM_ATTRIBUTE_WRITER, writer); }
+	void resetWriter() { iAttributes->removeAttr(ITEM_ATTRIBUTE_WRITER); }
 
 	const std::string& getSpecialDescription() const { return iAttributes->getStrAttr(ITEM_ATTRIBUTE_DESCRIPTION); }
 	void setSpecialDescription(const std::string& desc) { iAttributes->setStrAttr(ITEM_ATTRIBUTE_DESCRIPTION, desc); }
@@ -313,6 +331,7 @@ public:
 		}
 		return 0;
 	}
+	bool hasWrapId() const { return iAttributes->hasAttr(ITEM_ATTRIBUTE_WRAPID); }
 
 	uint32_t getOwner() const { return iAttributes->getIntAttr(ITEM_ATTRIBUTE_OWNER); }
 	void setOwner(uint32_t owner) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_OWNER, owner); }
@@ -329,9 +348,11 @@ public:
 
 	std::map<CombatType_t, Reflect> getReflects() const { return mAttributes->getReflects(); }
 	const Reflect& getReflect(CombatType_t combatType) { return mAttributes->getReflect(combatType); }
+	Reflect getReflect(CombatType_t combatType, bool total = true) const;
 
 	std::map<CombatType_t, uint16_t> getBoosts() const { return mAttributes->getBoosts(); }
 	int16_t getBoostPercent(CombatType_t combatType) { return mAttributes->getBoostPercent(combatType); }
+	uint16_t getBoostPercent(CombatType_t combatType, bool total = true) const;
 
 	std::array<int16_t, COMBAT_COUNT> getAbsorbs() const { return iType->abilities->absorbPercent; }
 	std::array<int16_t, COMBAT_COUNT> getFieldAbsorbs() const { return iType->abilities->fieldAbsorbPercent; }
@@ -351,6 +372,12 @@ public:
 
 	bool isLoadedFromMap() const { return loadedFromMap; }
 	void setLoadedFromMap(bool value) { loadedFromMap = value; }
+
+	void setDefaultSubtype();
+
+	bool hasMarketAttributes() const;
+
+	bool hasUsedAttributes() const;
 };
 
 #endif
