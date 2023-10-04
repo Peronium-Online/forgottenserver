@@ -4,7 +4,7 @@
 #ifndef FS_PODIUM_H
 #define FS_PODIUM_H
 
-#include #include "libs/item/Item.h"
+#include "libs/item/Item.h"
 
 class Podium final : public Item
 {
@@ -16,8 +16,7 @@ public:
 	static Podium* toPodium(Item* item) { return static_cast<Podium*>(item); }
 	static const Podium* toPodium(const Item* item) { return static_cast<const Podium*>(item); }
 
-	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream) override;
-	void serializeAttr(PropWriteStream& propWriteStream) const override;
+	void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream) override;
 
 	void setOutfit(const Look& newOutfit) { outfit = newOutfit; }
 	const Look getOutfit() const { return outfit; }
@@ -32,6 +31,7 @@ public:
 		}
 	}
 	void setFlags(uint8_t newFlags) { flags = newFlags; }
+	std::bitset<3> getFlags() const { return flags; }
 
 	const Direction getDirection() const { return direction; }
 	void setDirection(Direction newDirection) { direction = newDirection; }

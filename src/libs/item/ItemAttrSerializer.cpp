@@ -208,3 +208,25 @@ bool ItemAttrSerializer::serializeBedAttr(const BedItem* bed, PropWriteStream& p
 
 	return true;
 }
+
+bool ItemAttrSerializer::serializePodiumAttr(const Podium* item, PropWriteStream& propWriteStream)
+{
+	if (ATTR_PODIUMOUTFIT != 0) {
+		auto outfit = item->getOutfit();
+
+		propWriteStream.write<uint8_t>(ATTR_PODIUMOUTFIT);
+		propWriteStream.write<uint8_t>(static_cast<uint8_t>(item->getFlags().to_ulong()));
+		propWriteStream.write<uint8_t>(item->getDirection());
+		propWriteStream.write<uint16_t>(outfit.type);
+		propWriteStream.write<uint8_t>(outfit.head);
+		propWriteStream.write<uint8_t>(outfit.body);
+		propWriteStream.write<uint8_t>(outfit.legs);
+		propWriteStream.write<uint8_t>(outfit.feet);
+		propWriteStream.write<uint8_t>(outfit.addons);
+		propWriteStream.write<uint16_t>(outfit.mount);
+		propWriteStream.write<uint8_t>(outfit.mountHead);
+		propWriteStream.write<uint8_t>(outfit.mountBody);
+		propWriteStream.write<uint8_t>(outfit.mountLegs);
+		propWriteStream.write<uint8_t>(outfit.mountFeet);
+	}
+}
