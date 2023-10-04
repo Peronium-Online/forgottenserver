@@ -46,13 +46,13 @@ void HouseTile::updateHouse(Item* item)
 		return;
 	}
 
-	Door* door = item->getDoor();
+	Door* door = Door::toDoor(item);
 	if (door) {
 		if (door->getDoorId() != 0) {
 			house->addDoor(door);
 		}
 	} else {
-		BedItem* bed = item->getBed();
+		BedItem* bed = BedItem::toBedItem(item);
 		if (bed) {
 			house->addBed(bed);
 		}
@@ -71,7 +71,7 @@ ReturnValue HouseTile::queryAdd(int32_t index, const Thing& thing, uint32_t coun
 			return RETURNVALUE_NOTPOSSIBLE;
 		}
 	} else if (const Item* item = thing.getItem()) {
-		if (item->isStoreItem() && !item->hasAttribute(ITEM_ATTRIBUTE_WRAPID)) {
+		if (item->isStoreItem() && !item->hasWrapId()) {
 			return RETURNVALUE_ITEMCANNOTBEMOVEDTHERE;
 		}
 

@@ -4,11 +4,14 @@
 #ifndef FS_HOUSE_H
 #define FS_HOUSE_H
 
+#include "bed.h"
 #include "constants/const.h"
 #include "constants/enums.h"
 #include "container.h"
+#include "libs/item/Item.h"
 #include "position.h"
 
+#include <cmath>
 #include <set>
 #include <unordered_set>
 
