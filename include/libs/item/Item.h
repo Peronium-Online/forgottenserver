@@ -358,6 +358,7 @@ public:
 	std::array<int16_t, COMBAT_COUNT> getFieldAbsorbs() const { return iType->abilities->fieldAbsorbPercent; }
 
 	uint8_t getOpenContainerCID() const { return iAttributes->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER); }
+	void setOpenContainerCID(uint8_t cid) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER, cid); }
 
 	int32_t getSlotPosition() const { return iType->slotPosition; }
 

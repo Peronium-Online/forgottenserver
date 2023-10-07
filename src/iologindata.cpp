@@ -10,6 +10,8 @@
 #include "depotchest.h"
 #include "game.h"
 #include "inbox.h"
+#include "libs/item/ItemAttrSerializer.h"
+#include "libs/item/ItemFactory.h"
 #include "libs/util/tools/hash.h"
 #include "storeinbox.h"
 
@@ -488,7 +490,7 @@ bool IOLoginData::loadPlayer(Player* player, DBResult_ptr result)
 
 			Container* itemContainer = item->getContainer();
 			if (itemContainer) {
-				uint8_t cid = item->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER);
+				uint8_t cid = item->getOpenContainerCID();
 				if (cid > 0) {
 					openContainersList.emplace(cid, itemContainer);
 				}
@@ -646,8 +648,8 @@ bool IOLoginData::saveItems(const Player* player, const ItemBlockList& itemList,
 		++runningId;
 
 		if (Container* container = item->getContainer()) {
-			if (container->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER)) {
-				container->setIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER, 0);
+			if (container->getOpenContainerCID()) {
+				container->setOpenContainerCID(0);
 			}
 
 			if (!openContainers.empty()) {
@@ -656,7 +658,7 @@ bool IOLoginData::saveItems(const Player* player, const ItemBlockList& itemList,
 					auto opcontainer = openContainer.container;
 
 					if (opcontainer == container) {
-						container->setIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER, static_cast<int64_t>(its.first) + 1);
+						container->setOpenContainerCID(static_cast<int64_t>(its.first) + 1);
 						break;
 					}
 				}
@@ -666,7 +668,7 @@ bool IOLoginData::saveItems(const Player* player, const ItemBlockList& itemList,
 		}
 
 		propWriteStream.clear();
-		item->serializeAttr(propWriteStream);
+		ItemAttrSerializer::serializeAttr(item, propWriteStream);
 
 		size_t attributesSize;
 		const char* attributes = propWriteStream.getStream(attributesSize);
@@ -690,8 +692,8 @@ bool IOLoginData::saveItems(const Player* player, const ItemBlockList& itemList,
 			if (subContainer) {
 				containers.emplace_back(subContainer, runningId);
 
-				if (subContainer->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER)) {
-					subContainer->setIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER, 0);
+				if (subContainer->getOpenContainerCID()) {
+					subContainer->setOpenContainerCID(0);
 				}
 
 				if (!openContainers.empty()) {
@@ -700,7 +702,7 @@ bool IOLoginData::saveItems(const Player* player, const ItemBlockList& itemList,
 						auto opcontainer = openContainer.container;
 
 						if (opcontainer == subContainer) {
-							subContainer->setIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER, it.first + 1);
+							subContainer->setOpenContainerCID(it.first + 1);
 							break;
 						}
 					}
@@ -708,7 +710,7 @@ bool IOLoginData::saveItems(const Player* player, const ItemBlockList& itemList,
 			}
 
 			propWriteStream.clear();
-			item->serializeAttr(propWriteStream);
+			ItemAttrSerializer::serializeAttr(item, propWriteStream);
 
 			size_t attributesSize;
 			const char* attributes = propWriteStream.getStream(attributesSize);
@@ -1040,10 +1042,9 @@ void IOLoginData::loadItems(ItemMap& itemMap, DBResult_ptr result)
 
 		PropStream propStream;
 		propStream.init(attr, attrSize);
-
-		Item* item = Item::CreateItem(type, count);
+		Item* item = ItemFactory::create(type, count);
 		if (item) {
-			if (!item->unserializeAttr(propStream)) {
+			if (!ItemAttrSerializer::unserializeAttr(item, propStream)) {
 				std::cout << "WARNING: Serialize error in IOLoginData::loadItems" << std::endl;
 			}
 
