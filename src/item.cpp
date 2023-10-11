@@ -912,7 +912,7 @@ void Item::serializeAttr(PropWriteStream& propWriteStream) const
 	}
 }
 
-bool Item::hasProperty(ITEMPROPERTY prop) const
+bool Item::hasProperty(ItemProperties prop) const
 {
 	const ItemType& it = items[id];
 	switch (prop) {

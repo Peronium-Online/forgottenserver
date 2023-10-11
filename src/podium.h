@@ -11,7 +11,7 @@ class Podium final : public Item
 public:
 	explicit Podium(uint16_t type) : Item(type){};
 
-	static bool isPodium(Item* item) { return item->getType() == ITEM_TYPE_PODIUM; }
+	static bool isPodium(const Item* item) { return item->getType() == ITEM_TYPE_PODIUM; }
 
 	static Podium* toPodium(Item* item) { return static_cast<Podium*>(item); }
 	static const Podium* toPodium(const Item* item) { return static_cast<const Podium*>(item); }

@@ -83,6 +83,18 @@ public:
 		return &items.front();
 	}
 
+	uint16_t getItemIdByName(const std::string& name)
+	{
+		if (name.empty()) {
+			return 0;
+		}
+
+		auto result = nameToItems.find(boost::algorithm::to_lower_copy(name));
+		if (result == nameToItems.end()) return 0;
+
+		return result->second;
+	}
+
 	bool hasCurrencyItemOf(uint64_t amount) { return currencyItems.find(amount) != currencyItems.end(); }
 
 	bool isCurrencyItem(uint16_t id)
@@ -97,6 +109,13 @@ public:
 	}
 
 	void addCurrencyItem(uint64_t amount, uint16_t id) { currencyItems.insert(CurrencyMap::value_type(amount, id)); }
+
+	bool isUniqueItemName(const std::string& name) const
+	{
+		auto ids = nameToItems.equal_range(boost::algorithm::to_lower_copy(name));
+
+		return std::next(ids.first) == ids.second;
+	}
 };
 
 #endif

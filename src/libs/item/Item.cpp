@@ -735,3 +735,35 @@ bool Item::hasMarketAttributes() const
 	// discard items with other modified attributes
 	return !hasUsedAttributes();
 }
+
+bool Item::hasProperty(ItemProperties prop) const
+{
+	switch (prop) {
+		case CONST_PROP_BLOCKSOLID:
+			return iType->blockSolid;
+		case CONST_PROP_MOVEABLE:
+			return iType->moveable && !hasUniqueId();
+		case CONST_PROP_HASHEIGHT:
+			return iType->hasHeight;
+		case CONST_PROP_BLOCKPROJECTILE:
+			return iType->blockProjectile;
+		case CONST_PROP_BLOCKPATH:
+			return iType->blockPathFind;
+		case CONST_PROP_ISVERTICAL:
+			return iType->isVertical;
+		case CONST_PROP_ISHORIZONTAL:
+			return iType->isHorizontal;
+		case CONST_PROP_IMMOVABLEBLOCKSOLID:
+			return iType->blockSolid && (!iType->moveable || hasUniqueId());
+		case CONST_PROP_IMMOVABLEBLOCKPATH:
+			return iType->blockPathFind && (!iType->moveable || hasUniqueId());
+		case CONST_PROP_IMMOVABLENOFIELDBLOCKPATH:
+			return !iType->isMagicField() && iType->blockPathFind && (!iType->moveable || hasUniqueId());
+		case CONST_PROP_NOFIELDBLOCKPATH:
+			return !iType->isMagicField() && iType->blockPathFind;
+		case CONST_PROP_SUPPORTHANGABLE:
+			return iType->isHorizontal || iType->isVertical;
+		default:
+			return false;
+	}
+}

@@ -19,7 +19,7 @@ class Podium;
 class Teleport;
 class TrashHolder;
 
-enum ITEMPROPERTY
+enum ItemProperties
 {
 	CONST_PROP_BLOCKSOLID = 0,
 	CONST_PROP_HASHEIGHT,
@@ -800,7 +800,7 @@ public:
 	void setBoostPercent(CombatType_t combatType, uint16_t value) { getAttributes()->boostPercent[combatType] = value; }
 	uint16_t getBoostPercent(CombatType_t combatType, bool total = true) const;
 
-	bool hasProperty(ITEMPROPERTY prop) const;
+	bool hasProperty(ItemProperties prop) const;
 	bool isBlocking() const { return items[id].blockSolid; }
 	bool isStackable() const { return items[id].stackable; }
 	bool isAlwaysOnTop() const { return items[id].alwaysOnTop; }

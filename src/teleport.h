@@ -11,8 +11,7 @@ class Teleport final : public Item, public Cylinder
 public:
 	explicit Teleport(uint16_t type) : Item(type){};
 
-	Teleport* getTeleport() override { return this; }
-	const Teleport* getTeleport() const override { return this; }
+	static bool isTeleport(const Item* item) { return item->getType() == ITEM_TYPE_TELEPORT; }
 
 	// serialization
 	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream) override;

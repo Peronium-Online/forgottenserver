@@ -58,6 +58,20 @@ public:
 
 	virtual void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream);
 
+	// TODO: find a better way to handle this methods
+	bool hasAttr(ItemAttrTypes attr) { return iAttributes->hasAttr(attr); };
+	int64_t getIntAttr(ItemAttrTypes attr) { return iAttributes->getIntAttr(attr); };
+	std::string getStringAttr(ItemAttrTypes attr) { return iAttributes->getStrAttr(attr); };
+	void setIntAttr(ItemAttrTypes attr, int64_t value) { iAttributes->setIntAttr(attr, value); };
+	void setStringAttr(ItemAttrTypes attr, std::string value) { iAttributes->setStrAttr(attr, value); };
+	void removeAttr(ItemAttrTypes attr) { iAttributes->removeAttr(attr); };
+	const CustomLuaAttribute* getCustomAttr(int64_t key) { return iAttributes->getCustomAttr(key); };
+	const CustomLuaAttribute* getCustomAttr(std::string key) { return iAttributes->getCustomAttr(key); };
+	void setCustomAttr(std::string key, CustomLuaAttribute value) { iAttributes->setCustomAttr(key, value); };
+	bool removeCustomAttr(int64_t key) { return iAttributes->removeCustomAttr(key); };
+	bool removeCustomAttr(std::string key) { return iAttributes->removeCustomAttr(key); };
+	bool hasProperty(ItemProperties prop) const;
+
 	bool isBlocking() const { return iType->blockSolid; }
 	bool isStackable() const { return iType->stackable; }
 	bool isAlwaysOnTop() const { return iType->alwaysOnTop; }
@@ -159,6 +173,7 @@ public:
 		return static_cast<ItemDecayState>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_DECAYSTATE));
 	}
 	void setDecaying(ItemDecayState decayState) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
+	void setDecayTo(int32_t decayTo) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_DECAYTO, decayTo); }
 	int32_t getDecayTo() const
 	{
 		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_DECAYTO)) {
@@ -349,10 +364,15 @@ public:
 	std::map<CombatType_t, Reflect> getReflects() const { return mAttributes->getReflects(); }
 	const Reflect& getReflect(CombatType_t combatType) { return mAttributes->getReflect(combatType); }
 	Reflect getReflect(CombatType_t combatType, bool total = true) const;
+	void setReflect(CombatType_t combatType, Reflect reflect) { mAttributes->setReflect(combatType, reflect); }
 
 	std::map<CombatType_t, uint16_t> getBoosts() const { return mAttributes->getBoosts(); }
 	int16_t getBoostPercent(CombatType_t combatType) { return mAttributes->getBoostPercent(combatType); }
 	uint16_t getBoostPercent(CombatType_t combatType, bool total = true) const;
+	void setBoostPercent(CombatType_t combatType, uint16_t boostPercent)
+	{
+		mAttributes->setBoostPercent(combatType, boostPercent);
+	}
 
 	std::array<int16_t, COMBAT_COUNT> getAbsorbs() const { return iType->abilities->absorbPercent; }
 	std::array<int16_t, COMBAT_COUNT> getFieldAbsorbs() const { return iType->abilities->fieldAbsorbPercent; }
@@ -379,6 +399,11 @@ public:
 	bool hasMarketAttributes() const;
 
 	bool hasUsedAttributes() const;
+
+	void setStoreItem(bool storeItem)
+	{
+		iAttributes->setIntAttr(ITEM_ATTRIBUTE_STOREITEM, static_cast<int64_t>(storeItem));
+	}
 };
 
 #endif

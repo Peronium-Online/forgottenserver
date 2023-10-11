@@ -541,7 +541,7 @@ enum ItemAttrTypesIndex
 	ATTR_BOOST = 43,
 };
 
-enum ITEMPROPERTY
+enum ItemProperties
 {
 	CONST_PROP_BLOCKSOLID = 0,
 	CONST_PROP_HASHEIGHT,

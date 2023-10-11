@@ -19,6 +19,8 @@
 #include "iologindata.h"
 #include "iomapserialize.h"
 #include "iomarket.h"
+#include "libs/item/ItemFactory.h"
+#include "libs/item/itemutils.h"
 #include "libs/monster/Monster.h"
 #include "libs/monster/MonsterSeek.h"
 #include "libs/monster/MonsterSummon.h"
@@ -124,7 +126,7 @@ uint32_t ScriptEnvironment::addThing(Thing* thing)
 	}
 
 	Item* item = thing->getItem();
-	if (item && item->hasAttribute(ITEM_ATTRIBUTE_UNIQUEID)) {
+	if (item && item->hasUniqueId()) {
 		return item->getUniqueId();
 	}
 
@@ -696,9 +698,9 @@ void LuaScriptInterface::setItemMetatable(lua_State* L, int32_t index, const Ite
 {
 	if (item->getContainer()) {
 		luaL_getmetatable(L, "Container");
-	} else if (item->getTeleport()) {
+	} else if (Teleport::isTeleport(item)) {
 		luaL_getmetatable(L, "Teleport");
-	} else if (item->getPodium()) {
+	} else if (Podium::isPodium(item)) {
 		luaL_getmetatable(L, "Podium");
 	} else {
 		luaL_getmetatable(L, "Item");
@@ -3472,15 +3474,15 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State* L)
 	bool canDropOnMap = getBoolean(L, 4, true);
 	uint16_t subType = getNumber<uint16_t>(L, 5, 1);
 
-	const ItemType& it = Item::items[itemId];
+	auto it = Items::getInstance().getItemType(itemId);
 	int32_t itemCount;
 
 	auto parameters = lua_gettop(L);
 	if (parameters > 4) {
 		// subtype already supplied, count then is the amount
 		itemCount = std::max<int32_t>(1, count);
-	} else if (it.hasSubType()) {
-		if (it.stackable) {
+	} else if (it->hasSubType()) {
+		if (it->stackable) {
 			itemCount = static_cast<int32_t>(std::ceil(static_cast<float>(count) / 100));
 		} else {
 			itemCount = 1;
@@ -3492,18 +3494,18 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State* L)
 
 	while (itemCount > 0) {
 		uint16_t stackCount = subType;
-		if (it.stackable && stackCount > 100) {
+		if (it->stackable && stackCount > 100) {
 			stackCount = 100;
 		}
 
-		Item* newItem = Item::CreateItem(itemId, stackCount);
+		Item* newItem = ItemFactory::create(itemId, stackCount);
 		if (!newItem) {
 			reportErrorFunc(L, getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
 			pushBoolean(L, false);
 			return 1;
 		}
 
-		if (it.stackable) {
+		if (it->stackable) {
 			subType -= stackCount;
 		}
 
@@ -3584,7 +3586,8 @@ int LuaScriptInterface::luaGetSubTypeName(lua_State* L)
 	// getSubTypeName(subType)
 	int32_t subType = getNumber<int32_t>(L, 1);
 	if (subType > 0) {
-		pushString(L, Item::items[subType].name);
+		auto item = Items::getInstance().getItemType(subType);
+		pushString(L, item->name);
 	} else {
 		lua_pushnil(L);
 	}
@@ -3788,14 +3791,14 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State* L)
 	}
 
 	uint16_t itemId = getNumber<uint16_t>(L, 2);
-	const ItemType& it = Item::items[itemId];
+	auto it = Items::getInstance().getItemType(itemId);
 
 	int32_t itemCount = 1;
 	int32_t subType = 1;
 	uint32_t count = getNumber<uint32_t>(L, 3, 1);
 
-	if (it.hasSubType()) {
-		if (it.stackable) {
+	if (it->hasSubType()) {
+		if (it->stackable) {
 			itemCount = static_cast<int32_t>(std::ceil(static_cast<float>(count) / 100));
 		}
 
@@ -3806,14 +3809,14 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State* L)
 
 	while (itemCount > 0) {
 		int32_t stackCount = std::min<int32_t>(100, subType);
-		Item* newItem = Item::CreateItem(itemId, stackCount);
+		Item* newItem = ItemFactory::create(itemId, stackCount);
 		if (!newItem) {
 			reportErrorFunc(L, getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
 			pushBoolean(L, false);
 			return 1;
 		}
 
-		if (it.stackable) {
+		if (it->stackable) {
 			subType -= stackCount;
 		}
 
@@ -4582,13 +4585,12 @@ int LuaScriptInterface::luaGameGetMonsterTypes(lua_State* L)
 int LuaScriptInterface::luaGameGetCurrencyItems(lua_State* L)
 {
 	// Game.getCurrencyItems()
-	const auto& currencyItems = Item::items.currencyItems;
-	size_t size = currencyItems.size();
+	size_t size = Items::currencyItems.size();
 	lua_createtable(L, size, 0);
 
-	for (const auto& it : currencyItems) {
-		const ItemType& itemType = Item::items[it.second];
-		pushUserdata<const ItemType>(L, &itemType);
+	for (const auto& it : Items::currencyItems) {
+		auto itemType = Items::getInstance().getItemType(it.second);
+		pushUserdata<const ItemType>(L, itemType);
 		setMetatable(L, -1, "ItemType");
 		lua_rawseti(L, -2, size--);
 	}
@@ -4599,9 +4601,9 @@ int LuaScriptInterface::luaGameGetItemTypeByClientId(lua_State* L)
 {
 	// Game.getItemTypeByClientId(clientId)
 	uint16_t spriteId = getNumber<uint16_t>(L, 1);
-	const ItemType& itemType = Item::items.getItemIdByClientId(spriteId);
-	if (itemType.id != 0) {
-		pushUserdata<const ItemType>(L, &itemType);
+	auto itemType = Items::getInstance().getItemTypeByClientId(spriteId);
+	if (itemType->id != 0) {
+		pushUserdata<const ItemType>(L, itemType);
 		setMetatable(L, -1, "ItemType");
 	} else {
 		lua_pushnil(L);
@@ -4752,19 +4754,19 @@ int LuaScriptInterface::luaGameCreateItem(lua_State* L)
 	if (isNumber(L, 1)) {
 		id = getNumber<uint16_t>(L, 1);
 	} else {
-		id = Item::items.getItemIdByName(getString(L, 1));
+		id = Items::getInstance().getItemIdByName(getString(L, 1));
 		if (id == 0) {
 			lua_pushnil(L);
 			return 1;
 		}
 	}
 
-	const ItemType& it = Item::items[id];
-	if (it.stackable) {
+	auto it = Items::getInstance().getItemType(id);
+	if (it->stackable) {
 		count = std::min<uint16_t>(count, 100);
 	}
 
-	Item* item = Item::CreateItem(id, count);
+	Item* item = ItemFactory::create(id, count);
 	if (!item) {
 		lua_pushnil(L);
 		return 1;
@@ -4798,14 +4800,14 @@ int LuaScriptInterface::luaGameCreateContainer(lua_State* L)
 	if (isNumber(L, 1)) {
 		id = getNumber<uint16_t>(L, 1);
 	} else {
-		id = Item::items.getItemIdByName(getString(L, 1));
+		id = Items::getInstance().getItemIdByName(getString(L, 1));
 		if (id == 0) {
 			lua_pushnil(L);
 			return 1;
 		}
 	}
 
-	Container* container = Item::CreateItemAsContainer(id, size);
+	Container* container = ItemFactory::createAsContainer(id, size);
 	if (!container) {
 		lua_pushnil(L);
 		return 1;
@@ -5427,7 +5429,7 @@ int LuaScriptInterface::luaTileGetItemById(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -5456,7 +5458,7 @@ int LuaScriptInterface::luaTileGetItemByType(lua_State* L)
 
 	bool found;
 
-	ItemTypes_t itemType = getNumber<ItemTypes_t>(L, 2);
+	ItemTypes itemType = getNumber<ItemTypes>(L, 2);
 	switch (itemType) {
 		case ITEM_TYPE_TELEPORT:
 			found = tile->hasFlag(TILESTATE_TELEPORT);
@@ -5487,8 +5489,7 @@ int LuaScriptInterface::luaTileGetItemByType(lua_State* L)
 	}
 
 	if (Item* item = tile->getGround()) {
-		const ItemType& it = Item::items[item->getID()];
-		if (it.type == itemType) {
+		if (item->getType() == itemType) {
 			pushUserdata<Item>(L, item);
 			setItemMetatable(L, -1, item);
 			return 1;
@@ -5497,8 +5498,7 @@ int LuaScriptInterface::luaTileGetItemByType(lua_State* L)
 
 	if (const TileItemVector* items = tile->getItemList()) {
 		for (Item* item : *items) {
-			const ItemType& it = Item::items[item->getID()];
-			if (it.type == itemType) {
+			if (item->getType() == itemType) {
 				pushUserdata<Item>(L, item);
 				setItemMetatable(L, -1, item);
 				return 1;
@@ -5547,7 +5547,7 @@ int LuaScriptInterface::luaTileGetItemCountById(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -5767,7 +5767,7 @@ int LuaScriptInterface::luaTileHasProperty(lua_State* L)
 		item = nullptr;
 	}
 
-	ITEMPROPERTY property = getNumber<ITEMPROPERTY>(L, 2);
+	ItemProperties property = getNumber<ItemProperties>(L, 2);
 	if (item) {
 		pushBoolean(L, tile->hasProperty(item, property));
 	} else {
@@ -5839,7 +5839,7 @@ int LuaScriptInterface::luaTileAddItem(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -5848,7 +5848,7 @@ int LuaScriptInterface::luaTileAddItem(lua_State* L)
 
 	uint32_t subType = getNumber<uint32_t>(L, 3, 1);
 
-	Item* item = Item::CreateItem(itemId, std::min<uint32_t>(subType, 100));
+	Item* item = ItemFactory::create(itemId, std::min<uint32_t>(subType, 100));
 	if (!item) {
 		lua_pushnil(L);
 		return 1;
@@ -6137,7 +6137,7 @@ int LuaScriptInterface::luaNetworkMessageAddItemId(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -6816,16 +6816,16 @@ int LuaScriptInterface::luaItemHasAttribute(lua_State* L)
 		return 1;
 	}
 
-	itemAttrTypes attribute;
+	ItemAttrTypes attribute;
 	if (isNumber(L, 2)) {
-		attribute = getNumber<itemAttrTypes>(L, 2);
+		attribute = getNumber<ItemAttrTypes>(L, 2);
 	} else if (isString(L, 2)) {
 		attribute = stringToItemAttribute(getString(L, 2));
 	} else {
 		attribute = ITEM_ATTRIBUTE_NONE;
 	}
 
-	pushBoolean(L, item->hasAttribute(attribute));
+	pushBoolean(L, item->hasAttr(attribute));
 	return 1;
 }
 
@@ -6838,9 +6838,9 @@ int LuaScriptInterface::luaItemGetAttribute(lua_State* L)
 		return 1;
 	}
 
-	itemAttrTypes attribute;
+	ItemAttrTypes attribute;
 	if (isNumber(L, 2)) {
-		attribute = getNumber<itemAttrTypes>(L, 2);
+		attribute = getNumber<ItemAttrTypes>(L, 2);
 	} else if (isString(L, 2)) {
 		attribute = stringToItemAttribute(getString(L, 2));
 	} else {
@@ -6850,7 +6850,7 @@ int LuaScriptInterface::luaItemGetAttribute(lua_State* L)
 	if (ItemAttributes::isIntAttrType(attribute)) {
 		lua_pushnumber(L, item->getIntAttr(attribute));
 	} else if (ItemAttributes::isStrAttrType(attribute)) {
-		pushString(L, item->getStrAttr(attribute));
+		pushString(L, item->getStringAttr(attribute));
 	} else {
 		lua_pushnil(L);
 	}
@@ -6866,9 +6866,9 @@ int LuaScriptInterface::luaItemSetAttribute(lua_State* L)
 		return 1;
 	}
 
-	itemAttrTypes attribute;
+	ItemAttrTypes attribute;
 	if (isNumber(L, 2)) {
-		attribute = getNumber<itemAttrTypes>(L, 2);
+		attribute = getNumber<ItemAttrTypes>(L, 2);
 	} else if (isString(L, 2)) {
 		attribute = stringToItemAttribute(getString(L, 2));
 	} else {
@@ -6885,7 +6885,7 @@ int LuaScriptInterface::luaItemSetAttribute(lua_State* L)
 		item->setIntAttr(attribute, getNumber<int32_t>(L, 3));
 		pushBoolean(L, true);
 	} else if (ItemAttributes::isStrAttrType(attribute)) {
-		item->setStrAttr(attribute, getString(L, 3));
+		item->setStringAttr(attribute, getString(L, 3));
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -6902,9 +6902,9 @@ int LuaScriptInterface::luaItemRemoveAttribute(lua_State* L)
 		return 1;
 	}
 
-	itemAttrTypes attribute;
+	ItemAttrTypes attribute;
 	if (isNumber(L, 2)) {
-		attribute = getNumber<itemAttrTypes>(L, 2);
+		attribute = getNumber<ItemAttrTypes>(L, 2);
 	} else if (isString(L, 2)) {
 		attribute = stringToItemAttribute(getString(L, 2));
 	} else {
@@ -6913,7 +6913,7 @@ int LuaScriptInterface::luaItemRemoveAttribute(lua_State* L)
 
 	bool ret = attribute != ITEM_ATTRIBUTE_UNIQUEID;
 	if (ret) {
-		item->removeAttribute(attribute);
+		item->removeAttr(attribute);
 	} else {
 		reportErrorFunc(L, "Attempt to erase protected key \"uid\"");
 	}
@@ -6930,11 +6930,11 @@ int LuaScriptInterface::luaItemGetCustomAttribute(lua_State* L)
 		return 1;
 	}
 
-	const ItemAttributes::CustomAttribute* attr;
+	const CustomLuaAttribute* attr;
 	if (isNumber(L, 2)) {
-		attr = item->getCustomAttribute(getNumber<int64_t>(L, 2));
+		attr = item->getCustomAttr(getNumber<int64_t>(L, 2));
 	} else if (isString(L, 2)) {
-		attr = item->getCustomAttribute(getString(L, 2));
+		attr = item->getCustomAttr(getString(L, 2));
 	} else {
 		lua_pushnil(L);
 		return 1;
@@ -6967,7 +6967,7 @@ int LuaScriptInterface::luaItemSetCustomAttribute(lua_State* L)
 		return 1;
 	}
 
-	ItemAttributes::CustomAttribute val;
+	CustomLuaAttribute val;
 	if (isNumber(L, 3)) {
 		double tmp = getNumber<double>(L, 3);
 		if (std::floor(tmp) < tmp) {
@@ -6984,7 +6984,7 @@ int LuaScriptInterface::luaItemSetCustomAttribute(lua_State* L)
 		return 1;
 	}
 
-	item->setCustomAttribute(key, val);
+	item->setCustomAttr(key, val);
 	pushBoolean(L, true);
 	return 1;
 }
@@ -6999,9 +6999,9 @@ int LuaScriptInterface::luaItemRemoveCustomAttribute(lua_State* L)
 	}
 
 	if (isNumber(L, 2)) {
-		pushBoolean(L, item->removeCustomAttribute(getNumber<int64_t>(L, 2)));
+		pushBoolean(L, item->removeCustomAttr(getNumber<int64_t>(L, 2)));
 	} else if (isString(L, 2)) {
-		pushBoolean(L, item->removeCustomAttribute(getString(L, 2)));
+		pushBoolean(L, item->removeCustomAttr(getString(L, 2)));
 	} else {
 		lua_pushnil(L);
 	}
@@ -7090,7 +7090,7 @@ int LuaScriptInterface::luaItemTransform(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -7103,8 +7103,8 @@ int LuaScriptInterface::luaItemTransform(lua_State* L)
 		return 1;
 	}
 
-	const ItemType& it = Item::items[itemId];
-	if (it.stackable) {
+	auto it = Items::getInstance().getItemType(itemId);
+	if (it->stackable) {
 		subType = std::min<int32_t>(subType, 100);
 	}
 
@@ -7159,7 +7159,7 @@ int LuaScriptInterface::luaItemHasProperty(lua_State* L)
 	// item:hasProperty(property)
 	Item* item = getUserdata<Item>(L, 1);
 	if (item) {
-		ITEMPROPERTY property = getNumber<ITEMPROPERTY>(L, 2);
+		ItemProperties property = getNumber<ItemProperties>(L, 2);
 		pushBoolean(L, item->hasProperty(property));
 	} else {
 		lua_pushnil(L);
@@ -7376,7 +7376,7 @@ int LuaScriptInterface::luaContainerAddItem(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -7384,12 +7384,12 @@ int LuaScriptInterface::luaContainerAddItem(lua_State* L)
 	}
 
 	uint32_t count = getNumber<uint32_t>(L, 3, 1);
-	const ItemType& it = Item::items[itemId];
-	if (it.stackable) {
+	auto it = Items::getInstance().getItemType(itemId);
+	if (it->stackable) {
 		count = std::min<uint16_t>(count, 100);
 	}
 
-	Item* item = Item::CreateItem(itemId, count);
+	Item* item = ItemFactory::create(itemId, count);
 	if (!item) {
 		lua_pushnil(L);
 		return 1;
@@ -7465,7 +7465,7 @@ int LuaScriptInterface::luaContainerGetItemCountById(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -7507,7 +7507,7 @@ int LuaScriptInterface::luaTeleportCreate(lua_State* L)
 	uint32_t id = getNumber<uint32_t>(L, 2);
 
 	Item* item = getScriptEnv()->getItemByUID(id);
-	if (item && item->getTeleport()) {
+	if (item && Teleport::isTeleport(item)) {
 		pushUserdata(L, item);
 		setMetatable(L, -1, "Teleport");
 	} else {
@@ -7548,7 +7548,7 @@ int LuaScriptInterface::luaPodiumCreate(lua_State* L)
 	uint32_t id = getNumber<uint32_t>(L, 2);
 
 	Item* item = getScriptEnv()->getItemByUID(id);
-	if (item && item->getPodium()) {
+	if (item && Podium::isPodium(item)) {
 		pushUserdata(L, item);
 		setMetatable(L, -1, "Podium");
 	} else {
@@ -9295,7 +9295,7 @@ int LuaScriptInterface::luaPlayerGetItemCount(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -9320,7 +9320,7 @@ int LuaScriptInterface::luaPlayerGetItemById(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -9716,7 +9716,7 @@ int LuaScriptInterface::luaPlayerAddItem(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -9726,14 +9726,14 @@ int LuaScriptInterface::luaPlayerAddItem(lua_State* L)
 	int32_t count = getNumber<int32_t>(L, 3, 1);
 	int32_t subType = getNumber<int32_t>(L, 5, 1);
 
-	const ItemType& it = Item::items[itemId];
+	auto it = Items::getInstance().getItemType(itemId);
 
 	int32_t itemCount = 1;
 	int parameters = lua_gettop(L);
 	if (parameters >= 5) {
 		itemCount = std::max<int32_t>(1, count);
-	} else if (it.hasSubType()) {
-		if (it.stackable) {
+	} else if (it->hasSubType()) {
+		if (it->stackable) {
 			itemCount = std::ceil(count / 100.f);
 		}
 
@@ -9754,12 +9754,12 @@ int LuaScriptInterface::luaPlayerAddItem(lua_State* L)
 	slots_t slot = getNumber<slots_t>(L, 6, CONST_SLOT_WHEREEVER);
 	for (int32_t i = 1; i <= itemCount; ++i) {
 		int32_t stackCount = subType;
-		if (it.stackable) {
+		if (it->stackable) {
 			stackCount = std::min<int32_t>(stackCount, 100);
 			subType -= stackCount;
 		}
 
-		Item* item = Item::CreateItem(itemId, stackCount);
+		Item* item = ItemFactory::create(itemId, stackCount);
 		if (!item) {
 			if (!hasTable) {
 				lua_pushnil(L);
@@ -9843,7 +9843,7 @@ int LuaScriptInterface::luaPlayerRemoveItem(lua_State* L)
 	if (isNumber(L, 2)) {
 		itemId = getNumber<uint16_t>(L, 2);
 	} else {
-		itemId = Item::items.getItemIdByName(getString(L, 2));
+		itemId = Items::getInstance().getItemIdByName(getString(L, 2));
 		if (itemId == 0) {
 			lua_pushnil(L);
 			return 1;
@@ -9938,9 +9938,9 @@ int LuaScriptInterface::luaPlayerShowTextDialog(lua_State* L)
 
 	Item* item;
 	if (isNumber(L, 2)) {
-		item = Item::CreateItem(getNumber<uint16_t>(L, 2));
+		item = ItemFactory::create(getNumber<uint16_t>(L, 2));
 	} else if (isString(L, 2)) {
-		item = Item::CreateItem(Item::items.getItemIdByName(getString(L, 2)));
+		item = ItemFactory::create(Items::getInstance().getItemIdByName(getString(L, 2)));
 	} else if (isUserdata(L, 2)) {
 		if (getUserdataType(L, 2) != LuaData_Item) {
 			pushBoolean(L, false);
@@ -9959,7 +9959,7 @@ int LuaScriptInterface::luaPlayerShowTextDialog(lua_State* L)
 	}
 
 	if (length < 0) {
-		length = Item::items[item->getID()].maxTextLen;
+		length = item->getMaxTextLen();
 	}
 
 	if (!text.empty()) {
@@ -12391,14 +12391,14 @@ int LuaScriptInterface::luaItemTypeCreate(lua_State* L)
 	if (isNumber(L, 2)) {
 		id = getNumber<uint32_t>(L, 2);
 	} else if (isString(L, 2)) {
-		id = Item::items.getItemIdByName(getString(L, 2));
+		id = Items::getInstance().getItemIdByName(getString(L, 2));
 	} else {
 		lua_pushnil(L);
 		return 1;
 	}
 
-	const ItemType& itemType = Item::items[id];
-	pushUserdata<const ItemType>(L, &itemType);
+	auto itemType = Items::getInstance().getItemType(id);
+	pushUserdata<const ItemType>(L, itemType);
 	setMetatable(L, -1, "ItemType");
 	return 1;
 }
@@ -14948,21 +14948,21 @@ int LuaScriptInterface::luaLootSetId(lua_State* L)
 			loot->setItemId(getNumber<uint16_t>(L, 2));
 		} else {
 			auto name = getString(L, 2);
-			auto ids = Item::items.nameToItems.equal_range(boost::algorithm::to_lower_copy(name));
+			auto id = Items::getInstance().getItemIdByName(name);
 
-			if (ids.first == Item::items.nameToItems.cend()) {
+			if (id == 0) {
 				std::cout << "[Warning - Loot:setId] Unknown loot item \"" << name << "\". " << std::endl;
 				pushBoolean(L, false);
 				return 1;
 			}
 
-			if (std::next(ids.first) != ids.second) {
+			if (!Items::getInstance().isUniqueItemName(name)) {
 				std::cout << "[Warning - Loot:setId] Non-unique loot item \"" << name << "\". " << std::endl;
 				pushBoolean(L, false);
 				return 1;
 			}
 
-			loot->setItemId(ids.first->second);
+			loot->setItemId(id);
 		}
 		pushBoolean(L, true);
 	} else {
@@ -15738,11 +15738,11 @@ int LuaScriptInterface::luaSpellRegister(lua_State* L)
 			RuneSpell* rune = dynamic_cast<RuneSpell*>(getUserdata<Spell>(L, 1));
 			if (rune->getMagicLevel() != 0 || rune->getLevel() != 0) {
 				// Change information in the ItemType to get accurate description
-				ItemType& iType = Item::items.getItemType(rune->getRuneItemId());
-				iType.name = rune->getName();
-				iType.runeMagLevel = rune->getMagicLevel();
-				iType.runeLevel = rune->getLevel();
-				iType.charges = rune->getCharges();
+				auto iType = Items::getInstance().getItemType(rune->getRuneItemId());
+				iType->name = rune->getName();
+				iType->runeMagLevel = rune->getMagicLevel();
+				iType->runeLevel = rune->getLevel();
+				iType->charges = rune->getCharges();
 			}
 			if (!rune->isScripted()) {
 				pushBoolean(L, false);
@@ -16914,8 +16914,8 @@ int LuaScriptInterface::luaMoveEventRegister(lua_State* L)
 		if ((moveevent->getEventType() == MOVE_EVENT_EQUIP || moveevent->getEventType() == MOVE_EVENT_DEEQUIP) &&
 		    moveevent->getSlot() == SLOTP_WHEREEVER) {
 			uint32_t id = moveevent->getItemIdRange().at(0);
-			ItemType& it = Item::items.getItemType(id);
-			moveevent->setSlot(it.slotPosition);
+			auto it = Items::getInstance().getItemType(id);
+			moveevent->setSlot(it->slotPosition);
 		}
 		if (!moveevent->isScripted()) {
 			pushBoolean(L, g_moveEvents->registerLuaFunction(moveevent));
@@ -17338,7 +17338,7 @@ int LuaScriptInterface::luaCreateWeapon(lua_State* L)
 		return 1;
 	}
 
-	WeaponType_t type = getNumber<WeaponType_t>(L, 2);
+	WeaponTypes type = getNumber<WeaponTypes>(L, 2);
 	switch (type) {
 		case WEAPON_SWORD:
 		case WEAPON_AXE:
@@ -17430,17 +17430,17 @@ int LuaScriptInterface::luaWeaponRegister(lua_State* L)
 		}
 
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
-		it.weaponType = weapon->weaponType;
+		auto it = Items::getInstance().getItemType(id);
+		it->weaponType = weapon->weaponType;
 
 		if (weapon->getWieldInfo() != 0) {
-			it.wieldInfo = weapon->getWieldInfo();
-			it.vocationString = weapon->getVocationString();
-			it.minReqLevel = weapon->getReqLevel();
-			it.minReqMagicLevel = weapon->getReqMagLv();
+			it->wieldInfo = weapon->getWieldInfo();
+			it->vocationString = weapon->getVocationString();
+			it->minReqLevel = weapon->getReqLevel();
+			it->minReqMagicLevel = weapon->getReqMagLv();
 		}
 
-		weapon->configureWeapon(it);
+		weapon->configureWeapon(*it);
 		pushBoolean(L, g_weapons->registerLuaEvent(weapon));
 		*weaponPtr = nullptr; // Remove luascript reference
 	} else {
@@ -17703,8 +17703,8 @@ int LuaScriptInterface::luaWeaponAttack(lua_State* L)
 	Weapon* weapon = getUserdata<Weapon>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
-		it.attack = getNumber<int32_t>(L, 2);
+		auto it = Items::getInstance().getItemType(id);
+		it->attack = getNumber<int32_t>(L, 2);
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -17718,10 +17718,10 @@ int LuaScriptInterface::luaWeaponDefense(lua_State* L)
 	Weapon* weapon = getUserdata<Weapon>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
-		it.defense = getNumber<int32_t>(L, 2);
+		auto it = Items::getInstance().getItemType(id);
+		it->defense = getNumber<int32_t>(L, 2);
 		if (lua_gettop(L) > 2) {
-			it.extraDefense = getNumber<int32_t>(L, 3);
+			it->extraDefense = getNumber<int32_t>(L, 3);
 		}
 		pushBoolean(L, true);
 	} else {
@@ -17736,8 +17736,8 @@ int LuaScriptInterface::luaWeaponRange(lua_State* L)
 	Weapon* weapon = getUserdata<Weapon>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
-		it.shootRange = getNumber<uint8_t>(L, 2);
+		auto it = Items::getInstance().getItemType(id);
+		it->shootRange = getNumber<uint8_t>(L, 2);
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -17752,10 +17752,10 @@ int LuaScriptInterface::luaWeaponCharges(lua_State* L)
 	if (weapon) {
 		bool showCharges = getBoolean(L, 3, true);
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
+		auto it = Items::getInstance().getItemType(id);
 
-		it.charges = getNumber<uint8_t>(L, 2);
-		it.showCharges = showCharges;
+		it->charges = getNumber<uint8_t>(L, 2);
+		it->showCharges = showCharges;
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -17770,10 +17770,10 @@ int LuaScriptInterface::luaWeaponDuration(lua_State* L)
 	if (weapon) {
 		bool showDuration = getBoolean(L, 3, true);
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
+		auto it = Items::getInstance().getItemType(id);
 
-		it.decayTime = getNumber<uint32_t>(L, 2);
-		it.showDuration = showDuration;
+		it->decayTime = getNumber<uint32_t>(L, 2);
+		it->showDuration = showDuration;
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -17788,9 +17788,9 @@ int LuaScriptInterface::luaWeaponDecayTo(lua_State* L)
 	if (weapon) {
 		uint16_t itemid = getNumber<uint16_t>(L, 2, 0);
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
+		auto it = Items::getInstance().getItemType(id);
 
-		it.decayTo = itemid;
+		it->decayTo = itemid;
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -17804,8 +17804,8 @@ int LuaScriptInterface::luaWeaponTransformEquipTo(lua_State* L)
 	Weapon* weapon = getUserdata<Weapon>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
-		it.transformEquipTo = getNumber<uint16_t>(L, 2);
+		auto it = Items::getInstance().getItemType(id);
+		it->transformEquipTo = getNumber<uint16_t>(L, 2);
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -17819,8 +17819,8 @@ int LuaScriptInterface::luaWeaponTransformDeEquipTo(lua_State* L)
 	Weapon* weapon = getUserdata<Weapon>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
-		it.transformDeEquipTo = getNumber<uint16_t>(L, 2);
+		auto it = Items::getInstance().getItemType(id);
+		it->transformDeEquipTo = getNumber<uint16_t>(L, 2);
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -17834,8 +17834,8 @@ int LuaScriptInterface::luaWeaponShootType(lua_State* L)
 	Weapon* weapon = getUserdata<Weapon>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
-		it.shootType = getNumber<ShootType_t>(L, 2);
+		auto it = Items::getInstance().getItemType(id);
+		it->shootType = getNumber<ShootType_t>(L, 2);
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -17849,13 +17849,13 @@ int LuaScriptInterface::luaWeaponSlotType(lua_State* L)
 	Weapon* weapon = getUserdata<Weapon>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
+		auto it = Items::getInstance().getItemType(id);
 		std::string slot = getString(L, 2);
 
 		if (slot == "two-handed") {
-			it.slotPosition |= SLOTP_TWO_HAND;
+			it->slotPosition |= SLOTP_TWO_HAND;
 		} else {
-			it.slotPosition |= SLOTP_HAND;
+			it->slotPosition |= SLOTP_HAND;
 		}
 		pushBoolean(L, true);
 	} else {
@@ -17870,13 +17870,13 @@ int LuaScriptInterface::luaWeaponAmmoType(lua_State* L)
 	WeaponDistance* weapon = getUserdata<WeaponDistance>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
+		auto it = Items::getInstance().getItemType(id);
 		std::string type = getString(L, 2);
 
 		if (type == "arrow") {
-			it.ammoType = AMMO_ARROW;
+			it->ammoType = AMMO_ARROW;
 		} else if (type == "bolt") {
-			it.ammoType = AMMO_BOLT;
+			it->ammoType = AMMO_BOLT;
 		} else {
 			std::cout << "[Warning - weapon:ammoType] Type \"" << type << "\" does not exist." << std::endl;
 			lua_pushnil(L);
@@ -17895,8 +17895,8 @@ int LuaScriptInterface::luaWeaponHitChance(lua_State* L)
 	Weapon* weapon = getUserdata<Weapon>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
-		it.hitChance = getNumber<int8_t>(L, 2);
+		auto it = Items::getInstance().getItemType(id);
+		it->hitChance = getNumber<int8_t>(L, 2);
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -17910,8 +17910,8 @@ int LuaScriptInterface::luaWeaponMaxHitChance(lua_State* L)
 	Weapon* weapon = getUserdata<Weapon>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
-		it.maxHitChance = getNumber<int32_t>(L, 2);
+		auto it = Items::getInstance().getItemType(id);
+		it->maxHitChance = getNumber<int32_t>(L, 2);
 		pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -17925,29 +17925,29 @@ int LuaScriptInterface::luaWeaponExtraElement(lua_State* L)
 	Weapon* weapon = getUserdata<Weapon>(L, 1);
 	if (weapon) {
 		uint16_t id = weapon->getID();
-		ItemType& it = Item::items.getItemType(id);
-		it.abilities.get()->elementDamage = getNumber<uint16_t>(L, 2);
+		auto it = Items::getInstance().getItemType(id);
+		it->abilities.get()->elementDamage = getNumber<uint16_t>(L, 2);
 
 		if (!getNumber<CombatType_t>(L, 3)) {
 			std::string element = getString(L, 3);
 			std::string tmpStrValue = boost::algorithm::to_lower_copy(element);
 			if (tmpStrValue == "earth") {
-				it.abilities.get()->elementType = COMBAT_EARTHDAMAGE;
+				it->abilities.get()->elementType = COMBAT_EARTHDAMAGE;
 			} else if (tmpStrValue == "ice") {
-				it.abilities.get()->elementType = COMBAT_ICEDAMAGE;
+				it->abilities.get()->elementType = COMBAT_ICEDAMAGE;
 			} else if (tmpStrValue == "energy") {
-				it.abilities.get()->elementType = COMBAT_ENERGYDAMAGE;
+				it->abilities.get()->elementType = COMBAT_ENERGYDAMAGE;
 			} else if (tmpStrValue == "fire") {
-				it.abilities.get()->elementType = COMBAT_FIREDAMAGE;
+				it->abilities.get()->elementType = COMBAT_FIREDAMAGE;
 			} else if (tmpStrValue == "death") {
-				it.abilities.get()->elementType = COMBAT_DEATHDAMAGE;
+				it->abilities.get()->elementType = COMBAT_DEATHDAMAGE;
 			} else if (tmpStrValue == "holy") {
-				it.abilities.get()->elementType = COMBAT_HOLYDAMAGE;
+				it->abilities.get()->elementType = COMBAT_HOLYDAMAGE;
 			} else {
 				std::cout << "[Warning - weapon:extraElement] Type \"" << element << "\" does not exist." << std::endl;
 			}
 		} else {
-			it.abilities.get()->elementType = getNumber<CombatType_t>(L, 3);
+			it->abilities.get()->elementType = getNumber<CombatType_t>(L, 3);
 		}
 		pushBoolean(L, true);
 	} else {

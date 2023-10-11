@@ -203,8 +203,6 @@ public:
 	}
 
 	void forEachAttribute(const std::function<void(ItemAttrTypes type, const Attribute& attribute)>& func);
-
-	bool hasUsedAttributes() const;
 };
 
 class MutableItemAttributes

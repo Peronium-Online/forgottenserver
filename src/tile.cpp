@@ -24,7 +24,7 @@ extern ConfigManager g_config;
 StaticTile real_nullptr_tile(0xFFFF, 0xFFFF, 0xFF);
 Tile& Tile::nullptr_tile = real_nullptr_tile;
 
-bool Tile::hasProperty(ITEMPROPERTY prop) const
+bool Tile::hasProperty(ItemProperties prop) const
 {
 	if (ground && ground->hasProperty(prop)) {
 		return true;
@@ -40,7 +40,7 @@ bool Tile::hasProperty(ITEMPROPERTY prop) const
 	return false;
 }
 
-bool Tile::hasProperty(const Item* exclude, ITEMPROPERTY prop) const
+bool Tile::hasProperty(const Item* exclude, ItemProperties prop) const
 {
 	assert(exclude);
 

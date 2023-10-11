@@ -131,8 +131,8 @@ public:
 	uint32_t getTopItemCount() const;
 	uint32_t getDownItemCount() const;
 
-	bool hasProperty(ITEMPROPERTY prop) const;
-	bool hasProperty(const Item* exclude, ITEMPROPERTY prop) const;
+	bool hasProperty(ItemProperties prop) const;
+	bool hasProperty(const Item* exclude, ItemProperties prop) const;
 
 	bool hasFlag(uint32_t flag) const { return hasBitSet(flag, this->flags); }
 	void setFlag(uint32_t flag) { this->flags |= flag; }
