@@ -5,15 +5,17 @@
 #define FS_MAILBOX_H
 
 #include "cylinder.h"
-#include #include "libs/item/Item.h"
+#include "libs/item/Item.h"
 
 class Mailbox final : public Item, public Cylinder
 {
 public:
 	explicit Mailbox(uint16_t itemId) : Item(itemId) {}
 
-	Mailbox* getMailbox() override { return this; }
-	const Mailbox* getMailbox() const override { return this; }
+	static bool isMailbox(Item* item) { return item->getType() == ITEM_TYPE_MAILBOX; }
+
+	static Mailbox* toMailbox(Item* item) { return static_cast<Mailbox*>(item); }
+	static const Mailbox* toMailbox(const Item* item) { return static_cast<const Mailbox*>(item); }
 
 	// cylinder implementations
 	ReturnValue queryAdd(int32_t index, const Thing& thing, uint32_t count, uint32_t flags,

@@ -4,7 +4,7 @@
 #ifndef FS_TELEPORT_H
 #define FS_TELEPORT_H
 
-#include #include "libs/item/Item.h"
+#include "libs/item/Item.h"
 
 class Teleport final : public Item, public Cylinder
 {
@@ -13,9 +13,7 @@ public:
 
 	static bool isTeleport(const Item* item) { return item->getType() == ITEM_TYPE_TELEPORT; }
 
-	// serialization
-	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream) override;
-	void serializeAttr(PropWriteStream& propWriteStream) const override;
+	void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream) override;
 
 	const Position& getDestPos() const { return destPos; }
 	void setDestPos(const Position& pos) { destPos = pos; }

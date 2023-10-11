@@ -230,3 +230,15 @@ bool ItemAttrSerializer::serializePodiumAttr(const Podium* item, PropWriteStream
 		propWriteStream.write<uint8_t>(outfit.mountFeet);
 	}
 }
+
+bool ItemAttrSerializer::serializeTeleportAttr(const Teleport* teleport, PropWriteStream& propStream)
+{
+	serializeAttr(teleport, propStream);
+
+	auto destPos = teleport->getDestPos();
+
+	propStream.write<uint8_t>(ATTR_TELE_DEST);
+	propStream.write<uint16_t>(destPos.x);
+	propStream.write<uint16_t>(destPos.y);
+	propStream.write<uint8_t>(destPos.z);
+}

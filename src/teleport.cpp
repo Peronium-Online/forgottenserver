@@ -9,26 +9,16 @@
 
 extern Game g_game;
 
-Attr_ReadValue Teleport::readAttr(AttrTypes_t attr, PropStream& propStream)
+void Teleport::setAttributeFromPropStream(ItemAttrTypesIndex attr, PropStream& propStream)
 {
 	if (attr == ATTR_TELE_DEST) {
 		if (!propStream.read<uint16_t>(destPos.x) || !propStream.read<uint16_t>(destPos.y) ||
 		    !propStream.read<uint8_t>(destPos.z)) {
-			return ATTR_READ_ERROR;
+			throw ItemAttrError{ATTR_TELE_DEST, "Unable to read teleport destination attribute"};
 		}
-		return ATTR_READ_CONTINUE;
+		return;
 	}
-	return Item::readAttr(attr, propStream);
-}
-
-void Teleport::serializeAttr(PropWriteStream& propWriteStream) const
-{
-	Item::serializeAttr(propWriteStream);
-
-	propWriteStream.write<uint8_t>(ATTR_TELE_DEST);
-	propWriteStream.write<uint16_t>(destPos.x);
-	propWriteStream.write<uint16_t>(destPos.y);
-	propWriteStream.write<uint8_t>(destPos.z);
+	return Item::setAttributeFromPropStream(attr, propStream);
 }
 
 ReturnValue Teleport::queryAdd(int32_t, const Thing&, uint32_t, uint32_t, Creature*) const
@@ -83,7 +73,7 @@ void Teleport::addThing(int32_t, Thing* thing)
 		}
 	}
 
-	const MagicEffectClasses effect = Item::items[id].magicEffect;
+	const MagicEffectClasses effect = iType->magicEffect;
 
 	if (Creature* creature = thing->getCreature()) {
 		Position origPos = creature->getPosition();
