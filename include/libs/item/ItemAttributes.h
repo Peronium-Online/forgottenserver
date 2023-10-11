@@ -8,78 +8,79 @@
 #include <unordered_map>
 
 typedef std::unordered_map<std::string, CustomLuaAttribute> CustomAttributeMap;
-
-struct Attribute
+typedef union
 {
-	ItemAttrTypes type;
-	union
-	{
-		int64_t integer;
-		std::string* string;
-		CustomAttributeMap* custom;
-	} value;
+	int64_t integer;
+	std::string* string;
+	CustomAttributeMap* custom;
+} AttributeValue;
 
-	explicit Attribute(ItemAttrTypes type) : type(type) { memset(&value, 0, sizeof(value)); }
-	Attribute(const Attribute& i)
+class ItemAttributes
+{
+private:
+	struct Attribute
 	{
-		type = i.type;
-		if (ItemAttributes::isIntAttrType(type)) {
-			value.integer = i.value.integer;
-		} else if (ItemAttributes::isStrAttrType(type)) {
-			value.string = new std::string(*i.value.string);
-		} else if (ItemAttributes::isCustomAttrType(type)) {
-			value.custom = new CustomAttributeMap(*i.value.custom);
-		} else {
-			memset(&value, 0, sizeof(value));
-		}
-	}
-	Attribute(Attribute&& attribute) : value(attribute.value), type(attribute.type)
-	{
-		memset(&attribute.value, 0, sizeof(value));
-		attribute.type = ITEM_ATTRIBUTE_NONE;
-	}
-	~Attribute()
-	{
-		if (ItemAttributes::isStrAttrType(type)) {
-			delete value.string;
-		} else if (ItemAttributes::isCustomAttrType(type)) {
-			delete value.custom;
-		}
-	}
+		ItemAttrTypes type;
+		AttributeValue value;
 
-	Attribute& operator=(Attribute other)
-	{
-		Attribute::swap(*this, other);
-		return *this;
-	}
-	Attribute& operator=(Attribute&& other)
-	{
-		if (this != &other) {
+		explicit Attribute(ItemAttrTypes type) : type(type) { memset(&value, 0, sizeof(value)); }
+		Attribute(const Attribute& i)
+		{
+			type = i.type;
+			if (ItemAttributes::isIntAttrType(type)) {
+				value.integer = i.value.integer;
+			} else if (ItemAttributes::isStrAttrType(type)) {
+				value.string = new std::string(*i.value.string);
+			} else if (ItemAttributes::isCustomAttrType(type)) {
+				value.custom = new CustomAttributeMap(*i.value.custom);
+			} else {
+				memset(&value, 0, sizeof(value));
+			}
+		}
+		Attribute(Attribute&& attribute) : value(attribute.value), type(attribute.type)
+		{
+			memset(&attribute.value, 0, sizeof(value));
+			attribute.type = ITEM_ATTRIBUTE_NONE;
+		}
+		~Attribute()
+		{
 			if (ItemAttributes::isStrAttrType(type)) {
 				delete value.string;
 			} else if (ItemAttributes::isCustomAttrType(type)) {
 				delete value.custom;
 			}
-
-			value = other.value;
-			type = other.type;
-
-			memset(&other.value, 0, sizeof(value));
-			other.type = ITEM_ATTRIBUTE_NONE;
 		}
-		return *this;
-	}
 
-	static void swap(Attribute& first, Attribute& second)
-	{
-		std::swap(first.value, second.value);
-		std::swap(first.type, second.type);
-	}
-};
+		Attribute& operator=(Attribute other)
+		{
+			Attribute::swap(*this, other);
+			return *this;
+		}
+		Attribute& operator=(Attribute&& other)
+		{
+			if (this != &other) {
+				if (ItemAttributes::isStrAttrType(type)) {
+					delete value.string;
+				} else if (ItemAttributes::isCustomAttrType(type)) {
+					delete value.custom;
+				}
 
-class ItemAttributes
-{
-private:
+				value = other.value;
+				type = other.type;
+
+				memset(&other.value, 0, sizeof(value));
+				other.type = ITEM_ATTRIBUTE_NONE;
+			}
+			return *this;
+		}
+
+		static void swap(Attribute& first, Attribute& second)
+		{
+			std::swap(first.value, second.value);
+			std::swap(first.type, second.type);
+		}
+	};
+
 	std::vector<Attribute> attributes;
 	uint32_t attributeBits = 0;
 
@@ -112,10 +113,7 @@ public:
 
 	void setIntAttr(ItemAttrTypes type, int64_t value);
 	int64_t getIntAttr(ItemAttrTypes type) const;
-	void ItemAttributes::increaseIntAttr(ItemAttrTypes type, int64_t value)
-	{
-		setIntAttr(type, getIntAttr(type) + value);
-	}
+	void increaseIntAttr(ItemAttrTypes type, int64_t value) { setIntAttr(type, getIntAttr(type) + value); }
 
 	void setStrAttr(ItemAttrTypes type, const std::string& value);
 	const std::string& getStrAttr(ItemAttrTypes type) const;
@@ -202,7 +200,7 @@ public:
 		return false;
 	}
 
-	void forEachAttribute(const std::function<void(ItemAttrTypes type, const Attribute& attribute)>& func);
+	void forEachAttribute(const std::function<void(ItemAttrTypes type, const AttributeValue attribute)>& func);
 };
 
 class MutableItemAttributes

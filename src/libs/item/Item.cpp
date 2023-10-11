@@ -693,14 +693,14 @@ uint16_t Item::getBoostPercent(CombatType_t combatType, bool total /* = true */)
 bool Item::hasUsedAttributes() const
 {
 	bool has = false;
-	iAttributes->forEachAttribute([&](ItemAttrTypes type, const Attribute& attr) {
+	iAttributes->forEachAttribute([&](ItemAttrTypes type, const AttributeValue val) {
 		if (type == ITEM_ATTRIBUTE_CHARGES) {
-			uint16_t charges = static_cast<uint16_t>(attr.value.integer);
+			uint16_t charges = static_cast<uint16_t>(val.integer);
 			if (charges != iType->charges) {
 				has = true;
 			}
-		} else if (attr.type == ITEM_ATTRIBUTE_DURATION) {
-			uint32_t duration = static_cast<uint32_t>(attr.value.integer);
+		} else if (type == ITEM_ATTRIBUTE_DURATION) {
+			uint32_t duration = static_cast<uint32_t>(val.integer);
 			if (duration != getDefaultDuration()) {
 				has = true;
 			}

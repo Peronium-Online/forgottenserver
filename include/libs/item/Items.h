@@ -73,7 +73,7 @@ public:
 		return &items.front();
 	}
 
-	const ItemType* Items::getItemTypeByClientId(uint16_t spriteId) const
+	const ItemType* getItemTypeByClientId(uint16_t spriteId) const
 	{
 		if (spriteId >= 100) {
 			if (uint16_t serverId = clientIdToServerIdMap.getServerId(spriteId)) {
