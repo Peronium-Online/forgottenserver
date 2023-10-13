@@ -26,6 +26,9 @@ private:
 
 public:
 	IOMap(const std::string& filename) : OTBLoadable("data/world/" + filename + ".otbm", OTBM), fileName(filename) {}
+	IOMap(const std::string& filename, Map* map) :
+	    OTBLoadable("data/world/" + filename + ".otbm", OTBM), fileName(filename), map(map)
+	{}
 
 	static Tile* createTile(Item*& ground, Item* item, uint16_t x, uint16_t y, uint8_t z);
 

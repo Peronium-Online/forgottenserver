@@ -18,18 +18,18 @@ extern Game g_game;
 
 bool Map::loadMap(const std::string& identifier, bool loadHouses)
 {
-	IOMap loader;
-	if (!loader.loadMap(this, identifier)) {
-		std::cout << "[Fatal - Map::loadMap] " << loader.getLastErrorString() << std::endl;
+	IOMap* loader = new IOMap(identifier, this);
+	if (!loader->loadFromOTB()) {
+		std::cout << "[Fatal - Map::loadMap] " << loader->getLastErrorString() << std::endl;
 		return false;
 	}
 
-	if (!IOMap::loadSpawns(this)) {
+	if (!loader->loadSpawns()) {
 		std::cout << "[Warning - Map::loadMap] Failed to load spawn data." << std::endl;
 	}
 
 	if (loadHouses) {
-		if (!IOMap::loadHouses(this)) {
+		if (!loader->loadHouses()) {
 			std::cout << "[Warning - Map::loadMap] Failed to load house data." << std::endl;
 		}
 

@@ -108,6 +108,11 @@ public:
 		}
 		return false;
 	}
+	bool isCleanable() const
+	{
+		return !loadedFromMap && canRemove() && isPickupable() && !hasUniqueId() &&
+		       !iAttributes->hasAttr(ITEM_ATTRIBUTE_ACTIONID);
+	}
 
 	bool canReadText() const { return iType->canReadText; }
 	bool canWriteText() const { return iType->canWriteText; }
