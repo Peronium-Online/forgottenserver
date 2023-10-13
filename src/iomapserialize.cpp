@@ -8,6 +8,10 @@
 #include "bed.h"
 #include "game.h"
 #include "housetile.h"
+#include "libs/item/ItemAttrSerializer.h"
+#include "libs/item/ItemFactory.h"
+
+#include <fmt/format.h>
 
 extern Game g_game;
 
@@ -129,12 +133,12 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent)
 		tile = parent->getTile();
 	}
 
-	const ItemType& iType = Item::items[id];
-	if (iType.moveable || iType.forceSerialize || !tile) {
+	auto iType = Items::getInstance().getItemType(id);
+	if (iType->moveable || iType->forceSerialize || !tile) {
 		// create a new item
-		Item* item = Item::CreateItem(id);
+		Item* item = ItemFactory::create(id);
 		if (item) {
-			if (item->unserializeAttr(propStream)) {
+			if (ItemAttrSerializer::unserializeAttr(item, propStream)) {
 				Container* container = item->getContainer();
 				if (container && !loadContainer(propStream, container)) {
 					delete item;
@@ -157,10 +161,10 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent)
 				if (findItem->getID() == id) {
 					item = findItem;
 					break;
-				} else if (iType.isDoor() && findItem->getDoor()) {
+				} else if (iType->isDoor() && Door::isDoor(findItem)) {
 					item = findItem;
 					break;
-				} else if (iType.isBed() && findItem->getBed()) {
+				} else if (iType->isBed() && BedItem::isBedItem(findItem)) {
 					item = findItem;
 					break;
 				}
@@ -168,7 +172,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent)
 		}
 
 		if (item) {
-			if (item->unserializeAttr(propStream)) {
+			if (ItemAttrSerializer::unserializeAttr(item, propStream)) {
 				Container* container = item->getContainer();
 				if (container && !loadContainer(propStream, container)) {
 					return false;
@@ -180,9 +184,9 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent)
 			}
 		} else {
 			// The map changed since the last save, just read the attributes
-			std::unique_ptr<Item> dummy(Item::CreateItem(id));
+			std::unique_ptr<Item> dummy(ItemFactory::create(id));
 			if (dummy) {
-				dummy->unserializeAttr(propStream);
+				ItemAttrSerializer::unserializeAttr(dummy.get(), propStream);
 				Container* container = dummy->getContainer();
 				if (container) {
 					if (!loadContainer(propStream, container)) {
@@ -206,7 +210,7 @@ void IOMapSerialize::saveItem(PropWriteStream& stream, const Item* item)
 
 	// Write ID & props
 	stream.write<uint16_t>(item->getID());
-	item->serializeAttr(stream);
+	ItemAttrSerializer::serializeAttr(item, stream);
 
 	if (container) {
 		// Hack our way into the attributes
@@ -230,11 +234,12 @@ void IOMapSerialize::saveTile(PropWriteStream& stream, const Tile* tile)
 	std::forward_list<Item*> items;
 	uint16_t count = 0;
 	for (Item* item : *tileItems) {
-		const ItemType& it = Item::items[item->getID()];
+		auto it = Items::getInstance().getItemType(item->getID());
 
 		// Note that these are NEGATED, ie. these are the items that will be saved.
-		if (!(it.moveable || it.forceSerialize || item->getDoor() ||
-		      (item->getContainer() && !item->getContainer()->empty()) || it.canWriteText || item->getBed())) {
+		if (!(it->moveable || it->forceSerialize || Door::isDoor(item) ||
+		      (item->getContainer() && !item->getContainer()->empty()) || it->canWriteText ||
+		      BedItem::isBedItem(item))) {
 			continue;
 		}
 
