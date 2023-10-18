@@ -6,6 +6,7 @@
 #include "npc.h"
 
 #include "game.h"
+#include "libs/item/ItemFactory.h"
 #include "libs/util/tools/direction.h"
 #include "libs/util/tools/pugicast.h"
 #include "libs/util/tools/random.h"
@@ -911,11 +912,11 @@ int NpcScriptInterface::luaDoSellItem(lua_State* L)
 	uint32_t actionId = getNumber<uint32_t>(L, 5, 0);
 	bool canDropOnMap = getBoolean(L, 6, true);
 
-	const ItemType& it = Item::items[itemId];
-	if (it.stackable) {
+	auto it = Items::getInstance().getItemType(itemId);
+	if (it->stackable) {
 		while (amount > 0) {
 			int32_t stackCount = std::min<int32_t>(100, amount);
-			Item* item = Item::CreateItem(it.id, stackCount);
+			Item* item = ItemFactory::create(it->id, stackCount);
 			if (item && actionId != 0) {
 				item->setActionId(actionId);
 			}
@@ -931,7 +932,7 @@ int NpcScriptInterface::luaDoSellItem(lua_State* L)
 		}
 	} else {
 		for (uint32_t i = 0; i < amount; ++i) {
-			Item* item = Item::CreateItem(it.id, subType);
+			Item* item = ItemFactory::create(it->id, subType);
 			if (item && actionId != 0) {
 				item->setActionId(actionId);
 			}
