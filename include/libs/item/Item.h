@@ -101,6 +101,7 @@ public:
 		}
 		return iType->storeItem;
 	}
+	bool isContainer() const { return iType->isContainer(); }
 	bool isOpenContainer() const
 	{
 		if (iAttributes->hasAttr(ITEM_ATTRIBUTE_OPENCONTAINER)) {
@@ -409,6 +410,8 @@ public:
 	{
 		iAttributes->setIntAttr(ITEM_ATTRIBUTE_STOREITEM, static_cast<int64_t>(storeItem));
 	}
+
+	uint8_t getClassification() const { return iType->classification; }
 };
 
 #endif

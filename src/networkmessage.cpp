@@ -82,22 +82,22 @@ void NetworkMessage::addPosition(const Position& pos)
 
 void NetworkMessage::addItem(uint16_t id, uint8_t count)
 {
-	const ItemType& it = Item::items[id];
+	auto it = Items::getInstance().getItemType(id);
 
-	add<uint16_t>(it.clientId);
+	add<uint16_t>(it->clientId);
 
-	if (it.stackable) {
+	if (it->stackable) {
 		addByte(count);
-	} else if (it.isSplash() || it.isFluidContainer()) {
+	} else if (it->isSplash() || it->isFluidContainer()) {
 		addByte(fluidMap[count & 7]);
-	} else if (it.isContainer()) {
+	} else if (it->isContainer()) {
 		addByte(0x00); // assigned loot container icon
 		addByte(0x00); // quiver ammo count
-	} else if (it.classification > 0) {
+	} else if (it->classification > 0) {
 		addByte(0x00); // item tier (0-10)
 	}
 
-	if (it.isPodium()) {
+	if (it->isPodium()) {
 		add<uint16_t>(0); // looktype
 		add<uint16_t>(0); // lookmount
 		addByte(2);       // direction
@@ -107,23 +107,21 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 
 void NetworkMessage::addItem(const Item* item)
 {
-	const ItemType& it = Item::items[item->getID()];
+	add<uint16_t>(item->getClientID());
 
-	add<uint16_t>(it.clientId);
-
-	if (it.stackable) {
+	if (item->isStackable()) {
 		addByte(std::min<uint16_t>(0xFF, item->getItemCount()));
-	} else if (it.isSplash() || it.isFluidContainer()) {
+	} else if (item->isSplash() || item->isFluidContainer()) {
 		addByte(fluidMap[item->getFluidType() & 7]);
-	} else if (it.classification > 0) {
+	} else if (item->getClassification() > 0) {
 		addByte(0x00); // item tier (0-10)
 	}
 
-	if (it.isContainer()) {
+	if (item->isContainer()) {
 		addByte(0x00); // assigned loot container icon
 		// quiver ammo count
 		const Container* container = item->getContainer();
-		if (container && it.weaponType == WEAPON_QUIVER) {
+		if (container && item->getWeaponType() == WEAPON_QUIVER) {
 			addByte(0x01);
 			add<uint32_t>(container->getAmmoCount());
 		} else {
@@ -132,8 +130,8 @@ void NetworkMessage::addItem(const Item* item)
 	}
 
 	// display outfit on the podium
-	if (it.isPodium()) {
-		const Podium* podium = item->getPodium();
+	if (item->isPodium()) {
+		const Podium* podium = Podium::toPodium(item);
 		const Look& outfit = podium->getOutfit();
 
 		// add outfit
@@ -169,4 +167,4 @@ void NetworkMessage::addItem(const Item* item)
 	}
 }
 
-void NetworkMessage::addItemId(uint16_t itemId) { add<uint16_t>(Item::items[itemId].clientId); }
+void NetworkMessage::addItemId(uint16_t itemId) { add<uint16_t>(Items::getInstance().getItemType(itemId)->clientId); }
