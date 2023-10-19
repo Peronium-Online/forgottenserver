@@ -97,11 +97,11 @@ bool MoveEvents::registerEvent(Event_ptr event, const pugi::xml_node& node)
 
 		for (const auto& id : idList) {
 			if (moveEvent->getEventType() == MOVE_EVENT_EQUIP) {
-				ItemType& it = Item::items.getItemType(id);
-				it.wieldInfo = moveEvent->getWieldInfo();
-				it.minReqLevel = moveEvent->getReqLevel();
-				it.minReqMagicLevel = moveEvent->getReqMagLv();
-				it.vocationString = moveEvent->getVocationString();
+				auto it = Items::getInstance().getItemType(id);
+				it->wieldInfo = moveEvent->getWieldInfo();
+				it->minReqLevel = moveEvent->getReqLevel();
+				it->minReqMagicLevel = moveEvent->getReqMagLv();
+				it->vocationString = moveEvent->getVocationString();
 			}
 			addEvent(std::move(*moveEvent), id, itemIdMap);
 		}
@@ -112,20 +112,20 @@ bool MoveEvents::registerEvent(Event_ptr event, const pugi::xml_node& node)
 		addEvent(*moveEvent, id, itemIdMap);
 
 		if (moveEvent->getEventType() == MOVE_EVENT_EQUIP) {
-			ItemType& it = Item::items.getItemType(id);
-			it.wieldInfo = moveEvent->getWieldInfo();
-			it.minReqLevel = moveEvent->getReqLevel();
-			it.minReqMagicLevel = moveEvent->getReqMagLv();
-			it.vocationString = moveEvent->getVocationString();
+			auto it = Items::getInstance().getItemType(id);
+			it->wieldInfo = moveEvent->getWieldInfo();
+			it->minReqLevel = moveEvent->getReqLevel();
+			it->minReqMagicLevel = moveEvent->getReqMagLv();
+			it->vocationString = moveEvent->getVocationString();
 
 			while (++id <= endId) {
 				addEvent(*moveEvent, id, itemIdMap);
 
-				ItemType& tit = Item::items.getItemType(id);
-				tit.wieldInfo = moveEvent->getWieldInfo();
-				tit.minReqLevel = moveEvent->getReqLevel();
-				tit.minReqMagicLevel = moveEvent->getReqMagLv();
-				tit.vocationString = moveEvent->getVocationString();
+				auto tit = Items::getInstance().getItemType(id);
+				tit->wieldInfo = moveEvent->getWieldInfo();
+				tit->minReqLevel = moveEvent->getReqLevel();
+				tit->minReqMagicLevel = moveEvent->getReqMagLv();
+				tit->vocationString = moveEvent->getVocationString();
 			}
 		} else {
 			while (++id <= endId) {
@@ -197,21 +197,21 @@ bool MoveEvents::registerLuaFunction(MoveEvent* event)
 			uint32_t id = moveEvent->getItemIdRange().at(0);
 			addEvent(*moveEvent, id, itemIdMap);
 			if (moveEvent->getEventType() == MOVE_EVENT_EQUIP) {
-				ItemType& it = Item::items.getItemType(id);
-				it.wieldInfo = moveEvent->getWieldInfo();
-				it.minReqLevel = moveEvent->getReqLevel();
-				it.minReqMagicLevel = moveEvent->getReqMagLv();
-				it.vocationString = moveEvent->getVocationString();
+				auto it = Items::getInstance().getItemType(id);
+				it->wieldInfo = moveEvent->getWieldInfo();
+				it->minReqLevel = moveEvent->getReqLevel();
+				it->minReqMagicLevel = moveEvent->getReqMagLv();
+				it->vocationString = moveEvent->getVocationString();
 			}
 		} else {
 			uint32_t iterId = 0;
 			while (++iterId < moveEvent->getItemIdRange().size()) {
 				if (moveEvent->getEventType() == MOVE_EVENT_EQUIP) {
-					ItemType& it = Item::items.getItemType(moveEvent->getItemIdRange().at(iterId));
-					it.wieldInfo = moveEvent->getWieldInfo();
-					it.minReqLevel = moveEvent->getReqLevel();
-					it.minReqMagicLevel = moveEvent->getReqMagLv();
-					it.vocationString = moveEvent->getVocationString();
+					auto it = Items::getInstance().getItemType(moveEvent->getItemIdRange().at(iterId));
+					it->wieldInfo = moveEvent->getWieldInfo();
+					it->minReqLevel = moveEvent->getReqLevel();
+					it->minReqMagicLevel = moveEvent->getReqMagLv();
+					it->vocationString = moveEvent->getVocationString();
 				}
 				addEvent(*moveEvent, moveEvent->getItemIdRange().at(iterId), itemIdMap);
 			}
@@ -247,21 +247,21 @@ bool MoveEvents::registerLuaEvent(MoveEvent* event)
 			uint32_t id = moveEvent->getItemIdRange().at(0);
 			addEvent(*moveEvent, id, itemIdMap);
 			if (moveEvent->getEventType() == MOVE_EVENT_EQUIP) {
-				ItemType& it = Item::items.getItemType(id);
-				it.wieldInfo = moveEvent->getWieldInfo();
-				it.minReqLevel = moveEvent->getReqLevel();
-				it.minReqMagicLevel = moveEvent->getReqMagLv();
-				it.vocationString = moveEvent->getVocationString();
+				auto it = Items::getInstance().getItemType(id);
+				it->wieldInfo = moveEvent->getWieldInfo();
+				it->minReqLevel = moveEvent->getReqLevel();
+				it->minReqMagicLevel = moveEvent->getReqMagLv();
+				it->vocationString = moveEvent->getVocationString();
 			}
 		} else {
 			auto v = moveEvent->getItemIdRange();
 			for (auto i = v.begin(); i != v.end(); i++) {
 				if (moveEvent->getEventType() == MOVE_EVENT_EQUIP) {
-					ItemType& it = Item::items.getItemType(*i);
-					it.wieldInfo = moveEvent->getWieldInfo();
-					it.minReqLevel = moveEvent->getReqLevel();
-					it.minReqMagicLevel = moveEvent->getReqMagLv();
-					it.vocationString = moveEvent->getVocationString();
+					auto it = Items::getInstance().getItemType(*i);
+					it->wieldInfo = moveEvent->getWieldInfo();
+					it->minReqLevel = moveEvent->getReqLevel();
+					it->minReqMagicLevel = moveEvent->getReqMagLv();
+					it->vocationString = moveEvent->getVocationString();
 				}
 				addEvent(*moveEvent, *i, itemIdMap);
 			}
@@ -376,7 +376,7 @@ MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType)
 {
 	MoveListMap::iterator it;
 
-	if (item->hasAttribute(ITEM_ATTRIBUTE_UNIQUEID)) {
+	if (item->hasUniqueId()) {
 		it = uniqueIdMap.find(item->getUniqueId());
 		if (it != uniqueIdMap.end()) {
 			std::list<MoveEvent>& moveEventList = it->second.moveEvent[eventType];
@@ -386,7 +386,7 @@ MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType)
 		}
 	}
 
-	if (item->hasAttribute(ITEM_ATTRIBUTE_ACTIONID)) {
+	if (item->hasActionId()) {
 		it = actionIdMap.find(item->getActionId());
 		if (it != actionIdMap.end()) {
 			std::list<MoveEvent>& moveEventList = it->second.moveEvent[eventType];
@@ -673,7 +673,7 @@ bool MoveEvent::configureEvent(const pugi::xml_node& node)
 
 uint32_t MoveEvent::StepInField(Creature* creature, Item* item, const Position&)
 {
-	MagicField* field = item->getMagicField();
+	MagicField* field = MagicField::toMagicField(item);
 	if (field) {
 		field->onStepInField(creature);
 		return 1;
@@ -686,7 +686,7 @@ uint32_t MoveEvent::StepOutField(Creature*, Item*, const Position&) { return 1; 
 
 uint32_t MoveEvent::AddItemField(Item* item, Item*, const Position&)
 {
-	if (MagicField* field = item->getMagicField()) {
+	if (MagicField* field = MagicField::toMagicField(item)) {
 		Tile* tile = item->getTile();
 		if (CreatureVector* creatures = tile->getCreatures()) {
 			for (Creature* creature : *creatures) {
@@ -728,56 +728,55 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, Player* player, Item* ite
 		return RETURNVALUE_NOERROR;
 	}
 
-	const ItemType& it = Item::items[item->getID()];
-	if (it.transformEquipTo != 0) {
-		Item* newItem = g_game.transformItem(item, it.transformEquipTo);
+	if (item->getTransformEquipTo() != 0) {
+		Item* newItem = g_game.transformItem(item, item->getTransformEquipTo());
 		g_game.startDecay(newItem);
 	} else {
 		player->setItemAbility(slot, true);
 	}
 
-	if (!it.abilities) {
+	if (!item->hasAbilities()) {
 		return RETURNVALUE_NOERROR;
 	}
 
-	if (it.abilities->invisible) {
+	if (item->hasInvisibleAbility()) {
 		Condition* condition = Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_INVISIBLE, -1, 0);
 		player->addCondition(condition);
 	}
 
-	if (it.abilities->manaShield) {
+	if (item->hasManaShieldAbility()) {
 		Condition* condition =
 		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_MANASHIELD, -1, 0);
 		player->addCondition(condition);
 	}
 
-	if (it.abilities->speed != 0) {
-		g_game.changeSpeed(player, it.abilities->speed);
+	if (item->getSpeedIncrease() != 0) {
+		g_game.changeSpeed(player, item->getSpeedIncrease());
 	}
 
-	if (it.abilities->conditionSuppressions != 0) {
-		player->addConditionSuppressions(it.abilities->conditionSuppressions);
+	if (item->getConditionSuppressions() != 0) {
+		player->addConditionSuppressions(item->getConditionSuppressions());
 		player->sendIcons();
 	}
 
-	if (it.abilities->regeneration) {
+	if (item->hasRegenerationAbility()) {
 		Condition* condition =
 		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_REGENERATION, -1, 0);
 
-		if (it.abilities->healthGain != 0) {
-			condition->setParam(CONDITION_PARAM_HEALTHGAIN, it.abilities->healthGain);
+		if (item->getHealthGain() != 0) {
+			condition->setParam(CONDITION_PARAM_HEALTHGAIN, item->getHealthGain());
 		}
 
-		if (it.abilities->healthTicks != 0) {
-			condition->setParam(CONDITION_PARAM_HEALTHTICKS, it.abilities->healthTicks);
+		if (item->getHealthTicks() != 0) {
+			condition->setParam(CONDITION_PARAM_HEALTHTICKS, item->getHealthTicks());
 		}
 
-		if (it.abilities->manaGain != 0) {
-			condition->setParam(CONDITION_PARAM_MANAGAIN, it.abilities->manaGain);
+		if (item->getManaGain() != 0) {
+			condition->setParam(CONDITION_PARAM_MANAGAIN, item->getManaGain());
 		}
 
-		if (it.abilities->manaTicks != 0) {
-			condition->setParam(CONDITION_PARAM_MANATICKS, it.abilities->manaTicks);
+		if (item->getManaTicks() != 0) {
+			condition->setParam(CONDITION_PARAM_MANATICKS, item->getManaTicks());
 		}
 
 		player->addCondition(condition);
@@ -787,22 +786,22 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, Player* player, Item* ite
 	bool needUpdateSkills = false;
 
 	for (int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i) {
-		if (it.abilities->skills[i]) {
+		if (item->getSkill(i)) {
 			needUpdateSkills = true;
-			player->setVarSkill(static_cast<skills_t>(i), it.abilities->skills[i]);
+			player->setVarSkill(static_cast<skills_t>(i), item->getSkill(i));
 		}
 	}
 
 	for (int32_t i = 0; i < COMBAT_COUNT; ++i) {
-		if (it.abilities->specialMagicLevelSkill[i]) {
-			player->setSpecialMagicLevelSkill(indexToCombatType(i), it.abilities->specialMagicLevelSkill[i]);
+		if (item->getSpecialMagicLevelSkill(i)) {
+			player->setSpecialMagicLevelSkill(indexToCombatType(i), item->getSpecialMagicLevelSkill(i));
 		}
 	}
 
 	for (int32_t i = SPECIALSKILL_FIRST; i <= SPECIALSKILL_LAST; ++i) {
-		if (it.abilities->specialSkills[i]) {
+		if (item->getSpecialSkill(i)) {
 			needUpdateSkills = true;
-			player->setVarSpecialSkill(static_cast<SpecialSkills_t>(i), it.abilities->specialSkills[i]);
+			player->setVarSpecialSkill(static_cast<SpecialSkills_t>(i), item->getSpecialSkill(i));
 		}
 	}
 
@@ -814,16 +813,16 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, Player* player, Item* ite
 	bool needUpdateStats = false;
 
 	for (int32_t s = STAT_FIRST; s <= STAT_LAST; ++s) {
-		if (it.abilities->stats[s]) {
+		if (item->getStats(s)) {
 			needUpdateStats = true;
-			player->setVarStats(static_cast<stats_t>(s), it.abilities->stats[s]);
+			player->setVarStats(static_cast<stats_t>(s), item->getStats(s));
 		}
 
-		if (it.abilities->statsPercent[s]) {
+		if (item->getStatPercent(s)) {
 			needUpdateStats = true;
 			player->setVarStats(static_cast<stats_t>(s),
 			                    static_cast<int32_t>(player->getDefaultStats(static_cast<stats_t>(s)) *
-			                                         ((it.abilities->statsPercent[s] - 100) / 100.f)));
+			                                         ((item->getStatPercent(s) - 100) / 100.f)));
 		}
 	}
 
@@ -843,34 +842,33 @@ ReturnValue MoveEvent::DeEquipItem(MoveEvent*, Player* player, Item* item, slots
 
 	player->setItemAbility(slot, false);
 
-	const ItemType& it = Item::items[item->getID()];
-	if (it.transformDeEquipTo != 0) {
-		g_game.transformItem(item, it.transformDeEquipTo);
+	if (item->getTransformEquipTo() != 0) {
+		g_game.transformItem(item, item->getTransformEquipTo());
 		g_game.startDecay(item);
 	}
 
-	if (!it.abilities) {
+	if (!item->hasAbilities()) {
 		return RETURNVALUE_NOERROR;
 	}
 
-	if (it.abilities->invisible) {
+	if (item->hasInvisibleAbility()) {
 		player->removeCondition(CONDITION_INVISIBLE, static_cast<ConditionId_t>(slot));
 	}
 
-	if (it.abilities->manaShield) {
+	if (item->hasManaShieldAbility()) {
 		player->removeCondition(CONDITION_MANASHIELD, static_cast<ConditionId_t>(slot));
 	}
 
-	if (it.abilities->speed != 0) {
-		g_game.changeSpeed(player, -it.abilities->speed);
+	if (item->getSpeedIncrease() != 0) {
+		g_game.changeSpeed(player, -item->getSpeedIncrease());
 	}
 
-	if (it.abilities->conditionSuppressions != 0) {
-		player->removeConditionSuppressions(it.abilities->conditionSuppressions);
+	if (item->getConditionSuppressions() != 0) {
+		player->removeConditionSuppressions(item->getConditionSuppressions());
 		player->sendIcons();
 	}
 
-	if (it.abilities->regeneration) {
+	if (item->hasRegenerationAbility()) {
 		player->removeCondition(CONDITION_REGENERATION, static_cast<ConditionId_t>(slot));
 	}
 
@@ -878,22 +876,22 @@ ReturnValue MoveEvent::DeEquipItem(MoveEvent*, Player* player, Item* item, slots
 	bool needUpdateSkills = false;
 
 	for (int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i) {
-		if (it.abilities->skills[i] != 0) {
+		if (item->getSkill(i) != 0) {
 			needUpdateSkills = true;
-			player->setVarSkill(static_cast<skills_t>(i), -it.abilities->skills[i]);
+			player->setVarSkill(static_cast<skills_t>(i), -item->getSkill(i));
 		}
 	}
 
 	for (int32_t i = 0; i < COMBAT_COUNT; ++i) {
-		if (it.abilities->specialMagicLevelSkill[i] != 0) {
-			player->setSpecialMagicLevelSkill(indexToCombatType(i), -it.abilities->specialMagicLevelSkill[i]);
+		if (item->getSpecialMagicLevelSkill(i) != 0) {
+			player->setSpecialMagicLevelSkill(indexToCombatType(i), -item->getSpecialMagicLevelSkill(i));
 		}
 	}
 
 	for (int32_t i = SPECIALSKILL_FIRST; i <= SPECIALSKILL_LAST; ++i) {
-		if (it.abilities->specialSkills[i] != 0) {
+		if (item->getSpecialSkill(i) != 0) {
 			needUpdateSkills = true;
-			player->setVarSpecialSkill(static_cast<SpecialSkills_t>(i), -it.abilities->specialSkills[i]);
+			player->setVarSpecialSkill(static_cast<SpecialSkills_t>(i), -item->getSpecialSkill(i));
 		}
 	}
 
@@ -905,16 +903,16 @@ ReturnValue MoveEvent::DeEquipItem(MoveEvent*, Player* player, Item* item, slots
 	bool needUpdateStats = false;
 
 	for (int32_t s = STAT_FIRST; s <= STAT_LAST; ++s) {
-		if (it.abilities->stats[s]) {
+		if (item->getStats(s) != 0) {
 			needUpdateStats = true;
-			player->setVarStats(static_cast<stats_t>(s), -it.abilities->stats[s]);
+			player->setVarStats(static_cast<stats_t>(s), -item->getStats(s));
 		}
 
-		if (it.abilities->statsPercent[s]) {
+		if (item->getStatPercent(s)) {
 			needUpdateStats = true;
 			player->setVarStats(static_cast<stats_t>(s),
 			                    -static_cast<int32_t>(player->getDefaultStats(static_cast<stats_t>(s)) *
-			                                          ((it.abilities->statsPercent[s] - 100) / 100.f)));
+			                                          ((item->getStatPercent(s) - 100) / 100.f)));
 		}
 	}
 

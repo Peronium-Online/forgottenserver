@@ -225,6 +225,7 @@ public:
 		return static_cast<uint16_t>(iAttributes->getIntAttr(ITEM_ATTRIBUTE_ACTIONID));
 	}
 	void setActionId(uint16_t n) { iAttributes->setIntAttr(ITEM_ATTRIBUTE_ACTIONID, n); }
+	bool hasActionId() const { return iAttributes->hasAttr(ITEM_ATTRIBUTE_ACTIONID); }
 
 	bool hasUniqueId() const { return iAttributes->hasAttr(ITEM_ATTRIBUTE_UNIQUEID); }
 	uint16_t getUniqueId() const
@@ -395,8 +396,6 @@ public:
 	virtual void onRemoved();
 	virtual void onTradeEvent(TradeEvents, Player*) {}
 
-	bool hasAbilities() const { return !!iType->abilities; }
-
 	bool isLoadedFromMap() const { return loadedFromMap; }
 	void setLoadedFromMap(bool value) { loadedFromMap = value; }
 
@@ -411,7 +410,23 @@ public:
 		iAttributes->setIntAttr(ITEM_ATTRIBUTE_STOREITEM, static_cast<int64_t>(storeItem));
 	}
 
+	bool hasAbilities() const { return !!iType->abilities; }
 	uint8_t getClassification() const { return iType->classification; }
+	uint8_t getTransformEquipTo() const { return iType->transformEquipTo; }
+	bool hasInvisibleAbility() const { return iType->abilities->invisible; };
+	bool hasManaShieldAbility() const { return iType->abilities->manaShield; };
+	int32_t getSkill(uint8_t skill) const { return iType->abilities->skills[skill]; };
+	int32_t getSpecialSkill(uint8_t skill) const { return iType->abilities->specialSkills[skill]; };
+	int32_t getSpecialMagicLevelSkill(uint8_t skill) const { return iType->abilities->specialMagicLevelSkill[skill]; };
+	int32_t getStats(uint8_t stat) const { return iType->abilities->stats[stat]; };
+	int32_t getStatPercent(uint8_t stat) const { return iType->abilities->statsPercent[stat]; };
+	bool hasRegenerationAbility() const { return iType->abilities->regeneration; };
+	uint32_t getHealthGain() const { return iType->abilities->healthGain; };
+	uint32_t getHealthTicks() const { return iType->abilities->healthTicks; };
+	uint32_t getManaGain() const { return iType->abilities->manaGain; };
+	uint32_t getManaTicks() const { return iType->abilities->manaTicks; };
+	int32_t getSpeedIncrease() const { return iType->abilities->speed; };
+	uint32_t getConditionSuppressions() const { return iType->abilities->conditionSuppressions; };
 };
 
 #endif
