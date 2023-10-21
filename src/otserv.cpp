@@ -20,6 +20,7 @@
 #include "scriptmanager.h"
 #include "server.h"
 
+#include <fmt/format.h>
 #include <fstream>
 
 #if __has_include("gitmetadata.h")
@@ -263,15 +264,15 @@ void mainLoader(int, char*[], ServiceManager* services)
 
 	// load item data
 	std::cout << ">> Loading items... ";
-	if (!Item::items.loadFromOtb("data/items/items.otb")) {
+	if (!Items::getInstance().loadFromOTB()) {
 		startupErrorMessage("Unable to load items (OTB)!");
 		return;
 	}
-	std::cout << fmt::format("OTB v{:d}.{:d}.{:d}", Item::items.majorVersion, Item::items.minorVersion,
-	                         Item::items.buildNumber)
+	std::cout << fmt::format("OTB v{:d}.{:d}.{:d}", Items::getInstance().otbMajorVersion,
+	                         Items::getInstance().otbMinorVersion, Items::getInstance().otbBuildNumber)
 	          << std::endl;
 
-	if (!Item::items.loadFromXml()) {
+	if (!Items::getInstance().loadFromXML()) {
 		startupErrorMessage("Unable to load items (XML)!");
 		return;
 	}
