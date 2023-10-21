@@ -414,7 +414,7 @@ public:
 
 	uint16_t getMaxItems() const { return iType->maxItems; }
 
-	unint16_t getItemTypeId() const { return iType->id; }
+	uint16_t getItemTypeId() const { return iType->id; }
 
 	bool hasAbilities() const { return !!iType->abilities; }
 	uint8_t getClassification() const { return iType->classification; }

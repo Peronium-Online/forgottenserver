@@ -11,8 +11,6 @@
 #include "libs/item/ItemAttrSerializer.h"
 #include "libs/item/ItemFactory.h"
 
-#include <fmt/color.h>
-
 extern Game g_game;
 
 void IOMapSerialize::loadHouseItems(Map* map)
@@ -328,7 +326,8 @@ bool IOMapSerialize::saveHouseInfo()
 
 		std::string listText;
 		if (house->getAccessList(GUEST_LIST, listText) && !listText.empty()) {
-			if (!stmt.addRow(fmt::format("{:d}, {}, {:s}", house->getId(), GUEST_LIST, db.escapeString(listText)))) {
+			if (!stmt.addRow(fmt::format("{:d}, {}, {:s}", house->getId(), static_cast<int16_t>(GUEST_LIST),
+			                             db.escapeString(listText)))) {
 				return false;
 			}
 
@@ -336,7 +335,8 @@ bool IOMapSerialize::saveHouseInfo()
 		}
 
 		if (house->getAccessList(SUBOWNER_LIST, listText) && !listText.empty()) {
-			if (!stmt.addRow(fmt::format("{:d}, {}, {:s}", house->getId(), SUBOWNER_LIST, db.escapeString(listText)))) {
+			if (!stmt.addRow(fmt::format("{:d}, {}, {:s}", house->getId(), static_cast<int16_t>(SUBOWNER_LIST),
+			                             db.escapeString(listText)))) {
 				return false;
 			}
 

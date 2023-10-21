@@ -63,20 +63,20 @@ enum VipStatus_t : uint8_t
 	VIPSTATUS_TRAINING = 3
 };
 
-enum MarketAction_t
+enum MarketAction_t : uint8_t
 {
 	MARKETACTION_BUY = 0,
 	MARKETACTION_SELL = 1,
 };
 
-enum MarketRequest_t
+enum MarketRequest_t : uint8_t
 {
 	MARKETREQUEST_OWN_HISTORY = 1,
 	MARKETREQUEST_OWN_OFFERS = 2,
 	MARKETREQUEST_ITEM = 3,
 };
 
-enum MarketOfferState_t
+enum MarketOfferState_t : uint8_t
 {
 	OFFERSTATE_ACTIVE = 0,
 	OFFERSTATE_CANCELLED = 1,
