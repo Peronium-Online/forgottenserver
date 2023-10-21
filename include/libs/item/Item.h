@@ -410,6 +410,12 @@ public:
 		iAttributes->setIntAttr(ITEM_ATTRIBUTE_STOREITEM, static_cast<int64_t>(storeItem));
 	}
 
+	uint16_t getWareId() const { return iType->wareId; }
+
+	uint16_t getMaxItems() const { return iType->maxItems; }
+
+	unint16_t getItemTypeId() const { return iType->id; }
+
 	bool hasAbilities() const { return !!iType->abilities; }
 	uint8_t getClassification() const { return iType->classification; }
 	uint8_t getTransformEquipTo() const { return iType->transformEquipTo; }

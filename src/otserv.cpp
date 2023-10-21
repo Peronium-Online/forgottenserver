@@ -20,7 +20,7 @@
 #include "scriptmanager.h"
 #include "server.h"
 
-#include <fmt/format.h>
+#include <fmt/color.h>
 #include <fstream>
 
 #if __has_include("gitmetadata.h")

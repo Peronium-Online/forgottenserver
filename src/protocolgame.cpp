@@ -1604,10 +1604,10 @@ void ProtocolGame::parseMarketCreateOffer(NetworkMessage& msg)
 	uint8_t type = msg.getByte();
 	uint16_t spriteId = msg.get<uint16_t>();
 
-	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
-	if (it.id == 0 || it.wareId == 0) {
+	auto it = Items::getInstance().getItemTypeByClientId(spriteId);
+	if (it->id == 0 || it->wareId == 0) {
 		return;
-	} else if (it.classification > 0) {
+	} else if (it->classification > 0) {
 		msg.getByte(); // item tier
 	}
 
@@ -2065,7 +2065,7 @@ void ProtocolGame::sendShop(Npc* npc, const ShopInfoList& itemList)
 
 	// currency displayed in trade window (currently only gold supported) if item other than gold coin is sent, the shop
 	// window takes information about currency amount from player items packet (the one that updates action bars)
-	msg.add<uint16_t>(Item::items[ITEM_GOLD_COIN].clientId);
+	msg.add<uint16_t>(Items::getInstance().getItemType(ITEM_GOLD_COIN)->clientId);
 	msg.addString(""); // doesn't show anywhere, could be used in otclient for currency name
 
 	uint16_t itemsToSend = std::min<size_t>(itemList.size(), std::numeric_limits<uint16_t>::max());
@@ -2108,8 +2108,8 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 
 			int8_t subtype = -1;
 
-			const ItemType& itemType = Item::items[shopInfo.itemId];
-			if (itemType.hasSubType() && !itemType.stackable) {
+			auto itemType = Items::getInstance().getItemType(shopInfo.itemId);
+			if (itemType->hasSubType() && !itemType->stackable) {
 				subtype = (shopInfo.subType == 0 ? -1 : shopInfo.subType);
 			}
 
@@ -2133,14 +2133,14 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 
 			int8_t subtype = -1;
 
-			const ItemType& itemType = Item::items[shopInfo.itemId];
-			if (itemType.hasSubType() && !itemType.stackable) {
+			auto itemType = Items::getInstance().getItemType(shopInfo.itemId);
+			if (itemType->hasSubType() && !itemType->stackable) {
 				subtype = (shopInfo.subType == 0 ? -1 : shopInfo.subType);
 			}
 
 			if (subtype != -1) {
 				uint32_t count;
-				if (itemType.isFluidContainer() || itemType.isSplash()) {
+				if (itemType->isFluidContainer() || itemType->isSplash()) {
 					count = player->getItemTypeCount(shopInfo.itemId,
 					                                 subtype); // This shop item requires extra checks
 				} else {
@@ -2223,12 +2223,11 @@ void ProtocolGame::sendMarketEnter()
 				continue;
 			}
 
-			const ItemType& itemType = Item::items[item->getID()];
-			if (itemType.wareId == 0) {
+			if (item->getWareId() == 0) {
 				continue;
 			}
 
-			if (c && (!itemType.isContainer() || c->capacity() != itemType.maxItems)) {
+			if (c && (!item->isContainer() || c->capacity() != item->getMaxItems())) {
 				continue;
 			}
 
@@ -2236,7 +2235,7 @@ void ProtocolGame::sendMarketEnter()
 				continue;
 			}
 
-			depotItems[itemType.id] += Item::countByType(item, -1);
+			depotItems[item->getItemTypeId()] += item->countByType(-1);
 		}
 	} while (!containerList.empty());
 
@@ -2245,9 +2244,9 @@ void ProtocolGame::sendMarketEnter()
 
 	msg.add<uint16_t>(itemsToSend);
 	for (std::map<uint16_t, uint32_t>::const_iterator it = depotItems.begin(); i < itemsToSend; ++it, ++i) {
-		const ItemType& itemType = Item::items[it->first];
-		msg.add<uint16_t>(itemType.wareId);
-		if (itemType.classification > 0) {
+		auto itemType = Items::getInstance().getItemType(it->first);
+		msg.add<uint16_t>(itemType->wareId);
+		if (itemType->classification > 0) {
 			msg.addByte(0);
 		}
 		msg.add<uint16_t>(std::min<uint32_t>(0xFFFF, it->second));
@@ -2276,7 +2275,7 @@ void ProtocolGame::sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& 
 	msg.addByte(MARKETREQUEST_ITEM);
 	msg.addItemId(itemId);
 
-	if (Item::items[itemId].classification > 0) {
+	if (Items::getInstance().getItemType(itemId)->classification > 0) {
 		msg.addByte(0); // item tier
 	}
 
@@ -2307,7 +2306,7 @@ void ProtocolGame::sendMarketAcceptOffer(const MarketOfferEx& offer)
 	msg.addByte(0xF9);
 	msg.addByte(MARKETREQUEST_ITEM);
 	msg.addItemId(offer.itemId);
-	if (Item::items[offer.itemId].classification > 0) {
+	if (Items::getInstance().getItemType(offer.itemId)->classification > 0) {
 		msg.addByte(0);
 	}
 
@@ -2343,7 +2342,7 @@ void ProtocolGame::sendMarketBrowseOwnOffers(const MarketOfferList& buyOffers, c
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.addItemId(offer.itemId);
-		if (Item::items[offer.itemId].classification > 0) {
+		if (Items::getInstance().getItemType(offer.itemId)->classification > 0) {
 			msg.addByte(0);
 		}
 		msg.add<uint16_t>(offer.amount);
@@ -2355,7 +2354,7 @@ void ProtocolGame::sendMarketBrowseOwnOffers(const MarketOfferList& buyOffers, c
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.addItemId(offer.itemId);
-		if (Item::items[offer.itemId].classification > 0) {
+		if (Items::getInstance().getItemType(offer.itemId)->classification > 0) {
 			msg.addByte(0);
 		}
 		msg.add<uint16_t>(offer.amount);
@@ -2376,7 +2375,7 @@ void ProtocolGame::sendMarketCancelOffer(const MarketOfferEx& offer)
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.addItemId(offer.itemId);
-		if (Item::items[offer.itemId].classification > 0) {
+		if (Items::getInstance().getItemType(offer.itemId)->classification > 0) {
 			msg.addByte(0);
 		}
 		msg.add<uint16_t>(offer.amount);
@@ -2388,7 +2387,7 @@ void ProtocolGame::sendMarketCancelOffer(const MarketOfferEx& offer)
 		msg.add<uint32_t>(offer.timestamp);
 		msg.add<uint16_t>(offer.counter);
 		msg.addItemId(offer.itemId);
-		if (Item::items[offer.itemId].classification > 0) {
+		if (Items::getInstance().getItemType(offer.itemId)->classification > 0) {
 			msg.addByte(0);
 		}
 		msg.add<uint16_t>(offer.amount);
@@ -2417,7 +2416,7 @@ void ProtocolGame::sendMarketBrowseOwnHistory(const HistoryMarketOfferList& buyO
 		msg.add<uint32_t>(it->timestamp);
 		msg.add<uint16_t>(counterMap[it->timestamp]++);
 		msg.addItemId(it->itemId);
-		if (Item::items[it->itemId].classification > 0) {
+		if (Items::getInstance().getItemType(it->itemId)->classification > 0) {
 			msg.addByte(0);
 		}
 		msg.add<uint16_t>(it->amount);
@@ -2433,7 +2432,7 @@ void ProtocolGame::sendMarketBrowseOwnHistory(const HistoryMarketOfferList& buyO
 		msg.add<uint32_t>(it->timestamp);
 		msg.add<uint16_t>(counterMap[it->timestamp]++);
 		msg.addItemId(it->itemId);
-		if (Item::items[it->itemId].classification > 0) {
+		if (Items::getInstance().getItemType(it->itemId)->classification > 0) {
 			msg.addByte(0);
 		}
 		msg.add<uint16_t>(it->amount);
@@ -3093,9 +3092,9 @@ void ProtocolGame::sendItems()
 	}
 
 	for (const auto& item : inventory) {
-		msg.add<uint16_t>(Item::items[item.first].clientId); // item clientId
-		msg.addByte(0);                                      // always 0
-		msg.add<uint16_t>(item.second);                      // count
+		msg.add<uint16_t>(Items::getInstance().getItemType(item.first)->clientId); // item clientId
+		msg.addByte(0);                                                            // always 0
+		msg.add<uint16_t>(item.second);                                            // count
 	}
 
 	writeToOutputBuffer(msg);
@@ -3311,10 +3310,10 @@ void ProtocolGame::sendPodiumWindow(const Item* item)
 		return;
 	}
 
-	const Podium* podium = item->getPodium();
-	if (!podium) {
+	if (!Podium::isPodium(item)) {
 		return;
 	}
+	const Podium* podium = Podium::toPodium(item);
 
 	const Tile* tile = item->getTile();
 	if (!tile) {
@@ -3914,17 +3913,17 @@ void ProtocolGame::MoveDownCreature(NetworkMessage& msg, const Creature* creatur
 
 void ProtocolGame::AddShopItem(NetworkMessage& msg, const ShopInfo& item)
 {
-	const ItemType& it = Item::items[item.itemId];
-	msg.add<uint16_t>(it.clientId);
+	auto it = Items::getInstance().getItemType(item.itemId);
+	msg.add<uint16_t>(it->clientId);
 
-	if (it.isSplash() || it.isFluidContainer()) {
+	if (it->isSplash() || it->isFluidContainer()) {
 		msg.addByte(serverFluidToClient(item.subType));
 	} else {
 		msg.addByte(0x00);
 	}
 
 	msg.addString(item.realName);
-	msg.add<uint32_t>(it.weight);
+	msg.add<uint32_t>(it->weight);
 	msg.add<uint32_t>(std::max<uint32_t>(item.buyPrice, 0));
 	msg.add<uint32_t>(std::max<uint32_t>(item.sellPrice, 0));
 }

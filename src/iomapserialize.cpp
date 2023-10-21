@@ -11,7 +11,7 @@
 #include "libs/item/ItemAttrSerializer.h"
 #include "libs/item/ItemFactory.h"
 
-#include <fmt/format.h>
+#include <fmt/color.h>
 
 extern Game g_game;
 

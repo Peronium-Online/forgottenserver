@@ -16,7 +16,7 @@
 #include "libs/util/tools/strings.h"
 #include "spells.h"
 
-#include <fmt/format.h>
+#include <fmt/color.h>
 
 extern Game g_game;
 extern Spells* g_spells;
