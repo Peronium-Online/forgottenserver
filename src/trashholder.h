@@ -4,15 +4,15 @@
 #ifndef FS_TRASHHOLDER_H
 #define FS_TRASHHOLDER_H
 
-#include #include "libs/item/Item.h"
+#include "libs/item/Item.h"
 
 class TrashHolder final : public Item, public Cylinder
 {
 public:
 	explicit TrashHolder(uint16_t itemId) : Item(itemId) {}
 
-	TrashHolder* getTrashHolder() override { return this; }
-	const TrashHolder* getTrashHolder() const override { return this; }
+	static bool isTrashHolder(const Item* item) { return item && item->getType() == ITEM_TYPE_TRASHHOLDER; }
+	static TrashHolder* toTrashHolder(Item* item) { return static_cast<TrashHolder*>(item); }
 
 	// cylinder implementations
 	ReturnValue queryAdd(int32_t index, const Thing& thing, uint32_t count, uint32_t flags,

@@ -12,7 +12,7 @@ class Mailbox final : public Item, public Cylinder
 public:
 	explicit Mailbox(uint16_t itemId) : Item(itemId) {}
 
-	static bool isMailbox(Item* item) { return item->getType() == ITEM_TYPE_MAILBOX; }
+	static bool isMailbox(const Item* item) { return item->getType() == ITEM_TYPE_MAILBOX; }
 
 	static Mailbox* toMailbox(Item* item) { return static_cast<Mailbox*>(item); }
 	static const Mailbox* toMailbox(const Item* item) { return static_cast<const Mailbox*>(item); }

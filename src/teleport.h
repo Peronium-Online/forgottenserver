@@ -12,6 +12,7 @@ public:
 	explicit Teleport(uint16_t type) : Item(type){};
 
 	static bool isTeleport(const Item* item) { return item->getType() == ITEM_TYPE_TELEPORT; }
+	static Teleport* getTeleport(Item* item) { return dynamic_cast<Teleport*>(item); }
 
 	void setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream) override;
 

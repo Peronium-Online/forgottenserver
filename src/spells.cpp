@@ -1094,10 +1094,10 @@ bool RuneSpell::configureEvent(const pugi::xml_node& node)
 	hasCharges = (charges > 0);
 	if (magLevel != 0 || level != 0) {
 		// Change information in the ItemType to get accurate description
-		ItemType& iType = Item::items.getItemType(runeId);
-		iType.runeMagLevel = magLevel;
-		iType.runeLevel = level;
-		iType.charges = charges;
+		auto iType = Items::getInstance().getItemType(runeId);
+		iType->runeMagLevel = magLevel;
+		iType->runeLevel = level;
+		iType->charges = charges;
 	}
 
 	return true;

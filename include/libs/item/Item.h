@@ -139,7 +139,7 @@ public:
 
 	uint16_t getItemCount() const { return count; }
 	void setItemCount(uint8_t n) { count = n; }
-	uint32_t countByType(int32_t subType)
+	uint32_t countByType(int32_t subType) const
 	{
 		if (subType == -1 || subType == getSubType()) {
 			return getItemCount();

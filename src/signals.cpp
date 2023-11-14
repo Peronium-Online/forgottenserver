@@ -86,7 +86,7 @@ void sighupHandler()
 	g_talkActions->reload();
 	std::cout << "Reloaded talk actions." << std::endl;
 
-	Item::items.reload();
+	Items::getInstance().reload();
 	std::cout << "Reloaded items." << std::endl;
 
 	g_weapons->reload();

@@ -14,7 +14,7 @@ class BedItem final : public Item
 public:
 	explicit BedItem(uint16_t id);
 
-	static bool isBedItem(Item* item) { return item->getType() == ITEM_TYPE_BED; }
+	static bool isBedItem(const Item* item) { return item->getType() == ITEM_TYPE_BED; }
 
 	static BedItem* toBedItem(Item* item) { return static_cast<BedItem*>(item); }
 	static const BedItem* toBedItem(const Item* item) { return static_cast<const BedItem*>(item); }

@@ -181,6 +181,7 @@ class MagicField final : public Item
 public:
 	explicit MagicField(uint16_t type) : Item(type), createTime(OTSYS_TIME()) {}
 
+	static bool isMagicField(const Item* item) { return item != nullptr && item->isMagicField(); }
 	static MagicField* toMagicField(Item* item) { return dynamic_cast<MagicField*>(item); }
 	static const MagicField* toMagicField(const Item* item) { return dynamic_cast<const MagicField*>(item); }
 
