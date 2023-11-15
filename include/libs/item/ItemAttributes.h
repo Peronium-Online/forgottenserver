@@ -5,6 +5,7 @@
 #include "libs/item/itemenums.h"
 #include "libs/util/datastructures/CustomLuaAttribute.h"
 
+#include <map>
 #include <unordered_map>
 
 typedef std::unordered_map<std::string, CustomLuaAttribute> CustomAttributeMap;
@@ -94,6 +95,8 @@ private:
 	const static uint32_t stringAttributeTypes = ITEM_ATTRIBUTE_DESCRIPTION | ITEM_ATTRIBUTE_TEXT |
 	                                             ITEM_ATTRIBUTE_WRITER | ITEM_ATTRIBUTE_NAME | ITEM_ATTRIBUTE_ARTICLE |
 	                                             ITEM_ATTRIBUTE_PLURALNAME;
+
+	const static std::string& EMPTY_STRING;
 
 public:
 	ItemAttributes() = default;

@@ -76,6 +76,12 @@ inline unsigned int cast(const char* str)
 	return static_cast<unsigned int>(cast<unsigned long>(str));
 }
 
+template <>
+inline bool cast(const char* str)
+{
+	return cast<int>(str) == 1 || strcmp(str, "true") == 1;
+}
+
 } // namespace pugi
 
 #endif // FS_PUGICAST_H

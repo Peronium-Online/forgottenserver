@@ -19,7 +19,7 @@ struct Reflect
 	uint16_t percent = 0;
 	uint16_t chance = 0;
 
-	static Reflect UNDEFINED;
+	static const Reflect UNDEFINED;
 };
 
 #endif

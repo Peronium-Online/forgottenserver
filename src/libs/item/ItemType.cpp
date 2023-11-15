@@ -417,6 +417,8 @@ ItemType* ItemType::loadFromXMLNode(pugi::xml_node node, bool reloading)
 			return Items::getInstance().getItemType(fromId);
 		}
 	}
+
+	return this;
 }
 
 void ItemType::setField(const std::string& element, ConditionDamage* cd)
@@ -526,6 +528,8 @@ ConditionDamage* ConditionDamageBuilder::loadFromXMLNode(pugi::xml_node node, bo
 
 		return this->conditionDamage.release();
 	}
+
+	return this->conditionDamage.release();
 }
 
 void ItemType::setWorth(uint64_t amount)

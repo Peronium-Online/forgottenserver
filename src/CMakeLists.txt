@@ -75,6 +75,7 @@ set(peronium_SRC
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/random.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/strings.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/util/tools/xml.cpp
+	${CMAKE_CURRENT_LIST_DIR}/libs/util/otb/OTBLoadable.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/itemmaps.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/Item.cpp
 	${CMAKE_CURRENT_LIST_DIR}/libs/item/ItemAttributes.cpp

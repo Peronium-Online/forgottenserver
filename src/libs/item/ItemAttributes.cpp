@@ -2,6 +2,10 @@
 
 #include <iostream>
 
+const Reflect Reflect::UNDEFINED;
+
+const std::string& ItemAttributes::EMPTY_STRING = "";
+
 bool ItemAttributes::equals(const ItemAttributes& other) const
 {
 	if (attributeBits != other.attributeBits) {
@@ -87,12 +91,12 @@ const std::string& ItemAttributes::getStrAttr(ItemAttrTypes type) const
 	if (!isStrAttrType(type)) {
 		std::cout << "Warning: trying to get non-string attribute: " << type << std::endl;
 
-		return "";
+		return EMPTY_STRING;
 	}
 
 	const Attribute* attr = getExistingAttr(type);
 	if (!attr) {
-		return "";
+		return EMPTY_STRING;
 	}
 	return *attr->value.string;
 }

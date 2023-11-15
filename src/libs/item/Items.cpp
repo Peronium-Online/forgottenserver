@@ -9,6 +9,8 @@
 extern MoveEvents* g_moveEvents;
 extern Weapons* g_weapons;
 
+CurrencyMap Items::currencyItems = {};
+
 bool Items::load(const OTBNode& node, PropStream stream)
 {
 	uint32_t flags;
