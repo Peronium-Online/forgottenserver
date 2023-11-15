@@ -40,8 +40,8 @@ void TrashHolder::addThing(int32_t, Thing* thing)
 		return;
 	}
 
-	const ItemType& it = Item::items[id];
-	if (item->isHangable() && it.isGroundTile()) {
+	auto it = Items::getInstance().getItemType(id);
+	if (item->isHangable() && it->isGroundTile()) {
 		Tile* tile = dynamic_cast<Tile*>(getParent());
 		if (tile && tile->hasFlag(TILESTATE_SUPPORTS_HANGABLE)) {
 			return;
@@ -50,8 +50,8 @@ void TrashHolder::addThing(int32_t, Thing* thing)
 
 	g_game.internalRemoveItem(item);
 
-	if (it.magicEffect != CONST_ME_NONE) {
-		g_game.addMagicEffect(getPosition(), it.magicEffect);
+	if (it->magicEffect != CONST_ME_NONE) {
+		g_game.addMagicEffect(getPosition(), it->magicEffect);
 	}
 }
 
