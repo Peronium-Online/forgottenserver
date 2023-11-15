@@ -1,19 +1,20 @@
 #ifndef PR_ITEMMAPS_H
 #define PR_ITEMMAPS_H
 
+#include "constants/enums.h"
 #include "libs/item/itemenums.h"
 #include "libs/util/datastructures/Dictionary.h"
 
 #include <boost/algorithm/string.hpp>
 #include <unordered_map>
 
-Dictionary<ItemFeatures>* ItemParseAttributesMap;
-Dictionary<ItemTypes>* ItemTypesMap;
-Dictionary<tileflags_t>* TileStatesMap;
-Dictionary<RaceType_t>* RaceTypesMap;
-Dictionary<WeaponTypes>* WeaponTypesMap;
-Dictionary<FluidTypes>* FluidTypesMap;
-Dictionary<AmmoTypes>* AmmoTypesMap;
+extern Dictionary<ItemFeatures>* ItemParseAttributesMap;
+extern Dictionary<ItemTypes>* ItemTypesMap;
+extern Dictionary<tileflags_t>* TileStatesMap;
+extern Dictionary<RaceType_t>* RaceTypesMap;
+extern Dictionary<WeaponTypes>* WeaponTypesMap;
+extern Dictionary<FluidTypes>* FluidTypesMap;
+extern Dictionary<AmmoTypes>* AmmoTypesMap;
 
 const uint8_t reverseFluidMap[] = {
     FLUID_EMPTY, FLUID_WATER, FLUID_MANA,     FLUID_BEER, FLUID_EMPTY, FLUID_BLOOD,

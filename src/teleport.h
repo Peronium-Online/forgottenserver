@@ -4,6 +4,7 @@
 #ifndef FS_TELEPORT_H
 #define FS_TELEPORT_H
 
+#include "cylinder.h"
 #include "libs/item/Item.h"
 
 class Teleport final : public Item, public Cylinder

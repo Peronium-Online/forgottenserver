@@ -4,6 +4,7 @@
 #ifndef FS_TRASHHOLDER_H
 #define FS_TRASHHOLDER_H
 
+#include "cylinder.h"
 #include "libs/item/Item.h"
 
 class TrashHolder final : public Item, public Cylinder

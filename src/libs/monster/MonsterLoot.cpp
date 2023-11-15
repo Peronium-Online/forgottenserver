@@ -1,21 +1,21 @@
 #include "libs/monster/MonsterLoot.h"
 
-#include "../../item.h"
-#include "../../items.h"
+#include "libs/item/Item.h"
+#include "libs/item/Items.h"
 
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 
 MonsterLoot* MonsterLoot::setItemId(uint16_t itemId)
 {
-	const ItemType& it = Item::items.getItemType(itemId);
-	if (it.name.empty()) {
+	auto it = Items::getInstance().getItemType(itemId);
+	if (it->name.empty()) {
 		std::cout << "[Warning - MonsterLoot::setItemId] Unknown loot item id \"" << itemId << "\". " << std::endl;
 		throw std::invalid_argument("Invalid item ID provided");
 	}
 
 	this->itemId = itemId;
-	uint32_t charges = Item::items[itemId].charges;
+	uint32_t charges = it->charges;
 	if (charges != 0) {
 		this->subType = charges;
 	}
@@ -25,24 +25,14 @@ MonsterLoot* MonsterLoot::setItemId(uint16_t itemId)
 
 MonsterLoot* MonsterLoot::setItemIdByName(std::string name)
 {
-	auto ids = Item::items.nameToItems.equal_range(boost::algorithm::to_lower_copy<std::string>(name));
-
-	// found anything?
-	if (ids.first == Item::items.nameToItems.cend()) {
-		std::cout << "[Warning - MonsterLoot::setItemIdByName] Unknown loot item \"" << name << "\". " << std::endl;
-		throw std::invalid_argument("Invalid item name provided");
-	}
-
-	// found more than one?
-	if (std::next(ids.first) != ids.second) {
+	if (!Items::getInstance().isUniqueItemName(name)) {
 		std::cout << "[Warning - MonsterLoot::setItemIdByName] Non-unique loot item \"" << name << "\". " << std::endl;
 		throw std::invalid_argument("Invalid item name provided");
 	}
 
-	uint32_t id = ids.first->second;
-	this->itemId = id;
+	this->itemId = Items::getInstance().getItemIdByName(name);
 
-	uint32_t charges = Item::items[id].charges;
+	uint32_t charges = Items::getInstance().getItemType(this->itemId)->charges;
 	if (charges != 0) {
 		this->subType = charges;
 	}
@@ -136,7 +126,7 @@ MonsterLoot* MonsterLoot::loadFromXMLNode(pugi::xml_node node, bool reloading)
 			this->setText(text);
 		}
 
-		if (Item::items[this->itemId].isContainer()) {
+		if (Items::getInstance().getItemType(this->itemId)->isContainer()) {
 			// NOTE: <inside> attribute was left for backwards compatibility with pre 1.x TFS versions. Please don't use
 			// it, if you don't have to.
 			for (auto subNode : node.child("inside") ? node.child("inside").children() : node.children()) {

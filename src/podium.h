@@ -6,8 +6,17 @@
 
 #include "libs/item/Item.h"
 
+#include <bitset>
+
 class Podium final : public Item
 {
+private:
+	std::bitset<3> flags = {true}; // show platform only
+	Direction direction = DIRECTION_SOUTH;
+
+protected:
+	Look outfit;
+
 public:
 	explicit Podium(uint16_t type) : Item(type){};
 
@@ -35,13 +44,6 @@ public:
 
 	const Direction getDirection() const { return direction; }
 	void setDirection(Direction newDirection) { direction = newDirection; }
-
-protected:
-	Look outfit;
-
-private:
-	std::bitset<3> flags = {true}; // show platform only
-	Direction direction = DIRECTION_SOUTH;
 };
 
 #endif // FS_PODIUM_H
