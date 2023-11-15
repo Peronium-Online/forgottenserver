@@ -53,30 +53,30 @@ std::string Weapons::getScriptBaseName() const { return "weapons"; }
 
 void Weapons::loadDefaults()
 {
-	for (size_t i = 100, size = Item::items.size(); i < size; ++i) {
-		const ItemType& it = Item::items.getItemType(i);
-		if (it.id == 0 || weapons.find(i) != weapons.end()) {
+	for (size_t i = 100, size = Items::getInstance().getItemsLength(); i < size; ++i) {
+		auto it = Items::getInstance().getItemType(i);
+		if (it->id == 0 || weapons.find(i) != weapons.end()) {
 			continue;
 		}
 
-		switch (it.weaponType) {
+		switch (it->weaponType) {
 			case WEAPON_AXE:
 			case WEAPON_SWORD:
 			case WEAPON_CLUB: {
 				WeaponMelee* weapon = new WeaponMelee(&scriptInterface);
-				weapon->configureWeapon(it);
+				weapon->configureWeapon(*it);
 				weapons[i] = weapon;
 				break;
 			}
 
 			case WEAPON_AMMO:
 			case WEAPON_DISTANCE: {
-				if (it.weaponType == WEAPON_DISTANCE && it.ammoType != AMMO_NONE) {
+				if (it->weaponType == WEAPON_DISTANCE && it->ammoType != AMMO_NONE) {
 					continue;
 				}
 
 				WeaponDistance* weapon = new WeaponDistance(&scriptInterface);
-				weapon->configureWeapon(it);
+				weapon->configureWeapon(*it);
 				weapons[i] = weapon;
 				break;
 			}
@@ -234,15 +234,15 @@ bool Weapon::configureEvent(const pugi::xml_node& node)
 		wieldInfo |= WIELDINFO_PREMIUM;
 	}
 
+	auto it = Items::getInstance().getItemType(id);
 	if (wieldInfo != 0) {
-		ItemType& it = Item::items.getItemType(id);
-		it.wieldInfo = wieldInfo;
-		it.vocationString = vocationString;
-		it.minReqLevel = getReqLevel();
-		it.minReqMagicLevel = getReqMagLv();
+		it->wieldInfo = wieldInfo;
+		it->vocationString = vocationString;
+		it->minReqLevel = getReqLevel();
+		it->minReqMagicLevel = getReqMagLv();
 	}
 
-	configureWeapon(Item::items[id]);
+	configureWeapon(*it);
 	return true;
 }
 
@@ -394,7 +394,7 @@ void Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int
 		executeUseWeapon(player, var);
 	} else {
 		CombatDamage damage;
-		WeaponType_t weaponType = item->getWeaponType();
+		WeaponTypes weaponType = item->getWeaponType();
 		if (weaponType == WEAPON_AMMO || weaponType == WEAPON_DISTANCE) {
 			damage.origin = ORIGIN_RANGED;
 		} else if (weaponType == WEAPON_WAND) {
@@ -580,7 +580,7 @@ bool WeaponMelee::getSkillType(const Player* player, const Item* item, skills_t&
 		skillpoint = 0;
 	}
 
-	WeaponType_t weaponType = item->getWeaponType();
+	WeaponTypes weaponType = item->getWeaponType();
 	switch (weaponType) {
 		case WEAPON_SWORD: {
 			skill = SKILL_SWORD;
@@ -660,8 +660,8 @@ void WeaponDistance::configureWeapon(const ItemType& it)
 bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) const
 {
 	int32_t damageModifier = 0;
-	const ItemType& it = Item::items[id];
-	if (it.weaponType == WEAPON_AMMO) {
+	auto it = Items::getInstance().getItemType(id);
+	if (it->weaponType == WEAPON_AMMO) {
 		Item* mainWeaponItem = player->getWeapon(true);
 		const Weapon* mainWeapon = g_weapons->getWeapon(mainWeaponItem);
 		if (mainWeapon) {
@@ -678,7 +678,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 	}
 
 	int32_t chance;
-	if (it.hitChance == 0) {
+	if (it->hitChance == 0) {
 		// hit chance is based on distance to target and distance skill
 		uint32_t skill = player->getSkillLevel(SKILL_DISTANCE);
 		const Position& playerPos = player->getPosition();
@@ -687,9 +687,9 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 		                                       Position::getDistanceY(playerPos, targetPos));
 
 		uint32_t maxHitChance;
-		if (it.maxHitChance != -1) {
-			maxHitChance = it.maxHitChance;
-		} else if (it.ammoType != AMMO_NONE) {
+		if (it->maxHitChance != -1) {
+			maxHitChance = it->maxHitChance;
+		} else if (it->ammoType != AMMO_NONE) {
 			// hit chance on two-handed weapons is limited to 90%
 			maxHitChance = 90;
 		} else {
@@ -720,7 +720,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 					chance = static_cast<uint32_t>(std::min<uint32_t>(skill, 104) * 0.70f) + 2;
 					break;
 				default:
-					chance = it.hitChance;
+					chance = it->hitChance;
 					break;
 			}
 		} else if (maxHitChance == 90) {
@@ -744,7 +744,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 					chance = std::min<uint32_t>(skill, 90);
 					break;
 				default:
-					chance = it.hitChance;
+					chance = it->hitChance;
 					break;
 			}
 		} else if (maxHitChance == 100) {
@@ -769,14 +769,14 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 					chance = static_cast<uint32_t>(std::min<uint32_t>(skill, 90) * 1.10f) + 1;
 					break;
 				default:
-					chance = it.hitChance;
+					chance = it->hitChance;
 					break;
 			}
 		} else {
 			chance = maxHitChance;
 		}
 	} else {
-		chance = it.hitChance;
+		chance = it->hitChance;
 	}
 
 	if (item->getWeaponType() == WEAPON_AMMO) {

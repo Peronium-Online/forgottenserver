@@ -116,6 +116,8 @@ public:
 
 		return std::next(ids.first) == ids.second;
 	}
+
+	uint32_t getItemsLength() const { return items.size(); }
 };
 
 #endif
