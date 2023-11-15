@@ -189,6 +189,8 @@ bool ItemAttrSerializer::serializeAttr(const Item* item, PropWriteStream& propWr
 			propWriteStream.write<uint16_t>(boost.second);
 		}
 	}
+
+	return true;
 }
 
 bool ItemAttrSerializer::serializeBedAttr(const BedItem* bed, PropWriteStream& propWriteStream)
@@ -229,6 +231,8 @@ bool ItemAttrSerializer::serializePodiumAttr(const Podium* item, PropWriteStream
 		propWriteStream.write<uint8_t>(outfit.mountLegs);
 		propWriteStream.write<uint8_t>(outfit.mountFeet);
 	}
+
+	return true;
 }
 
 bool ItemAttrSerializer::serializeTeleportAttr(const Teleport* teleport, PropWriteStream& propStream)
@@ -241,4 +245,6 @@ bool ItemAttrSerializer::serializeTeleportAttr(const Teleport* teleport, PropWri
 	propStream.write<uint16_t>(destPos.x);
 	propStream.write<uint16_t>(destPos.y);
 	propStream.write<uint8_t>(destPos.z);
+
+	return true;
 }

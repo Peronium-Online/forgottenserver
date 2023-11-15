@@ -4,6 +4,7 @@
 #include "../../../src/condition.h"
 #include "../../../src/position.h"
 #include "constants/const.h"
+#include "libs/item/ReflectAttribute.h"
 #include "libs/item/itemenums.h"
 #include "libs/item/itemmaps.h"
 #include "libs/util/tools/gamehelpers.h"

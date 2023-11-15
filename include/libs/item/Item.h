@@ -254,6 +254,7 @@ public:
 
 	ItemTypes getType() const { return iType->type; }
 
+	void setCorpseOwner(uint32_t corpseOwner) { setIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER, corpseOwner); }
 	uint32_t getCorpseOwner() const { return iAttributes->getIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER); }
 
 	uint16_t getMaxTextLen() const { return iType->maxTextLen; }

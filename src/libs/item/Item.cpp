@@ -91,14 +91,18 @@ void Item::setSubType(uint16_t n)
 uint16_t Item::getSubType() const
 {
 	if (iType->isFluidContainer() || iType->isSplash()) {
-		getFluidType();
-	} else if (iType->stackable) {
-		getItemCount();
-	} else if (iType->charges != 0) {
-		getCharges();
-	} else {
-		getItemCount();
+		return getFluidType();
 	}
+
+	if (iType->stackable) {
+		return getItemCount();
+	}
+
+	if (iType->charges != 0) {
+		return getCharges();
+	}
+
+	return getItemCount();
 }
 
 void Item::setAttributeFromPropStream(ItemAttrTypesIndex idx, PropStream& stream)

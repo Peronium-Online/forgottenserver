@@ -168,6 +168,8 @@ bool Items::loadFromOTB()
 	OTBLoadable::loadFromOTB();
 
 	this->items.shrink_to_fit();
+
+	return true;
 }
 
 bool Items::load(pugi::xml_node node, bool)
