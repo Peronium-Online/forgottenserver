@@ -25,7 +25,7 @@ MonsterLoot* MonsterLoot::setItemId(uint16_t itemId)
 
 MonsterLoot* MonsterLoot::setItemIdByName(std::string name)
 {
-	if (!Items::getInstance().isUniqueItemName(name)) {
+	if (Items::getInstance().getItemIdByName(name) && !Items::getInstance().isUniqueItemName(name)) {
 		std::cout << "[Warning - MonsterLoot::setItemIdByName] Non-unique loot item \"" << name << "\". " << std::endl;
 		throw std::invalid_argument("Invalid item name provided");
 	}

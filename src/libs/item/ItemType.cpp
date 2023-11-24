@@ -36,6 +36,10 @@ ItemType* ItemType::loadFromXMLNode(pugi::xml_node node, bool reloading)
 			std::cout << "[Warning - ItemType::loadFromXMLNode] Duplicate item with id: " << id << std::endl;
 			continue;
 		}
+		iType->name = node.attribute("name").as_string();
+
+		// instantiating abilities if necessary
+		iType->getAbilities();
 
 		pugi::xml_attribute attr;
 		if (attr = node.attribute("article")) {
@@ -413,12 +417,10 @@ ItemType* ItemType::loadFromXMLNode(pugi::xml_node node, bool reloading)
 			} else if (lowerCasedKey == "supply") {
 				iType->supply = pugi::cast<bool>(value.c_str());
 			}
-
-			return Items::getInstance().getItemType(fromId);
 		}
 	}
 
-	return this;
+	return Items::getInstance().getItemType(fromId);
 }
 
 void ItemType::setField(const std::string& element, ConditionDamage* cd)
@@ -474,7 +476,7 @@ ConditionDamage* ConditionDamageBuilder::loadFromXMLNode(pugi::xml_node node, bo
 {
 	CombatType_t combatType = COMBAT_NONE;
 
-	auto element = node.attribute("value").as_string();
+	auto element = std::string(node.attribute("value").as_string());
 	if (element == "fire") {
 		this->conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_FIRE);
 	} else if (element == "energy") {
