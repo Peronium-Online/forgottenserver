@@ -16,7 +16,6 @@ private:
 
 	Map* map;
 
-	const std::string& fileName;
 	bool parseMapDataAttributes(const OTBNode& mapNode, Map& map);
 	bool parseWaypoints(const OTBNode& waypointsNode, Map& map);
 	bool parseTowns(const OTBNode& townsNode, Map& map);
@@ -25,10 +24,8 @@ private:
 	bool load(const OTBNode& node, PropStream stream) override;
 
 public:
-	IOMap(const std::string& filename) : OTBLoadable("data/world/" + filename + ".otbm", OTBM), fileName(filename) {}
-	IOMap(const std::string& filename, Map* map) :
-	    OTBLoadable("data/world/" + filename + ".otbm", OTBM), fileName(filename), map(map)
-	{}
+	IOMap(const std::string& filename) : OTBLoadable("data/world/" + filename + ".otbm", OTBM) {}
+	IOMap(const std::string& filename, Map* map) : OTBLoadable("data/world/" + filename + ".otbm", OTBM), map(map) {}
 
 	static Tile* createTile(Item*& ground, Item* item, uint16_t x, uint16_t y, uint8_t z);
 
@@ -36,7 +33,7 @@ public:
 	{
 		if (map->spawnfile.empty()) {
 			// OTBM file doesn't tell us about the spawnfile, lets guess it is mapname-spawn.xml.
-			map->spawnfile = g_config.getString(ConfigManager::MAP_NAME);
+			map->spawnfile = "data/world/" + g_config.getString(ConfigManager::MAP_NAME);
 			map->spawnfile += "-spawn.xml";
 		}
 
@@ -47,7 +44,7 @@ public:
 	{
 		if (map->housefile.empty()) {
 			// OTBM file doesn't tell us about the housefile, lets guess it is mapname-house.xml.
-			map->housefile = g_config.getString(ConfigManager::MAP_NAME);
+			map->housefile = "data/world/" + g_config.getString(ConfigManager::MAP_NAME);
 			map->housefile += "-house.xml";
 		}
 

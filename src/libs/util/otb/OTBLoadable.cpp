@@ -7,8 +7,8 @@
 
 constexpr OTBIdentifier wildcard = {{'\0', '\0', '\0', '\0'}};
 
-OTBLoadable::OTBLoadable(const std::string& fileName, const OTBIdentifier& acceptedIdentifier) :
-    fileContents(fileName), fileName(fileName)
+OTBLoadable::OTBLoadable(std::string fileName, const OTBIdentifier& acceptedIdentifier) :
+    fileName(fileName), fileContents(fileName)
 {
 	constexpr auto minimalSize =
 	    sizeof(OTBIdentifier) + sizeof(OTBNode::START) + sizeof(OTBNode::type) + sizeof(OTBNode::END);
@@ -98,55 +98,6 @@ bool OTBLoadable::getProps(const OTBNode& node, PropStream& props)
 
 bool OTBLoadable::loadFromOTB()
 {
-	auto& root = this->parseTree();
-
-	PropStream props;
-	if (this->getProps(root, props)) {
-		// 4 byte flags
-		// attributes
-		// 0x01 = version data
-		uint32_t flags;
-		if (!props.read<uint32_t>(flags)) {
-			return false;
-		}
-
-		uint8_t attr;
-		if (!props.read<uint8_t>(attr)) {
-			return false;
-		}
-
-		if (attr == ROOT_ATTRIBUTE) {
-			uint16_t datalen;
-			if (!props.read<uint16_t>(datalen)) {
-				return false;
-			}
-
-			if (datalen != sizeof(VERSIONINFO)) {
-				return false;
-			}
-
-			VERSIONINFO vi;
-			if (!props.read(vi)) {
-				return false;
-			}
-
-			otbMajorVersion = vi.dwMajorVersion; // items otb format file version
-			otbMinorVersion = vi.dwMinorVersion; // client version
-			otbBuildNumber = vi.dwBuildNumber;   // revision
-		}
-	}
-
-	if (otbMajorVersion == 0xFFFFFFFF) {
-		std::cout << "[Warning - OTBLoadable::loadFromOtb] " << this->fileName << " using generic client version."
-		          << std::endl;
-	} else if (otbMajorVersion != 3) {
-		std::cout << "Old version detected, a newer version of " << this->fileName << "  is required." << std::endl;
-		return false;
-	} else if (otbMinorVersion < CLIENT_VERSION_LAST) {
-		std::cout << "A newer version of " << this->fileName << "  is required." << std::endl;
-		return false;
-	}
-
 	for (auto& itemNode : root.children) {
 		PropStream stream;
 		if (!this->getProps(itemNode, stream)) {

@@ -167,6 +167,55 @@ bool Items::load(const OTBNode& node, PropStream stream)
 
 bool Items::loadFromOTB()
 {
+	auto& root = this->parseTree();
+
+	PropStream props;
+	if (this->getProps(root, props)) {
+		// 4 byte flags
+		// attributes
+		// 0x01 = version data
+		uint32_t flags;
+		if (!props.read<uint32_t>(flags)) {
+			return false;
+		}
+
+		uint8_t attr;
+		if (!props.read<uint8_t>(attr)) {
+			return false;
+		}
+
+		if (attr == ROOT_ATTRIBUTE) {
+			uint16_t datalen;
+			if (!props.read<uint16_t>(datalen)) {
+				return false;
+			}
+
+			if (datalen != sizeof(VERSIONINFO)) {
+				return false;
+			}
+
+			VERSIONINFO vi;
+			if (!props.read(vi)) {
+				return false;
+			}
+
+			otbMajorVersion = vi.dwMajorVersion; // items otb format file version
+			otbMinorVersion = vi.dwMinorVersion; // client version
+			otbBuildNumber = vi.dwBuildNumber;   // revision
+		}
+	}
+
+	if (otbMajorVersion == 0xFFFFFFFF) {
+		std::cout << "[Warning - Items::loadFromOtb] " << this->fileName << " using generic client version."
+		          << std::endl;
+	} else if (otbMajorVersion != 3) {
+		std::cout << "Old version detected, a newer version of " << this->fileName << "  is required." << std::endl;
+		return false;
+	} else if (otbMinorVersion < CLIENT_VERSION_LAST) {
+		std::cout << "A newer version of " << this->fileName << "  is required." << std::endl;
+		return false;
+	}
+
 	OTBLoadable::loadFromOTB();
 
 	this->items.shrink_to_fit();

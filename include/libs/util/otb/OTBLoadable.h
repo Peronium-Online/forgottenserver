@@ -53,7 +53,6 @@ struct OTBNode
 class OTBLoadable
 {
 private:
-	const std::string& fileName;
 	MappedFile fileContents;
 	OTBNode root;
 	std::vector<char> propBuffer;
@@ -70,7 +69,9 @@ private:
 	virtual bool load(const OTBNode& node, PropStream stream) = 0;
 
 protected:
-	OTBLoadable(const std::string& fileName, const OTBIdentifier& acceptedIdentifier);
+	std::string fileName;
+
+	OTBLoadable(std::string fileName, const OTBIdentifier& acceptedIdentifier);
 
 	bool getProps(const OTBNode& node, PropStream& props);
 	const OTBNode& parseTree();
