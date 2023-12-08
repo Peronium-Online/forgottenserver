@@ -196,6 +196,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool exte
 		ReturnValue ret = tile->queryAdd(0, *creature, 1, FLAG_IGNOREBLOCKITEM);
 		foundTile = forceLogin || ret == RETURNVALUE_NOERROR || ret == RETURNVALUE_PLAYERISNOTINVITED;
 	} else {
+		std::cout << "[Map::placeCreature] invalid tile position!" << std::endl;
 		placeInPZ = false;
 		foundTile = false;
 	}
@@ -233,6 +234,8 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool exte
 		}
 
 		if (!foundTile) {
+			std::cout << "[Map::placeCreature] tile not found!" << std::endl;
+
 			return false;
 		}
 	}

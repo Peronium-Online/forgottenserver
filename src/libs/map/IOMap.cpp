@@ -348,8 +348,6 @@ bool IOMap::load(const OTBNode& node, PropStream stream)
 {
 	int64_t start = OTSYS_TIME();
 	try {
-		auto& root = this->parseTree();
-
 		PropStream propStream;
 		if (!this->getProps(root, propStream)) {
 			setLastErrorString("Could not read root property.");

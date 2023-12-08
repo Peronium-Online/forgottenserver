@@ -54,7 +54,6 @@ class OTBLoadable
 {
 private:
 	MappedFile fileContents;
-	OTBNode root;
 	std::vector<char> propBuffer;
 	std::stack<OTBNode*, std::vector<OTBNode*>> nodeStack;
 
@@ -70,6 +69,7 @@ private:
 
 protected:
 	std::string fileName;
+	OTBNode root;
 
 	OTBLoadable(std::string fileName, const OTBIdentifier& acceptedIdentifier);
 

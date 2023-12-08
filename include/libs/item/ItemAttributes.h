@@ -213,6 +213,8 @@ private:
 	std::map<CombatType_t, uint16_t> boostPercent;
 
 public:
+	MutableItemAttributes() = default;
+
 	void setReflect(CombatType_t combatType, const Reflect& reflect) { this->reflect[combatType] = reflect; }
 	const Reflect& getReflect(CombatType_t combatType)
 	{

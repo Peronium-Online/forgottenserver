@@ -43,6 +43,11 @@ bool Items::load(const OTBNode& node, PropStream stream)
 				if (!stream.read<uint16_t>(serverId)) {
 					return false;
 				}
+
+				if (this->getItemType(serverId)) {
+					return true;
+				}
+
 				break;
 			}
 
@@ -129,7 +134,7 @@ bool Items::load(const OTBNode& node, PropStream stream)
 	clientIdToServerIdMap.emplace(clientId, serverId);
 
 	// store the found item
-	ItemType* iType = new ItemType(serverId);
+	auto iType = std::make_unique<ItemType>(serverId);
 	iType->setGroup(static_cast<ItemGroups>(node.type));
 	iType->blockSolid = hasBitSet(FLAG_BLOCK_SOLID, flags);
 	iType->blockProjectile = hasBitSet(FLAG_BLOCK_PROJECTILE, flags);
@@ -160,14 +165,14 @@ bool Items::load(const OTBNode& node, PropStream stream)
 	iType->classification = classification;
 	iType->alwaysOnTopOrder = alwaysOnTopOrder;
 
-	this->addItem(*iType);
+	this->addItem(std::move(iType));
 
 	return true;
 }
 
 bool Items::loadFromOTB()
 {
-	auto& root = this->parseTree();
+	this->parseTree();
 
 	PropStream props;
 	if (this->getProps(root, props)) {
@@ -216,7 +221,9 @@ bool Items::loadFromOTB()
 		return false;
 	}
 
-	OTBLoadable::loadFromOTB();
+	if (!OTBLoadable::loadFromOTB()) {
+		return false;
+	}
 
 	this->items.shrink_to_fit();
 

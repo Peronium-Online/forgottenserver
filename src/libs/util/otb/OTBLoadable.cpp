@@ -98,6 +98,7 @@ bool OTBLoadable::getProps(const OTBNode& node, PropStream& props)
 
 bool OTBLoadable::loadFromOTB()
 {
+	this->parseTree();
 	for (auto& itemNode : root.children) {
 		PropStream stream;
 		if (!this->getProps(itemNode, stream)) {

@@ -12,7 +12,7 @@ using NameMap = std::unordered_map<std::string, uint16_t>;
 using CurrencyMap = std::map<uint64_t, uint16_t, std::greater<uint64_t>>;
 using InventoryVector = std::vector<uint16_t>;
 
-class Items final : virtual public XMLLoadable, public OTBLoadable
+class Items final : virtual public XMLLoadable, virtual public OTBLoadable
 {
 private:
 	Items() : OTBLoadable("data/items/items.otb", OTBI)
@@ -29,13 +29,13 @@ private:
 	NameMap nameToItems;
 	InventoryVector inventory;
 
-	void addItem(ItemType& item)
+	void addItem(std::unique_ptr<ItemType> item)
 	{
-		if (item.id >= items.size()) {
-			items.resize(item.id + 1);
+		if (item->id >= items.size()) {
+			items.resize(item->id + 1);
 		}
 
-		this->items.insert(this->items.begin() + item.id, std::move(item));
+		this->items.insert(this->items.begin() + item->id, std::move(*item));
 	}
 
 	void addNameToItems(const std::string& name, uint16_t id)
@@ -70,7 +70,7 @@ public:
 		if (id < items.size()) {
 			return &items[id];
 		}
-		return &items.front();
+		return nullptr;
 	}
 
 	const ItemType* getItemTypeByClientId(uint16_t spriteId) const
@@ -80,7 +80,7 @@ public:
 				return getItemType(serverId);
 			}
 		}
-		return &items.front();
+		return nullptr;
 	}
 
 	uint16_t getItemIdByName(const std::string& name)

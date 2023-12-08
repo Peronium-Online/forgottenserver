@@ -14,6 +14,9 @@ Item::Item(const uint16_t type, uint16_t count) : id(type)
 	const ItemType* it = Items::getInstance().getItemType(id);
 	this->iType = it;
 
+	this->iAttributes = std::make_unique<ItemAttributes>();
+	this->mAttributes = std::make_unique<MutableItemAttributes>();
+
 	if (it->isFluidContainer() || it->isSplash()) {
 		setFluidType(count);
 	} else if (it->stackable) {

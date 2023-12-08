@@ -9,6 +9,7 @@
 #include "../../podium.h"
 #include "../../teleport.h"
 #include "../../trashholder.h"
+#include "libs/item/ItemAttrSerializer.h"
 #include "libs/item/Items.h"
 
 Item* ItemFactory::create(const uint16_t type, uint16_t count)
@@ -93,7 +94,10 @@ Item* ItemFactory::create(PropStream& propStream)
 			break;
 	}
 
-	return create(id, 0);
+	auto newItem = create(id, 0);
+	ItemAttrSerializer::unserializeAttr(newItem, propStream);
+
+	return newItem;
 }
 
 Container* ItemFactory::createAsContainer(const uint16_t type, uint16_t size)
