@@ -29,7 +29,7 @@ private:
 	NameMap nameToItems;
 	InventoryVector inventory;
 
-	void addItem(std::unique_ptr<ItemType> item)
+	void addItem(std::shared_ptr<ItemType> item)
 	{
 		if (item->id >= items.size()) {
 			items.resize(item->id + 1);

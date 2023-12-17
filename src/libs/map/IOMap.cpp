@@ -201,7 +201,7 @@ bool IOMap::parseTileArea(const OTBNode& tileAreaNode, Map& map)
 
 			Item* item = ItemFactory::create(stream);
 			if (!item) {
-				setLastErrorString(fmt::format("[x:{:d}, y:{:d}, z:{:d}] Failed to create item.", x, y, z));
+				setLastErrorString(fmt::format("[x:{:d}; y:{:d}; z:{:d}] Failed to create item.", x, y, z));
 				return false;
 			}
 

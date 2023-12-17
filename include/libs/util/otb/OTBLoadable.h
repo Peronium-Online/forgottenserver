@@ -56,6 +56,7 @@ private:
 	MappedFile fileContents;
 	std::vector<char> propBuffer;
 	std::stack<OTBNode*, std::vector<OTBNode*>> nodeStack;
+	bool treeParsed = false;
 
 	OTBNode& getCurrentNode()
 	{

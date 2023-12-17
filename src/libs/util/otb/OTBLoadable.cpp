@@ -25,6 +25,10 @@ OTBLoadable::OTBLoadable(std::string fileName, const OTBIdentifier& acceptedIden
 
 const OTBNode& OTBLoadable::parseTree()
 {
+	if (treeParsed) {
+		return root;
+	}
+
 	auto it = fileContents.begin() + sizeof(OTBIdentifier);
 	if (static_cast<uint8_t>(*it) != OTBNode::START) {
 		throw InvalidOTBFormat{};
@@ -74,6 +78,8 @@ const OTBNode& OTBLoadable::parseTree()
 	if (!this->nodeStack.empty()) {
 		throw InvalidOTBFormat{};
 	}
+
+	treeParsed = true;
 
 	return root;
 }
